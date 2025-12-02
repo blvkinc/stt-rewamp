@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, Link } from 'react-router-dom'
 import { 
   BarChart3, 
   Calendar, 
@@ -247,6 +247,154 @@ const MerchantDashboard = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Packages Section */}
+        <div className="card border border-neutral-100">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-neutral-800">Your Packages</h2>
+                <p className="text-neutral-600 text-sm">Create and manage custom packages for your events</p>
+              </div>
+              <div className="flex space-x-3">
+                <Link to="/merchant/packages" className="btn-secondary flex items-center space-x-2">
+                  <span>View All</span>
+                </Link>
+                <Link to="/merchant/packages/create" className="btn-primary flex items-center space-x-2">
+                  <Plus className="w-5 h-5" />
+                  <span>Create Package</span>
+                </Link>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              {/* Package Card 1 */}
+              <div className="border border-neutral-200 rounded-2xl p-6 hover:shadow-soft-lg transition-all duration-300">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="font-bold text-neutral-800 text-lg mb-1">Classic Package</h3>
+                    <p className="text-neutral-600 text-sm">Standard dining experience</p>
+                  </div>
+                  <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                    Active
+                  </span>
+                </div>
+                
+                <div className="mb-4">
+                  <div className="text-2xl font-bold text-primary-600 mb-1">AED 299</div>
+                  <p className="text-neutral-500 text-sm">per person</p>
+                </div>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center space-x-2 text-sm text-neutral-600">
+                    <Users className="w-4 h-4" />
+                    <span>Up to 2 guests</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm text-neutral-600">
+                    <Calendar className="w-4 h-4" />
+                    <span>45 bookings</span>
+                  </div>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <button className="flex-1 btn-secondary text-sm py-2">Edit</button>
+                  <button className="flex-1 btn-primary text-sm py-2">View</button>
+                </div>
+              </div>
+
+              {/* Package Card 2 */}
+              <div className="border border-neutral-200 rounded-2xl p-6 hover:shadow-soft-lg transition-all duration-300 relative">
+                <div className="absolute -top-3 left-6">
+                  <span className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    Most Popular
+                  </span>
+                </div>
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="font-bold text-neutral-800 text-lg mb-1">Premium Package</h3>
+                    <p className="text-neutral-600 text-sm">Enhanced experience</p>
+                  </div>
+                  <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                    Active
+                  </span>
+                </div>
+                
+                <div className="mb-4">
+                  <div className="text-2xl font-bold text-primary-600 mb-1">AED 449</div>
+                  <p className="text-neutral-500 text-sm">per person</p>
+                </div>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center space-x-2 text-sm text-neutral-600">
+                    <Users className="w-4 h-4" />
+                    <span>Up to 4 guests</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm text-neutral-600">
+                    <Calendar className="w-4 h-4" />
+                    <span>89 bookings</span>
+                  </div>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <button className="flex-1 btn-secondary text-sm py-2">Edit</button>
+                  <button className="flex-1 btn-primary text-sm py-2">View</button>
+                </div>
+              </div>
+
+              {/* Package Card 3 */}
+              <div className="border border-neutral-200 rounded-2xl p-6 hover:shadow-soft-lg transition-all duration-300">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="font-bold text-neutral-800 text-lg mb-1">VIP Package</h3>
+                    <p className="text-neutral-600 text-sm">Ultimate luxury</p>
+                  </div>
+                  <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                    Active
+                  </span>
+                </div>
+                
+                <div className="mb-4">
+                  <div className="text-2xl font-bold text-primary-600 mb-1">AED 699</div>
+                  <p className="text-neutral-500 text-sm">per person</p>
+                </div>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center space-x-2 text-sm text-neutral-600">
+                    <Users className="w-4 h-4" />
+                    <span>Up to 6 guests</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm text-neutral-600">
+                    <Calendar className="w-4 h-4" />
+                    <span>32 bookings</span>
+                  </div>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <button className="flex-1 btn-secondary text-sm py-2">Edit</button>
+                  <button className="flex-1 btn-primary text-sm py-2">View</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Package Quick Actions */}
+            <div className="pt-6 border-t border-neutral-200">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button className="flex items-center justify-center space-x-2 p-4 border border-neutral-200 rounded-xl hover:border-primary-300 hover:bg-primary-50 transition-all duration-200">
+                  <TrendingUp className="w-5 h-5 text-primary-600" />
+                  <span className="font-medium text-neutral-800">View Analytics</span>
+                </button>
+                <button className="flex items-center justify-center space-x-2 p-4 border border-neutral-200 rounded-xl hover:border-primary-300 hover:bg-primary-50 transition-all duration-200">
+                  <BarChart3 className="w-5 h-5 text-primary-600" />
+                  <span className="font-medium text-neutral-800">Compare Packages</span>
+                </button>
+                <button className="flex items-center justify-center space-x-2 p-4 border border-neutral-200 rounded-xl hover:border-primary-300 hover:bg-primary-50 transition-all duration-200">
+                  <Plus className="w-5 h-5 text-primary-600" />
+                  <span className="font-medium text-neutral-800">Duplicate Package</span>
+                </button>
               </div>
             </div>
           </div>

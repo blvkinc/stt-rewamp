@@ -13,7 +13,8 @@ import {
   Plus,
   Tag,
   TrendingUp,
-  Bell
+  Bell,
+  Package
 } from 'lucide-react'
 import { useMerchant } from '../../context/MerchantContext'
 
@@ -26,6 +27,7 @@ const MerchantLayout = ({ children }) => {
   const navigation = [
     { name: 'Dashboard', href: '/merchant/dashboard', icon: LayoutDashboard },
     { name: 'Events', href: '/merchant/events', icon: Calendar },
+    { name: 'Packages', href: '/merchant/packages', icon: Package },
     { name: 'Bookings', href: '/merchant/bookings', icon: Users },
     { name: 'Customers', href: '/merchant/customers', icon: Users },
     { name: 'Analytics', href: '/merchant/analytics', icon: BarChart3 },

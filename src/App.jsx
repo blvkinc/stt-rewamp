@@ -25,6 +25,8 @@ import MerchantOnboardingPage from './pages/merchant/MerchantOnboardingPage'
 import MerchantDashboard from './pages/merchant/MerchantDashboard'
 import MerchantEventsPage from './pages/merchant/EventsPage'
 import CreateEventPage from './pages/merchant/CreateEventPage'
+import MerchantPackagesPage from './pages/merchant/PackagesPage'
+import CreatePackagePage from './pages/merchant/CreatePackagePage'
 import BookingsPage from './pages/merchant/BookingsPage'
 import AnalyticsPage from './pages/merchant/AnalyticsPage'
 import PromotionsPage from './pages/merchant/PromotionsPage'
@@ -87,6 +89,8 @@ function App() {
               <Route path="/merchant/dashboard" element={<MerchantDashboard />} />
               <Route path="/merchant/events" element={<MerchantEventsPage />} />
               <Route path="/merchant/events/create" element={<CreateEventPage />} />
+              <Route path="/merchant/packages" element={<MerchantPackagesPage />} />
+              <Route path="/merchant/packages/create" element={<CreatePackagePage />} />
               <Route path="/merchant/bookings" element={<BookingsPage />} />
               <Route path="/merchant/analytics" element={<AnalyticsPage />} />
               <Route path="/merchant/promotions" element={<PromotionsPage />} />

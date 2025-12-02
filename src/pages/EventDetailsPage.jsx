@@ -14,6 +14,7 @@ const EventDetailsPage = () => {
     id: 1,
     title: "Luxury Brunch at Burj Al Arab",
     venue: "Al Muntaha Restaurant",
+    venueId: 1,
     images: [
       "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
       "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop",
@@ -33,6 +34,46 @@ const EventDetailsPage = () => {
       "Family-friendly environment",
       "Live entertainment"
     ],
+    venueDetails: {
+      id: 1,
+      name: "Al Muntaha Restaurant",
+      description: "Located 200 meters above the Arabian Gulf at the iconic Burj Al Arab, Al Muntaha offers an unparalleled dining experience with breathtaking panoramic views.",
+      address: "Burj Al Arab, Jumeirah Street, Dubai",
+      phone: "+971 4 301 7600",
+      email: "reservations@burjalarab.com",
+      website: "www.burjalarab.com/almuntaha",
+      capacity: 200,
+      rating: 4.9,
+      reviews: 342,
+      priceRange: "AED 300-800",
+      amenities: [
+        "Panoramic Views",
+        "Valet Parking",
+        "WiFi",
+        "Air Conditioning",
+        "Private Dining Rooms",
+        "Wheelchair Accessible",
+        "Live Music",
+        "Bar Service"
+      ],
+      images: [
+        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
+        "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop",
+        "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop"
+      ],
+      openingHours: {
+        monday: "12:00 PM - 11:00 PM",
+        tuesday: "12:00 PM - 11:00 PM",
+        wednesday: "12:00 PM - 11:00 PM",
+        thursday: "12:00 PM - 12:00 AM",
+        friday: "11:00 AM - 12:00 AM",
+        saturday: "11:00 AM - 12:00 AM",
+        sunday: "11:00 AM - 11:00 PM"
+      },
+      dressCode: "Smart casual to formal attire",
+      parkingInfo: "Complimentary valet parking available",
+      upcomingEvents: 12
+    },
     packages: [
       {
         id: 1,
@@ -180,6 +221,7 @@ const EventDetailsPage = () => {
                 <nav className="-mb-px flex space-x-8">
                   {[
                     { id: 'overview', name: 'Overview' },
+                    { id: 'venue', name: 'Venue Details' },
                     { id: 'packages', name: 'Packages' },
                     { id: 'reviews', name: 'Reviews' }
                   ].map((tab) => (
@@ -229,6 +271,131 @@ const EventDetailsPage = () => {
                       </li>
                     ))}
                   </ul>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'venue' && (
+              <div className="space-y-8">
+                {/* Venue Header */}
+                <div className="bg-white rounded-2xl p-6 border border-neutral-200">
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <h2 className="text-3xl font-bold text-neutral-800 mb-2">{event.venueDetails.name}</h2>
+                      <p className="text-neutral-600 text-lg mb-4">{event.venueDetails.description}</p>
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-1">
+                          <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                          <span className="font-medium">{event.venueDetails.rating}</span>
+                          <span className="text-neutral-500">({event.venueDetails.reviews} reviews)</span>
+                        </div>
+                        <span className="text-neutral-300">•</span>
+                        <span className="text-neutral-600">{event.venueDetails.priceRange}</span>
+                      </div>
+                    </div>
+                    <Link 
+                      to={`/venues/${event.venueDetails.id}`}
+                      className="btn-secondary flex items-center space-x-2"
+                    >
+                      <span>View Full Venue</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+
+                  {/* Venue Images */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    {event.venueDetails.images.map((image, index) => (
+                      <div key={index} className="relative overflow-hidden rounded-xl">
+                        <img 
+                          src={image} 
+                          alt={`${event.venueDetails.name} ${index + 1}`}
+                          className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Contact & Location */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white rounded-2xl p-6 border border-neutral-200">
+                    <h3 className="text-xl font-bold text-neutral-800 mb-4">Contact Information</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-start space-x-3">
+                        <MapPin className="w-5 h-5 text-neutral-500 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-neutral-800">Address</p>
+                          <p className="text-neutral-600">{event.venueDetails.address}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <Phone className="w-5 h-5 text-neutral-500 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-neutral-800">Phone</p>
+                          <a href={`tel:${event.venueDetails.phone}`} className="text-primary-600 hover:text-primary-700">
+                            {event.venueDetails.phone}
+                          </a>
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <Mail className="w-5 h-5 text-neutral-500 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-neutral-800">Email</p>
+                          <a href={`mailto:${event.venueDetails.email}`} className="text-primary-600 hover:text-primary-700">
+                            {event.venueDetails.email}
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl p-6 border border-neutral-200">
+                    <h3 className="text-xl font-bold text-neutral-800 mb-4">Venue Details</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="font-medium text-neutral-800">Capacity</p>
+                        <p className="text-neutral-600">{event.venueDetails.capacity} guests</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-neutral-800">Dress Code</p>
+                        <p className="text-neutral-600">{event.venueDetails.dressCode}</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-neutral-800">Parking</p>
+                        <p className="text-neutral-600">{event.venueDetails.parkingInfo}</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-neutral-800">Upcoming Events</p>
+                        <p className="text-neutral-600">{event.venueDetails.upcomingEvents} events scheduled</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Amenities */}
+                <div className="bg-white rounded-2xl p-6 border border-neutral-200">
+                  <h3 className="text-xl font-bold text-neutral-800 mb-4">Venue Amenities</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {event.venueDetails.amenities.map((amenity, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <Check className="w-4 h-4 text-primary-600" />
+                        <span className="text-neutral-700">{amenity}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Opening Hours */}
+                <div className="bg-white rounded-2xl p-6 border border-neutral-200">
+                  <h3 className="text-xl font-bold text-neutral-800 mb-4">Opening Hours</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {Object.entries(event.venueDetails.openingHours).map(([day, hours]) => (
+                      <div key={day} className="flex justify-between items-center p-3 bg-neutral-50 rounded-lg">
+                        <span className="font-medium text-neutral-800 capitalize">{day}</span>
+                        <span className="text-neutral-600">{hours}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
