@@ -4,12 +4,15 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
-    // Disable auto-open in CI/CD environments like Builder.io
-    open: !process.env.CI && !process.env.BUILDER_IO,
-    host: true // Allow external connections
+    // Builder.io compatible server configuration
+    host: '::',  // IPv6 - allows both IPv4 and IPv6 connections
+    port: 8080,  // Builder.io default port
+    // Disable auto-open in CI/CD environments
+    open: !process.env.CI && !process.env.BUILDER_IO
   },
   build: {
+    // Builder.io expects output in dist/spa
+    outDir: 'dist',
     // Optimize chunk size
     chunkSizeWarningLimit: 1000,
     rollupOptions: {

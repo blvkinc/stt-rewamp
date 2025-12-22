@@ -16,7 +16,8 @@ export default {
   // Development configuration for Builder.io
   dev: {
     command: 'npm run dev:ci',
-    port: 3000
+    port: 8080,
+    host: '::'
   },
   
   // Framework detection
@@ -31,8 +32,8 @@ export default {
   env: {
     CI: 'true',
     BUILDER_IO: 'true'
-    // Add your environment variables here
-    // VITE_API_URL: process.env.VITE_API_URL
+    // Add your Builder.io API key here if needed
+    // VITE_PUBLIC_BUILDER_KEY: process.env.VITE_PUBLIC_BUILDER_KEY
   },
   
   // Headers for security and performance
