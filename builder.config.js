@@ -7,8 +7,16 @@ export default {
     command: 'npm run build',
     output: 'dist',
     environment: {
-      NODE_VERSION: '18'
+      NODE_VERSION: '18',
+      CI: 'true',
+      BUILDER_IO: 'true'
     }
+  },
+  
+  // Development configuration for Builder.io
+  dev: {
+    command: 'npm run dev:ci',
+    port: 3000
   },
   
   // Framework detection
@@ -21,6 +29,8 @@ export default {
   
   // Environment variables (add as needed)
   env: {
+    CI: 'true',
+    BUILDER_IO: 'true'
     // Add your environment variables here
     // VITE_API_URL: process.env.VITE_API_URL
   },

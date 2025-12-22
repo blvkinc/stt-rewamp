@@ -5,7 +5,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    open: true
+    // Disable auto-open in CI/CD environments like Builder.io
+    open: !process.env.CI && !process.env.BUILDER_IO,
+    host: true // Allow external connections
   },
   build: {
     // Optimize chunk size
