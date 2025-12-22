@@ -7,8 +7,8 @@ export default defineConfig({
     // Builder.io compatible server configuration
     host: '::',  // IPv6 - allows both IPv4 and IPv6 connections
     port: 8080,  // Builder.io default port
-    // Disable auto-open in CI/CD environments
-    open: !process.env.CI && !process.env.BUILDER_IO
+    // Completely disable auto-open to prevent xdg-open errors
+    open: false
   },
   build: {
     // Builder.io expects output in dist/spa
