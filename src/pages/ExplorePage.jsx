@@ -1,6 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Search, Filter, MapPin, Star, Calendar, Clock, Users, Grid, List, SlidersHorizontal, ArrowRight } from 'lucide-react'
+import { Search, Filter, MapPin, Star, Calendar, Clock, Users, Grid, List, Settings, ArrowRight, Heart, Gift } from 'lucide-react'
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Card, CardContent } from '../components/ui/card'
+import { Badge } from '../components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import EventCard from '../components/EventCard'
 import VenueCard from '../components/VenueCard'
 
@@ -284,109 +290,89 @@ const ExplorePage = () => {
     
     if (loading) {
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl p-6 shadow-soft animate-pulse">
-              <div className="bg-gray-200 h-48 rounded-xl mb-4"></div>
-              <div className="bg-gray-200 h-4 rounded mb-2"></div>
-              <div className="bg-gray-200 h-4 rounded w-2/3"></div>
-            </div>
-          ))}
+        <div className="text-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading amazing experiences...</p>
         </div>
       )
     }
 
     if (activeResults.length === 0) {
       return (
-        <div className="text-center py-16">
-          <div className="text-gray-400 mb-4">
-            <Search className="w-16 h-16 mx-auto" />
-          </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No results found</h3>
-          <p className="text-gray-600 mb-6">Try adjusting your search criteria or filters</p>
-          <button
-            onClick={clearFilters}
-            className="btn-secondary"
-          >
-            Clear Filters
-          </button>
-        </div>
+        <Card className="text-center py-16">
+          <CardContent>
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">No results found</h3>
+            <p className="text-gray-600 mb-6">
+              Try adjusting your search criteria or filters
+            </p>
+            <Button onClick={clearFilters}>Clear Filters</Button>
+          </CardContent>
+        </Card>
       )
     }
 
     return (
-      <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
+      <div className={`grid gap-6 ${
+        viewMode === 'list' 
+          ? 'grid-cols-1' 
+          : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+      }`}>
         {activeResults.map((item, index) => {
           if (item.title) {
-            // Event
+            // Event - use EventCard component
             return <EventCard key={`event-${item.id}`} event={item} />
           } else if (item.name && item.upcomingEvents !== undefined) {
-            // Venue
-            return <VenueCard key={`venue-${item.id}`} venue={item} viewMode={viewMode} />
+            // Venue - use VenueCard component
+            return <VenueCard key={`venue-${item.id}`} venue={item} />
           } else {
-            // Package
+            // Package Card - keep custom implementation for now
             return (
-              <div key={`package-${item.id}`} className="bg-white rounded-2xl overflow-hidden shadow-soft border border-neutral-100 hover:shadow-soft-lg transition-all duration-300 hover:-translate-y-1 group">
-                <div className="relative overflow-hidden">
-                  <img 
-                    src={item.image} 
-                    alt={item.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  {item.popular && (
-                    <div className="absolute top-3 left-3">
-                      <span className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+              <Link key={`package-${item.id}`} to={`/packages/${item.id}`} className="group">
+                <Card className="overflow-hidden border-0 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <div className="relative aspect-[4/3]">
+                    <img 
+                      src={item.image} 
+                      alt={item.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    {item.popular && (
+                      <Badge className="absolute top-3 left-3 bg-yellow-400 text-yellow-900">
                         Popular
-                      </span>
+                      </Badge>
+                    )}
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 fill-current text-yellow-400" />
+                        <span className="text-xs font-medium">{item.rating}</span>
+                      </div>
                     </div>
-                  )}
-                  <div className="absolute top-3 right-3">
-                    <div className="flex items-center space-x-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-medium">{item.rating}</span>
+                  </div>
+                  
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-rose-600 transition-colors">
+                      {item.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-2">{item.event}</p>
+                    <p className="text-xs text-gray-500 mb-3">{item.venue} • {item.location}</p>
+                    
+                    <div className="flex items-center gap-2 mb-3 text-xs text-gray-500">
+                      <Users className="w-3 h-3" />
+                      Up to {item.maxGuests} guests
                     </div>
-                  </div>
-                </div>
-                
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-neutral-800 mb-2 group-hover:text-primary-600 transition-colors">
-                    {item.name}
-                  </h3>
-                  
-                  <p className="text-sm text-neutral-600 mb-3">{item.event}</p>
-                  <p className="text-sm text-neutral-500 mb-4">{item.venue} • {item.location}</p>
-                  
-                  <div className="flex items-center space-x-2 mb-4">
-                    <Users className="w-4 h-4 text-neutral-500" />
-                    <span className="text-sm text-neutral-600">Up to {item.maxGuests} guests</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xl font-bold text-primary-600">AED {item.price}</span>
-                      {item.originalPrice > item.price && (
-                        <span className="text-sm text-neutral-500 line-through">AED {item.originalPrice}</span>
-                      )}
+                    
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold text-rose-600">AED {item.price}</span>
+                        {item.originalPrice > item.price && (
+                          <span className="text-sm text-gray-500 line-through">AED {item.originalPrice}</span>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500">per person</span>
                     </div>
-                    <span className="text-xs text-neutral-500">per person</span>
-                  </div>
-                  
-                  <div className="flex space-x-2">
-                    <Link 
-                      to={`/packages/${item.id}`}
-                      className="flex-1 btn-primary text-center text-sm"
-                    >
-                      View Package
-                    </Link>
-                    <Link 
-                      to={`/events/${item.event.toLowerCase().replace(/\s+/g, '-')}`}
-                      className="btn-secondary px-4 text-sm"
-                    >
-                      Event
-                    </Link>
-                  </div>
-                </div>
-              </div>
+                  </CardContent>
+                </Card>
+              </Link>
             )
           }
         })}
@@ -395,181 +381,294 @@ const ExplorePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      {/* Header */}
-      <div className="bg-white shadow-soft border-b border-neutral-100">
-        <div className="max-w-7xl mx-auto container-padding py-8">
-          <div className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-neutral-800 mb-4">
-              Explore Dubai's Best Experiences
-            </h1>
-            <p className="text-xl text-neutral-600">
-              Discover events, venues, and packages tailored to your preferences
-            </p>
+    <div className="min-h-screen bg-white">
+      {/* Elegant Hero Section */}
+      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=1920&h=1080&fit=crop"
+            alt="Dubai Experience"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/60 via-teal-900/50 to-cyan-900/60" />
+        </div>
+        
+        {/* Floating Elements */}
+        <div className="absolute top-20 left-16 w-32 h-32 bg-gradient-to-br from-emerald-300/20 to-teal-300/20 rounded-full blur-2xl animate-float" />
+        <div className="absolute bottom-20 right-16 w-40 h-40 bg-gradient-to-br from-teal-300/20 to-cyan-300/20 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-gradient-to-br from-cyan-300/15 to-emerald-300/15 rounded-full blur-xl animate-float" style={{ animationDelay: '4s' }} />
+        
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          {/* Elegant Badge */}
+          <div className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full shadow-lg mb-8 animate-fadeInUp">
+            <Gift className="w-4 h-4 text-emerald-300 mr-2" />
+            <span className="text-white font-medium">Discover Everything Dubai</span>
           </div>
           
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="mb-6">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-6 h-6" />
-              <input
-                type="text"
-                placeholder="Search events, venues, packages, or cuisine..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-14 pr-4 py-4 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-neutral-50 focus:bg-white transition-all duration-300 text-lg"
-              />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-primary px-6 py-2"
-              >
-                Search
-              </button>
+          {/* Elegant Typography */}
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+            Explore All
+            <br />
+            <span className="bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent">
+              Dubai Has to Offer
+            </span>
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
+            From exclusive events to stunning venues and curated packages - find everything in one place
+          </p>
+          
+          {/* Minimal Search Bar */}
+          <div className="max-w-2xl mx-auto mb-12 animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 via-teal-400/20 to-cyan-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <Card className="relative bg-white/90 backdrop-blur-xl border-0 shadow-xl rounded-3xl overflow-hidden">
+                <CardContent className="p-2">
+                  <form onSubmit={handleSearch}>
+                    <div className="flex items-center">
+                      <div className="flex-1 flex items-center px-6 py-4">
+                        <Search className="w-5 h-5 text-gray-400 mr-4 group-hover:text-emerald-500 transition-colors duration-300" />
+                        <Input
+                          placeholder="Search events, venues, packages, or experiences..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="flex-1 text-lg border-0 bg-transparent focus:ring-0 placeholder:text-gray-400"
+                        />
+                      </div>
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="m-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                      >
+                        Explore
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
             </div>
-          </form>
-
-          {/* Tabs */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex space-x-1 bg-neutral-100 rounded-2xl p-1">
-              {[
-                { key: 'all', label: 'All Results', count: results.total },
-                { key: 'events', label: 'Events', count: results.events.length },
-                { key: 'venues', label: 'Venues', count: results.venues.length },
-                { key: 'packages', label: 'Packages', count: results.packages.length }
-              ].map((tab) => (
+            
+            {/* Elegant Quick Filters */}
+            <div className="flex flex-wrap justify-center gap-3 mt-6">
+              {['All Categories', 'Tonight', 'This Weekend', 'Premium', 'Beach Clubs', 'Rooftops'].map((filter, index) => (
                 <button
-                  key={tab.key}
-                  onClick={() => {
-                    setActiveTab(tab.key)
-                    const newSearchParams = new URLSearchParams(searchParams)
-                    newSearchParams.set('tab', tab.key)
-                    setSearchParams(newSearchParams)
-                  }}
-                  className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
-                    activeTab === tab.key
-                      ? 'bg-white text-primary-600 shadow-soft'
-                      : 'text-neutral-600 hover:text-neutral-800'
-                  }`}
+                  key={filter}
+                  className="px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 hover:border-white/50 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 animate-fadeInUp"
+                  style={{ animationDelay: `${0.8 + index * 0.1}s` }}
                 >
-                  {tab.label} ({tab.count})
+                  {filter}
                 </button>
               ))}
             </div>
-
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-xl border transition-all duration-200 ${
-                  showFilters
-                    ? 'bg-primary-50 border-primary-200 text-primary-700'
-                    : 'bg-white border-neutral-200 text-neutral-600 hover:border-neutral-300'
-                }`}
-              >
-                <SlidersHorizontal className="w-5 h-5" />
-                <span>Filters</span>
-              </button>
-
-              <div className="flex space-x-1 bg-neutral-100 rounded-xl p-1">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    viewMode === 'grid'
-                      ? 'bg-white text-primary-600 shadow-soft'
-                      : 'text-neutral-600 hover:text-neutral-800'
-                  }`}
-                >
-                  <Grid className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    viewMode === 'list'
-                      ? 'bg-white text-primary-600 shadow-soft'
-                      : 'text-neutral-600 hover:text-neutral-800'
-                  }`}
-                >
-                  <List className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
           </div>
 
-          {/* Filters */}
-          {showFilters && (
-            <div className="bg-white rounded-2xl p-6 shadow-soft border border-neutral-100 mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">Category</label>
-                  <select
-                    value={filters.category}
-                    onChange={(e) => updateFilter('category', e.target.value)}
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none"
+          {/* Elegant Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '1s' }}>
+            {[
+              { label: "Total Results", value: results.total.toString(), icon: "🎯" },
+              { label: "Events", value: results.events.length.toString(), icon: "🎉" },
+              { label: "Venues", value: results.venues.length.toString(), icon: "🏛️" },
+              { label: "Packages", value: results.packages.length.toString(), icon: "📦" }
+            ].map((stat, index) => (
+              <div key={index} className="text-center group animate-fadeInUp" style={{ animationDelay: `${1.2 + index * 0.1}s` }}>
+                <div className="w-16 h-16 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
+                  <span className="text-2xl">{stat.icon}</span>
+                </div>
+                <div className="text-2xl md:text-3xl font-bold text-emerald-300 mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-white/80 text-sm font-medium">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20 py-12">
+        {/* Enhanced Tabs and Controls */}
+        <Card className="mb-8 border-0 shadow-lg rounded-3xl overflow-hidden">
+          <CardContent className="p-8">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+              <Tabs value={activeTab} onValueChange={(value) => {
+                setActiveTab(value)
+                const newSearchParams = new URLSearchParams(searchParams)
+                newSearchParams.set('tab', value)
+                setSearchParams(newSearchParams)
+              }} className="w-full lg:w-auto">
+                <TabsList className="grid w-full grid-cols-4 lg:w-auto bg-gray-100 rounded-2xl p-1">
+                  <TabsTrigger value="all" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-md">
+                    <span className="mr-2">🎯</span>
+                    All ({results.total})
+                  </TabsTrigger>
+                  <TabsTrigger value="events" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-md">
+                    <span className="mr-2">🎉</span>
+                    Events ({results.events.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="venues" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-md">
+                    <span className="mr-2">🏛️</span>
+                    Venues ({results.venues.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="packages" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-md">
+                    <span className="mr-2">📦</span>
+                    Packages ({results.packages.length})
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+              
+              <div className="flex items-center gap-4">
+                <Button
+                  variant={showFilters ? "default" : "outline"}
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-2 rounded-2xl px-6"
+                >
+                  <Filter className="w-4 h-4" />
+                  Filters
+                  {showFilters && <span className="ml-1 text-xs bg-white/20 px-2 py-1 rounded-full">ON</span>}
+                </Button>
+                <div className="flex bg-gray-100 rounded-2xl p-1">
+                  <Button
+                    variant={viewMode === 'grid' ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                    className="rounded-xl"
                   >
-                    <option value="all">All Categories</option>
-                    {categories.map(category => (
-                      <option key={category} value={category}>{category}</option>
-                    ))}
-                  </select>
+                    <Grid className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'list' ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className="rounded-xl"
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Enhanced Filters */}
+        {showFilters && (
+          <Card className="mb-8 border-0 shadow-lg rounded-3xl overflow-hidden">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                  <span className="mr-3">🎛️</span>
+                  Refine Your Search
+                </h3>
+                <Button variant="ghost" onClick={clearFilters} className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded-2xl">
+                  Clear All
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="space-y-3">
+                  <label className="block text-sm font-semibold text-gray-700 flex items-center">
+                    <span className="mr-2">🏷️</span>
+                    Category
+                  </label>
+                  <Select value={filters.category} onValueChange={(value) => updateFilter('category', value)}>
+                    <SelectTrigger className="rounded-2xl border-gray-200 focus:border-purple-300 focus:ring-purple-200">
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categories.map(category => (
+                        <SelectItem key={category} value={category}>{category}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">Location</label>
-                  <select
-                    value={filters.location}
-                    onChange={(e) => updateFilter('location', e.target.value)}
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none"
-                  >
-                    <option value="all">All Locations</option>
-                    {locations.map(location => (
-                      <option key={location} value={location}>{location}</option>
-                    ))}
-                  </select>
+                <div className="space-y-3">
+                  <label className="block text-sm font-semibold text-gray-700 flex items-center">
+                    <span className="mr-2">📍</span>
+                    Location
+                  </label>
+                  <Select value={filters.location} onValueChange={(value) => updateFilter('location', value)}>
+                    <SelectTrigger className="rounded-2xl border-gray-200 focus:border-purple-300 focus:ring-purple-200">
+                      <SelectValue placeholder="All Locations" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Locations</SelectItem>
+                      {locations.map(location => (
+                        <SelectItem key={location} value={location}>{location}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">Price Range</label>
-                  <select
-                    value={filters.priceRange}
-                    onChange={(e) => updateFilter('priceRange', e.target.value)}
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none"
-                  >
-                    <option value="all">All Prices</option>
-                    {priceRanges.map(range => (
-                      <option key={range.value} value={range.value}>{range.label}</option>
-                    ))}
-                  </select>
+                <div className="space-y-3">
+                  <label className="block text-sm font-semibold text-gray-700 flex items-center">
+                    <span className="mr-2">💰</span>
+                    Price Range
+                  </label>
+                  <Select value={filters.priceRange} onValueChange={(value) => updateFilter('priceRange', value)}>
+                    <SelectTrigger className="rounded-2xl border-gray-200 focus:border-purple-300 focus:ring-purple-200">
+                      <SelectValue placeholder="All Prices" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Prices</SelectItem>
+                      {priceRanges.map(range => (
+                        <SelectItem key={range.value} value={range.value}>{range.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">Date</label>
-                  <input
+                <div className="space-y-3">
+                  <label className="block text-sm font-semibold text-gray-700 flex items-center">
+                    <span className="mr-2">📅</span>
+                    Date
+                  </label>
+                  <Input
                     type="date"
                     value={filters.date}
                     onChange={(e) => updateFilter('date', e.target.value)}
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none"
+                    placeholder="Select date"
+                    className="rounded-2xl border-gray-200 focus:border-purple-300 focus:ring-purple-200"
                   />
                 </div>
               </div>
               
-              <div className="flex justify-between items-center">
-                <button
-                  onClick={clearFilters}
-                  className="text-neutral-600 hover:text-neutral-800 font-medium"
-                >
-                  Clear All Filters
-                </button>
-                <span className="text-sm text-neutral-600">
-                  {getActiveResults().length} results found
-                </span>
+              <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+                <p className="text-gray-600 flex items-center">
+                  <span className="mr-2">🎯</span>
+                  <span className="font-semibold text-purple-600">{getActiveResults().length}</span>
+                  <span className="ml-1">results found</span>
+                </p>
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={clearFilters} className="rounded-2xl">
+                    Reset
+                  </Button>
+                  <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl">
+                    Apply Filters
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      </div>
+            </CardContent>
+          </Card>
+        )}
 
-      {/* Results */}
-      <div className="max-w-7xl mx-auto container-padding py-8">
-        {renderResults()}
+        {/* Results */}
+        <Tabs value={activeTab} className="w-full">
+          <TabsContent value="all" className="mt-0">
+            {renderResults()}
+          </TabsContent>
+          <TabsContent value="events" className="mt-0">
+            {renderResults()}
+          </TabsContent>
+          <TabsContent value="venues" className="mt-0">
+            {renderResults()}
+          </TabsContent>
+          <TabsContent value="packages" className="mt-0">
+            {renderResults()}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )

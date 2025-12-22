@@ -1,8 +1,41 @@
 import React, { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Upload, Calendar, Clock, Users, DollarSign, Plus, X, AlertCircle, CheckCircle } from 'lucide-react'
+import {
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  TimePicker,
+  InputNumber,
+  Upload,
+  Button,
+  Card,
+  Row,
+  Col,
+  Typography,
+  Space,
+  Alert,
+  Divider,
+  Tag
+} from 'antd'
+import {
+  ArrowLeftOutlined,
+  UploadOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  UserOutlined,
+  DollarOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+  InboxOutlined
+} from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
+
+const { Title, Text } = Typography
+const { TextArea } = Input
+const { Option } = Select
+const { Dragger } = Upload
 
 const CreateEventPage = () => {
   const { merchant, addEvent, isMerchantAuthenticated } = useMerchant()
@@ -172,415 +205,415 @@ const CreateEventPage = () => {
 
   return (
     <MerchantLayout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <Link to="/merchant/events" className="inline-flex items-center space-x-2 text-neutral-600 hover:text-primary-500 mb-4 transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-              <span>Back to Events</span>
-            </Link>
-            <h1 className="text-3xl font-bold text-neutral-800">Create New Event</h1>
-            <p className="text-neutral-600">Create a new dining experience for your customers</p>
-          </div>
+        <div style={{ marginBottom: '32px' }}>
+          <Link to="/merchant/events">
+            <Button 
+              type="text" 
+              icon={<ArrowLeftOutlined />}
+              style={{ marginBottom: '16px', padding: 0 }}
+            >
+              Back to Events
+            </Button>
+          </Link>
+          <Title level={2} style={{ margin: 0, marginBottom: '8px' }}>
+            Create New Event
+          </Title>
+          <Text type="secondary">Create a new dining experience for your customers</Text>
         </div>
 
         {/* Form */}
-        <form onSubmit={(e) => handleSubmit(e, true)} className="space-y-8">
+        <Form
+          layout="vertical"
+          onFinish={(values) => handleSubmit({ preventDefault: () => {} }, true)}
+          style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}
+        >
           {/* Error/Success Messages */}
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center space-x-3">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <span className="text-red-700">{error}</span>
-            </div>
+            <Alert
+              message={error}
+              type="error"
+              showIcon
+              closable
+              onClose={() => setError('')}
+            />
           )}
           
           {success && (
-            <div className="p-4 bg-green-50 border border-green-200 rounded-2xl flex items-center space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-              <span className="text-green-700">{success}</span>
-            </div>
+            <Alert
+              message={success}
+              type="success"
+              showIcon
+              closable
+              onClose={() => setSuccess('')}
+            />
           )}
 
           {/* Basic Information */}
-          <div className="card border border-neutral-100">
-            <div className="p-8">
-              <h2 className="text-2xl font-bold text-neutral-800 mb-6">Basic Information</h2>
-              
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Event Title *
-                  </label>
-                  <input
-                    type="text"
-                    name="title"
+          <Card>
+            <Title level={4} style={{ marginBottom: '24px' }}>Basic Information</Title>
+            
+            <Row gutter={[24, 24]}>
+              <Col span={24}>
+                <Form.Item
+                  label="Event Title"
+                  name="title"
+                  rules={[{ required: true, message: 'Please enter event title' }]}
+                >
+                  <Input
+                    size="large"
+                    placeholder="e.g., Weekend Brunch Buffet"
                     value={eventData.title}
                     onChange={handleInputChange}
-                    required
-                    className="input-field"
-                    placeholder="e.g., Weekend Brunch Buffet"
                   />
-                </div>
+                </Form.Item>
+              </Col>
 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Description *
-                  </label>
-                  <textarea
-                    name="description"
+              <Col span={24}>
+                <Form.Item
+                  label="Description"
+                  name="description"
+                  rules={[{ required: true, message: 'Please enter event description' }]}
+                >
+                  <TextArea
+                    rows={4}
+                    placeholder="Describe your event, cuisine, ambiance, and what makes it special..."
                     value={eventData.description}
                     onChange={handleInputChange}
-                    required
-                    rows={4}
-                    className="input-field resize-none"
-                    placeholder="Describe your event, cuisine, ambiance, and what makes it special..."
                   />
-                </div>
+                </Form.Item>
+              </Col>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Event Type *
-                    </label>
-                    <select
-                      name="eventType"
-                      value={eventData.eventType}
-                      onChange={handleInputChange}
-                      required
-                      className="input-field"
-                    >
-                      <option value="">Select event type</option>
-                      {eventTypes.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </select>
-                  </div>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label="Event Type"
+                  name="eventType"
+                  rules={[{ required: true, message: 'Please select event type' }]}
+                >
+                  <Select
+                    size="large"
+                    placeholder="Select event type"
+                    value={eventData.eventType}
+                    onChange={(value) => setEventData({...eventData, eventType: value})}
+                  >
+                    {eventTypes.map(type => (
+                      <Option key={type} value={type}>{type}</Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
 
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Capacity (guests)
-                    </label>
-                    <div className="relative">
-                      <Users className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                      <input
-                        type="number"
-                        name="capacity"
-                        value={eventData.capacity}
-                        onChange={handleInputChange}
-                        className="input-field pl-12"
-                        placeholder="Maximum guests"
-                      />
-                    </div>
-                  </div>
-                </div>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label="Capacity (guests)"
+                  name="capacity"
+                >
+                  <InputNumber
+                    size="large"
+                    style={{ width: '100%' }}
+                    placeholder="Maximum guests"
+                    prefix={<UserOutlined />}
+                    value={eventData.capacity}
+                    onChange={(value) => setEventData({...eventData, capacity: value})}
+                  />
+                </Form.Item>
+              </Col>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Date *
-                    </label>
-                    <div className="relative">
-                      <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                      <input
-                        type="date"
-                        name="date"
-                        value={eventData.date}
-                        onChange={handleInputChange}
-                        required
-                        className="input-field pl-12"
-                      />
-                    </div>
-                  </div>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  label="Date"
+                  name="date"
+                  rules={[{ required: true, message: 'Please select date' }]}
+                >
+                  <DatePicker
+                    size="large"
+                    style={{ width: '100%' }}
+                    suffixIcon={<CalendarOutlined />}
+                  />
+                </Form.Item>
+              </Col>
 
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Start Time *
-                    </label>
-                    <div className="relative">
-                      <Clock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                      <input
-                        type="time"
-                        name="startTime"
-                        value={eventData.startTime}
-                        onChange={handleInputChange}
-                        required
-                        className="input-field pl-12"
-                      />
-                    </div>
-                  </div>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  label="Start Time"
+                  name="startTime"
+                  rules={[{ required: true, message: 'Please select start time' }]}
+                >
+                  <TimePicker
+                    size="large"
+                    style={{ width: '100%' }}
+                    format="HH:mm"
+                    suffixIcon={<ClockCircleOutlined />}
+                  />
+                </Form.Item>
+              </Col>
 
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      End Time *
-                    </label>
-                    <div className="relative">
-                      <Clock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                      <input
-                        type="time"
-                        name="endTime"
-                        value={eventData.endTime}
-                        onChange={handleInputChange}
-                        required
-                        className="input-field pl-12"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  label="End Time"
+                  name="endTime"
+                  rules={[{ required: true, message: 'Please select end time' }]}
+                >
+                  <TimePicker
+                    size="large"
+                    style={{ width: '100%' }}
+                    format="HH:mm"
+                    suffixIcon={<ClockCircleOutlined />}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
 
           {/* Images */}
-          <div className="card border border-neutral-100">
-            <div className="p-8">
-              <h2 className="text-2xl font-bold text-neutral-800 mb-6">Event Images</h2>
-              
-              <div className="border-2 border-dashed border-neutral-300 rounded-2xl p-8 text-center hover:border-primary-400 transition-colors mb-6">
-                <Upload className="w-12 h-12 text-neutral-400 mx-auto mb-4" />
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  id="event-images"
-                />
-                <label htmlFor="event-images" className="cursor-pointer">
-                  <span className="text-primary-600 font-medium text-lg">Upload Event Images</span>
-                  <p className="text-neutral-500 mt-2">JPG, PNG up to 5MB each. Maximum 5 images.</p>
-                </label>
-              </div>
+          <Card>
+            <Title level={4} style={{ marginBottom: '24px' }}>Event Images</Title>
+            
+            <Form.Item name="images">
+              <Dragger
+                multiple
+                accept="image/*"
+                beforeUpload={() => false}
+                onChange={({ fileList }) => {
+                  setEventData({
+                    ...eventData,
+                    images: fileList.slice(0, 5).map(file => file.originFileObj)
+                  })
+                }}
+                style={{ marginBottom: '24px' }}
+              >
+                <p className="ant-upload-drag-icon">
+                  <InboxOutlined style={{ fontSize: '48px', color: '#d9d9d9' }} />
+                </p>
+                <p className="ant-upload-text" style={{ fontSize: '16px', fontWeight: 500 }}>
+                  Upload Event Images
+                </p>
+                <p className="ant-upload-hint">
+                  JPG, PNG up to 5MB each. Maximum 5 images.
+                </p>
+              </Dragger>
+            </Form.Item>
 
-              {eventData.images.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  {eventData.images.map((image, index) => (
-                    <div key={index} className="relative">
+            {eventData.images.length > 0 && (
+              <Row gutter={[16, 16]}>
+                {eventData.images.map((image, index) => (
+                  <Col key={index} xs={12} sm={8} md={6} lg={4}>
+                    <div style={{ position: 'relative' }}>
                       <img
                         src={URL.createObjectURL(image)}
                         alt={`Event ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-xl"
+                        style={{ 
+                          width: '100%', 
+                          height: '80px', 
+                          objectFit: 'cover', 
+                          borderRadius: '8px' 
+                        }}
                       />
-                      <button
-                        type="button"
+                      <Button
+                        type="primary"
+                        danger
+                        size="small"
+                        icon={<DeleteOutlined />}
                         onClick={() => removeImage(index)}
-                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-sm hover:bg-red-600 transition-colors flex items-center justify-center"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                        style={{
+                          position: 'absolute',
+                          top: '-8px',
+                          right: '-8px',
+                          minWidth: '24px',
+                          height: '24px',
+                          borderRadius: '50%'
+                        }}
+                      />
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+                  </Col>
+                ))}
+              </Row>
+            )}
+          </Card>
 
           {/* Packages */}
-          <div className="card border border-neutral-100">
-            <div className="p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-neutral-800">Packages</h2>
-                <button
-                  type="button"
-                  onClick={addPackage}
-                  className="btn-secondary flex items-center space-x-2"
+          <Card>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <Title level={4} style={{ margin: 0 }}>Packages</Title>
+              <Button
+                type="dashed"
+                icon={<PlusOutlined />}
+                onClick={addPackage}
+              >
+                Add Package
+              </Button>
+            </div>
+
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+              {eventData.packages.map((pkg, index) => (
+                <Card 
+                  key={pkg.id} 
+                  size="small" 
+                  style={{ background: '#fafafa' }}
                 >
-                  <Plus className="w-5 h-5" />
-                  <span>Add Package</span>
-                </button>
-              </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <Title level={5} style={{ margin: 0 }}>Package {index + 1}</Title>
+                    {eventData.packages.length > 1 && (
+                      <Button
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => removePackage(pkg.id)}
+                      />
+                    )}
+                  </div>
 
-              <div className="space-y-6">
-                {eventData.packages.map((pkg, index) => (
-                  <div key={pkg.id} className="bg-neutral-50 rounded-2xl p-6 border border-neutral-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-neutral-800">Package {index + 1}</h3>
-                      {eventData.packages.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removePackage(pkg.id)}
-                          className="text-red-600 hover:text-red-700 p-2"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Package Name *
-                        </label>
-                        <input
-                          type="text"
+                  <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Package Name" required>
+                        <Input
                           value={pkg.name}
                           onChange={(e) => updatePackage(pkg.id, 'name', e.target.value)}
-                          required
-                          className="input-field"
                           placeholder="e.g., Individual Package"
                         />
-                      </div>
+                      </Form.Item>
+                    </Col>
 
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Package Type *
-                        </label>
-                        <select
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Package Type" required>
+                        <Select
                           value={pkg.type}
-                          onChange={(e) => updatePackage(pkg.id, 'type', e.target.value)}
-                          required
-                          className="input-field"
+                          onChange={(value) => updatePackage(pkg.id, 'type', value)}
+                          style={{ width: '100%' }}
                         >
-                          <option value="individual">Individual</option>
-                          <option value="couple">Couple</option>
-                          <option value="group">Group</option>
-                        </select>
-                      </div>
+                          <Option value="individual">Individual</Option>
+                          <Option value="couple">Couple</Option>
+                          <Option value="group">Group</Option>
+                        </Select>
+                      </Form.Item>
+                    </Col>
 
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Price (AED) *
-                        </label>
-                        <div className="relative">
-                          <DollarSign className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                          <input
-                            type="number"
-                            value={pkg.price}
-                            onChange={(e) => updatePackage(pkg.id, 'price', e.target.value)}
-                            required
-                            className="input-field pl-12"
-                            placeholder="299"
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Price (AED)" required>
+                        <InputNumber
+                          style={{ width: '100%' }}
+                          value={pkg.price}
+                          onChange={(value) => updatePackage(pkg.id, 'price', value)}
+                          prefix={<DollarOutlined />}
+                          placeholder="299"
+                        />
+                      </Form.Item>
+                    </Col>
+
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Guest Count">
+                        <InputNumber
+                          style={{ width: '100%' }}
+                          value={pkg.guestCount}
+                          onChange={(value) => updatePackage(pkg.id, 'guestCount', value)}
+                          prefix={<UserOutlined />}
+                          min={1}
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+
+                  <Form.Item label="Package Description" style={{ marginBottom: '16px' }}>
+                    <TextArea
+                      value={pkg.description}
+                      onChange={(e) => updatePackage(pkg.id, 'description', e.target.value)}
+                      rows={2}
+                      placeholder="Brief description of what's included..."
+                    />
+                  </Form.Item>
+
+                  <Form.Item label="What's Included">
+                    <Space direction="vertical" style={{ width: '100%' }}>
+                      {pkg.includes.map((item, itemIndex) => (
+                        <div key={itemIndex} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <Input
+                            value={item}
+                            onChange={(e) => updateIncludeItem(pkg.id, itemIndex, e.target.value)}
+                            placeholder="e.g., Buffet access, Welcome drink"
+                            style={{ flex: 1 }}
                           />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Guest Count
-                        </label>
-                        <div className="relative">
-                          <Users className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                          <input
-                            type="number"
-                            value={pkg.guestCount}
-                            onChange={(e) => updatePackage(pkg.id, 'guestCount', parseInt(e.target.value))}
-                            className="input-field pl-12"
-                            min="1"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Package Description
-                      </label>
-                      <textarea
-                        value={pkg.description}
-                        onChange={(e) => updatePackage(pkg.id, 'description', e.target.value)}
-                        rows={2}
-                        className="input-field resize-none"
-                        placeholder="Brief description of what's included..."
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        What's Included
-                      </label>
-                      <div className="space-y-2">
-                        {pkg.includes.map((item, itemIndex) => (
-                          <div key={itemIndex} className="flex items-center space-x-2">
-                            <input
+                          {pkg.includes.length > 1 && (
+                            <Button
                               type="text"
-                              value={item}
-                              onChange={(e) => updateIncludeItem(pkg.id, itemIndex, e.target.value)}
-                              className="flex-1 input-field"
-                              placeholder="e.g., Buffet access, Welcome drink"
+                              danger
+                              icon={<DeleteOutlined />}
+                              onClick={() => removeIncludeItem(pkg.id, itemIndex)}
                             />
-                            {pkg.includes.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => removeIncludeItem(pkg.id, itemIndex)}
-                                className="text-red-600 hover:text-red-700 p-2"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => addIncludeItem(pkg.id)}
-                          className="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center space-x-1"
-                        >
-                          <Plus className="w-4 h-4" />
-                          <span>Add Item</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+                          )}
+                        </div>
+                      ))}
+                      <Button
+                        type="dashed"
+                        icon={<PlusOutlined />}
+                        onClick={() => addIncludeItem(pkg.id)}
+                        style={{ width: '100%' }}
+                      >
+                        Add Item
+                      </Button>
+                    </Space>
+                  </Form.Item>
+                </Card>
+              ))}
+            </Space>
+          </Card>
 
           {/* Additional Information */}
-          <div className="card border border-neutral-100">
-            <div className="p-8">
-              <h2 className="text-2xl font-bold text-neutral-800 mb-6">Additional Information</h2>
-              
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Special Requirements
-                  </label>
-                  <textarea
-                    name="specialRequirements"
+          <Card>
+            <Title level={4} style={{ marginBottom: '24px' }}>Additional Information</Title>
+            
+            <Row gutter={[24, 24]}>
+              <Col span={24}>
+                <Form.Item
+                  label="Special Requirements"
+                  name="specialRequirements"
+                >
+                  <TextArea
+                    rows={3}
+                    placeholder="Dress code, age restrictions, dietary accommodations, etc."
                     value={eventData.specialRequirements}
                     onChange={handleInputChange}
-                    rows={3}
-                    className="input-field resize-none"
-                    placeholder="Dress code, age restrictions, dietary accommodations, etc."
                   />
-                </div>
+                </Form.Item>
+              </Col>
 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Cancellation Policy
-                  </label>
-                  <textarea
-                    name="cancellationPolicy"
+              <Col span={24}>
+                <Form.Item
+                  label="Cancellation Policy"
+                  name="cancellationPolicy"
+                >
+                  <TextArea
+                    rows={3}
+                    placeholder="Cancellation and refund policy for this event..."
                     value={eventData.cancellationPolicy}
                     onChange={handleInputChange}
-                    rows={3}
-                    className="input-field resize-none"
-                    placeholder="Cancellation and refund policy for this event..."
                   />
-                </div>
-              </div>
-            </div>
-          </div>
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
 
           {/* Action Buttons */}
-          <div className="flex flex-col md:flex-row gap-4 justify-end">
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Saving...' : 'Save as Draft'}
-            </button>
-            <button
-              type="button"
-              onClick={(e) => handleSubmit(e, false)}
-              disabled={loading}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Submitting...' : 'Submit for Approval'}
-            </button>
-          </div>
-        </form>
+          <Row justify="end">
+            <Space>
+              <Button
+                size="large"
+                loading={loading}
+                onClick={(e) => handleSubmit(e, true)}
+              >
+                {loading ? 'Saving...' : 'Save as Draft'}
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                loading={loading}
+                onClick={(e) => handleSubmit(e, false)}
+              >
+                {loading ? 'Submitting...' : 'Submit for Approval'}
+              </Button>
+            </Space>
+          </Row>
+        </Form>
       </div>
     </MerchantLayout>
   )

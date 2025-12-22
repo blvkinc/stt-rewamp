@@ -1,6 +1,8 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
-import { MapPin, Star, Calendar, ArrowRight } from 'lucide-react'
+import { MapPin, Star, Calendar, ArrowRight, Users, ChevronRight } from 'lucide-react'
+import { Button } from './ui/button'
+import { Card, CardContent } from './ui/card'
+import { Badge } from './ui/badge'
 
 const VenueCard = ({ venue, viewMode = 'grid' }) => {
   // Provide default values for missing properties
@@ -8,158 +10,175 @@ const VenueCard = ({ venue, viewMode = 'grid' }) => {
     amenities: [],
     description: '',
     address: venue.location || '',
+    rating: venue.rating || 4.5,
+    reviews: venue.reviews || 0,
+    upcomingEvents: venue.upcomingEvents || 0,
+    capacity: venue.capacity || 'N/A',
     ...venue
   }
+
   if (viewMode === 'list') {
     return (
-      <div className="bg-white rounded-2xl overflow-hidden shadow-soft border border-neutral-100 hover:shadow-soft-lg transition-all duration-300">
-        <div className="flex flex-col md:flex-row">
-          <div className="md:w-80 h-64 md:h-auto relative overflow-hidden">
-            <img 
-              src={safeVenue.image} 
-              alt={safeVenue.name}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute top-4 left-4">
-              <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-neutral-700">
+      <Link to={`/venues/${safeVenue.id}`} className="group">
+        <Card className="overflow-hidden border-0 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 bg-white rounded-3xl">
+          <div className="flex flex-col md:flex-row">
+            <div className="relative md:w-2/5 aspect-[4/3] md:aspect-auto">
+              <img 
+                src={safeVenue.image} 
+                alt={safeVenue.name}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              <Badge className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-gray-900 px-3 py-1.5 rounded-full font-medium shadow-lg">
                 {safeVenue.category}
-              </span>
+              </Badge>
+              
+              <div className="absolute top-4 right-4 bg-gradient-to-r from-rose-500 to-pink-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+                {safeVenue.priceRange}
+              </div>
             </div>
-          </div>
-          
-          <div className="flex-1 p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-2xl font-bold text-neutral-800 mb-2 hover:text-primary-600 transition-colors">
-                  <Link to={`/venues/${safeVenue.id}`}>{safeVenue.name}</Link>
-                </h3>
-                <p className="text-neutral-600 mb-3">{safeVenue.description}</p>
-                
-                <div className="flex items-center space-x-4 text-sm text-neutral-500 mb-4">
-                  <div className="flex items-center space-x-1">
-                    <MapPin className="w-4 h-4" />
-                    <span>{safeVenue.address}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="w-4 h-4" />
-                    <span>{safeVenue.upcomingEvents} upcoming events</span>
-                  </div>
+            
+            <CardContent className="flex-1 p-8">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-current text-yellow-400" />
+                  <span className="text-sm font-semibold">{safeVenue.rating}</span>
+                  <span className="text-sm text-gray-500">({safeVenue.reviews})</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                  <Users className="w-4 h-4" />
+                  <span>{safeVenue.capacity}</span>
                 </div>
               </div>
               
-              <div className="text-right">
-                <div className="text-2xl font-bold text-primary-600 mb-1">{safeVenue.priceRange}</div>
-                <div className="flex items-center space-x-1 mb-2">
-                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <span className="font-medium">{safeVenue.rating}</span>
-                  <span className="text-neutral-500 text-sm">({safeVenue.reviews})</span>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-rose-600 transition-colors">
+                {safeVenue.name}
+              </h3>
+              
+              <p className="text-gray-600 mb-4 leading-relaxed">
+                {safeVenue.description}
+              </p>
+              
+              <div className="flex items-center gap-2 text-gray-500 mb-4">
+                <MapPin className="w-4 h-4 text-rose-400" />
+                <span>{safeVenue.address}</span>
+              </div>
+              
+              <div className="flex flex-wrap gap-2 mb-6">
+                {safeVenue.amenities && safeVenue.amenities.slice(0, 4).map((amenity, index) => (
+                  <Badge key={index} variant="secondary" className="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-full px-3 py-1">
+                    {amenity}
+                  </Badge>
+                ))}
+                {safeVenue.amenities && safeVenue.amenities.length > 4 && (
+                  <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-700 rounded-full px-3 py-1">
+                    +{safeVenue.amenities.length - 4} more
+                  </Badge>
+                )}
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4 text-rose-400" />
+                  <span>{safeVenue.upcomingEvents} upcoming events</span>
+                </div>
+                <div className="flex items-center text-rose-600 text-sm font-medium group-hover:text-rose-700">
+                  View details
+                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-2 mb-4">
-              {safeVenue.amenities && safeVenue.amenities.slice(0, 3).map((amenity, index) => (
-                <span key={index} className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm">
-                  {amenity}
-                </span>
-              ))}
-              {safeVenue.amenities && safeVenue.amenities.length > 3 && (
-                <span className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm">
-                  +{safeVenue.amenities.length - 3} more
-                </span>
-              )}
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <Link 
-                to={`/venues/${safeVenue.id}`}
-                className="btn-primary flex items-center space-x-2"
-              >
-                <span>View Venue</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link 
-                to={`/venues/${safeVenue.id}#events`}
-                className="btn-secondary"
-              >
-                View Events
-              </Link>
-            </div>
+            </CardContent>
           </div>
-        </div>
-      </div>
+        </Card>
+      </Link>
     )
   }
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-soft border border-neutral-100 hover:shadow-soft-lg transition-all duration-300 hover:-translate-y-1 group">
-      <div className="relative overflow-hidden">
-        <img 
-          src={safeVenue.image} 
-          alt={safeVenue.name}
-          className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-        />
-        <div className="absolute top-4 left-4">
-          <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-neutral-700">
+    <Link to={`/venues/${safeVenue.id}`} className="group">
+      <Card className="overflow-hidden border-0 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white rounded-3xl">
+        <div className="relative aspect-[4/3]">
+          <img 
+            src={safeVenue.image} 
+            alt={safeVenue.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          
+          {/* Category Badge */}
+          <Badge className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm text-gray-900 hover:bg-white px-3 py-1.5 rounded-full font-medium shadow-lg">
             {safeVenue.category}
-          </span>
-        </div>
-        <div className="absolute top-4 right-4">
-          <div className="flex items-center space-x-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full">
-            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-medium">{safeVenue.rating}</span>
+          </Badge>
+          
+          {/* Capacity Badge */}
+          <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm rounded-full p-2 shadow-lg">
+            <div className="flex items-center gap-1 text-white text-sm">
+              <Users className="w-3 h-3" />
+              <span className="text-xs font-medium">{safeVenue.capacity}</span>
+            </div>
           </div>
-        </div>
-      </div>
-      
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-neutral-800 mb-2 group-hover:text-primary-600 transition-colors">
-          <Link to={`/venues/${safeVenue.id}`}>{safeVenue.name}</Link>
-        </h3>
-        
-        <p className="text-neutral-600 mb-4 line-clamp-2">{safeVenue.description}</p>
-        
-        <div className="flex items-center space-x-1 text-neutral-500 mb-4">
-          <MapPin className="w-4 h-4" />
-          <span className="text-sm">{safeVenue.address}</span>
-        </div>
-        
-        <div className="flex flex-wrap gap-2 mb-4">
-          {safeVenue.amenities && safeVenue.amenities.slice(0, 2).map((amenity, index) => (
-            <span key={index} className="px-2 py-1 bg-neutral-100 text-neutral-700 rounded-lg text-xs">
-              {amenity}
-            </span>
-          ))}
-          {safeVenue.amenities && safeVenue.amenities.length > 2 && (
-            <span className="px-2 py-1 bg-neutral-100 text-neutral-700 rounded-lg text-xs">
-              +{safeVenue.amenities.length - 2}
-            </span>
-          )}
-        </div>
-        
-        <div className="flex justify-between items-center mb-4">
-          <div className="text-lg font-bold text-primary-600">{safeVenue.priceRange}</div>
-          <div className="text-sm text-neutral-500">
-            {safeVenue.upcomingEvents} events
+          
+          {/* Price Badge */}
+          <div className="absolute top-4 left-4">
+            <div className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+              {safeVenue.priceRange}
+            </div>
           </div>
         </div>
         
-        <div className="flex space-x-2">
-          <Link 
-            to={`/venues/${safeVenue.id}`}
-            className="flex-1 btn-primary text-center"
-          >
-            View Venue
-          </Link>
-          <Link 
-            to={`/venues/${safeVenue.id}#events`}
-            className="btn-secondary px-4"
-          >
-            Events
-          </Link>
-        </div>
-      </div>
-    </div>
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4 fill-current text-yellow-400" />
+              <span className="text-sm font-semibold">{safeVenue.rating}</span>
+              <span className="text-sm text-gray-500">({safeVenue.reviews})</span>
+            </div>
+          </div>
+          
+          <h3 className="font-bold text-gray-900 mb-2 group-hover:text-rose-600 transition-colors text-lg leading-tight">
+            {safeVenue.name}
+          </h3>
+          
+          <p className="text-gray-600 mb-4">
+            {safeVenue.description || safeVenue.address}
+          </p>
+          
+          <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+            <MapPin className="w-4 h-4 text-rose-400" />
+            <span>{safeVenue.address}</span>
+          </div>
+          
+          <div className="flex flex-wrap gap-1 mb-4">
+            {safeVenue.amenities && safeVenue.amenities.slice(0, 2).map((amenity, index) => (
+              <Badge key={index} variant="secondary" className="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-full px-2 py-1">
+                {amenity}
+              </Badge>
+            ))}
+            {safeVenue.amenities && safeVenue.amenities.length > 2 && (
+              <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-700 rounded-full px-2 py-1">
+                +{safeVenue.amenities.length - 2}
+              </Badge>
+            )}
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1 text-sm text-gray-500">
+              <Calendar className="w-4 h-4 text-rose-400" />
+              <span>{safeVenue.upcomingEvents} events</span>
+            </div>
+            
+            {/* Hover Action */}
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="flex items-center text-rose-600 text-sm font-medium">
+                View venue
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   )
 }
 

@@ -1,24 +1,40 @@
 import React, { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { 
-  TrendingUp, 
-  Eye, 
-  Target, 
-  Zap,
-  Star,
-  Calendar,
-  Users,
-  DollarSign,
-  Play,
-  Pause,
-  BarChart3,
-  ExternalLink,
-  Instagram,
-  Facebook,
-  Twitter
-} from 'lucide-react'
+  Card, 
+  Button, 
+  Statistic, 
+  Progress, 
+  Tag, 
+  Tabs, 
+  Modal, 
+  Typography,
+  Space,
+  Row,
+  Col,
+  Badge,
+  message
+} from 'antd'
+import { 
+  EyeOutlined,
+  AimOutlined,
+  DollarOutlined,
+  ArrowUpOutlined,
+  PlayCircleOutlined,
+  PauseCircleOutlined,
+  BarChartOutlined,
+  InstagramOutlined,
+  FacebookOutlined,
+  TwitterOutlined,
+  LinkOutlined,
+  StarOutlined,
+  ThunderboltOutlined
+} from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
+
+const { Title, Text, Paragraph } = Typography
+const { TabPane } = Tabs
 
 const AdvertisingPage = () => {
   const { merchant, isMerchantAuthenticated } = useMerchant()
@@ -168,354 +184,416 @@ const AdvertisingPage = () => {
   ]
 
   const toggleCampaign = (id) => {
-    // Mock toggle functionality
-    alert(`Campaign ${id} status toggled!`)
+    message.success(`Campaign ${id} status toggled!`)
   }
 
   const purchasePackage = (packageId, type) => {
-    alert(`Purchasing ${type} package ${packageId}. Redirecting to payment...`)
+    Modal.confirm({
+      title: 'Purchase Package',
+      content: `Are you sure you want to purchase this ${type} package?`,
+      okText: 'Purchase',
+      cancelText: 'Cancel',
+      onOk() {
+        message.success(`Purchasing ${type} package ${packageId}. Redirecting to payment...`)
+      }
+    })
   }
 
   const getPlatformIcon = (platform) => {
     switch (platform) {
-      case 'instagram': return Instagram
-      case 'facebook': return Facebook
-      case 'twitter': return Twitter
-      default: return ExternalLink
+      case 'instagram': return <InstagramOutlined />
+      case 'facebook': return <FacebookOutlined />
+      case 'twitter': return <TwitterOutlined />
+      default: return <LinkOutlined />
     }
   }
 
   return (
     <MerchantLayout>
-      <div className="space-y-8">
+      <div style={{ padding: '24px' }}>
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-neutral-800 mb-2">Advertising</h1>
-            <p className="text-neutral-600">Boost your visibility and reach more customers</p>
-          </div>
+        <div style={{ marginBottom: '32px' }}>
+          <Title level={1} style={{ margin: 0, marginBottom: '8px' }}>Advertising</Title>
+          <Text type="secondary">Boost your visibility and reach more customers</Text>
         </div>
 
         {/* Performance Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Total Impressions</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">67.4K</p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center shadow-soft">
-                  <Eye className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Click-through Rate</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">3.2%</p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-accent-400 to-accent-600 rounded-2xl flex items-center justify-center shadow-soft">
-                  <Target className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Ad Spend</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">AED 588</p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center shadow-soft">
-                  <DollarSign className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Bookings from Ads</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">57</p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-accent-400 to-primary-400 rounded-2xl flex items-center justify-center shadow-soft">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Total Impressions"
+                value={67.4}
+                suffix="K"
+                prefix={<EyeOutlined style={{ color: '#667eea' }} />}
+                valueStyle={{ color: '#1f2937' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Click-through Rate"
+                value={3.2}
+                suffix="%"
+                prefix={<AimOutlined style={{ color: '#f093fb' }} />}
+                valueStyle={{ color: '#1f2937' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Ad Spend"
+                value={588}
+                prefix={<DollarOutlined style={{ color: '#667eea' }} />}
+                suffix="AED"
+                valueStyle={{ color: '#1f2937' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Bookings from Ads"
+                value={57}
+                prefix={<ArrowUpOutlined style={{ color: '#f093fb' }} />}
+                valueStyle={{ color: '#1f2937' }}
+              />
+            </Card>
+          </Col>
+        </Row>
 
         {/* Current Campaigns */}
-        <div className="card border border-neutral-100">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold text-neutral-800 mb-6">Active Campaigns</h2>
-            
-            <div className="space-y-4">
-              {currentCampaigns.map((campaign) => (
-                <div key={campaign.id} className="p-6 bg-neutral-50 rounded-2xl border border-neutral-200">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="text-xl font-bold text-neutral-800">{campaign.name}</h3>
-                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-                          {campaign.status}
-                        </span>
-                      </div>
-                      
-                      <p className="text-neutral-600 mb-4">{campaign.type}</p>
-                      
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-                        <div>
-                          <span className="text-neutral-500">Duration:</span>
-                          <div className="font-semibold text-neutral-800">
-                            {new Date(campaign.startDate).toLocaleDateString()} - {new Date(campaign.endDate).toLocaleDateString()}
-                          </div>
-                        </div>
-                        <div>
-                          <span className="text-neutral-500">Budget:</span>
-                          <div className="font-semibold text-neutral-800">AED {campaign.budget}</div>
-                        </div>
-                        <div>
-                          <span className="text-neutral-500">Impressions:</span>
-                          <div className="font-semibold text-neutral-800">{campaign.impressions.toLocaleString()}</div>
-                        </div>
-                        <div>
-                          <span className="text-neutral-500">Clicks:</span>
-                          <div className="font-semibold text-neutral-800">{campaign.clicks}</div>
-                        </div>
-                        <div>
-                          <span className="text-neutral-500">Bookings:</span>
-                          <div className="font-semibold text-neutral-800">{campaign.bookings}</div>
-                        </div>
-                      </div>
-                      
-                      <div className="mt-4">
-                        <div className="flex justify-between text-sm mb-1">
-                          <span className="text-neutral-500">Budget Used</span>
-                          <span className="text-neutral-700">{Math.round((campaign.spent / campaign.budget) * 100)}%</span>
-                        </div>
-                        <div className="w-full bg-neutral-200 rounded-full h-2">
-                          <div 
-                            className="bg-primary-500 h-2 rounded-full transition-all duration-500"
-                            style={{ width: `${(campaign.spent / campaign.budget) * 100}%` }}
-                          ></div>
-                        </div>
-                      </div>
+        <Card style={{ marginBottom: '32px' }}>
+          <Title level={3} style={{ marginBottom: '24px' }}>Active Campaigns</Title>
+          
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            {currentCampaigns.map((campaign) => (
+              <Card 
+                key={campaign.id}
+                style={{ 
+                  background: '#fafafa',
+                  borderRadius: '12px'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+                  <div style={{ flex: 1, minWidth: '300px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                      <Title level={4} style={{ margin: 0 }}>{campaign.name}</Title>
+                      <Tag color="green">{campaign.status}</Tag>
                     </div>
                     
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => toggleCampaign(campaign.id)}
-                        className="p-2 text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
-                      >
-                        {campaign.status === 'Active' ? (
-                          <Pause className="w-5 h-5" />
-                        ) : (
-                          <Play className="w-5 h-5" />
-                        )}
-                      </button>
-                      
-                      <button className="p-2 text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200">
-                        <BarChart3 className="w-5 h-5" />
-                      </button>
+                    <Paragraph type="secondary" style={{ marginBottom: '16px' }}>
+                      {campaign.type}
+                    </Paragraph>
+                    
+                    <Row gutter={[16, 8]} style={{ marginBottom: '16px' }}>
+                      <Col xs={24} sm={12} md={8} lg={4}>
+                        <Text type="secondary">Duration:</Text>
+                        <div>
+                          <Text strong>
+                            {new Date(campaign.startDate).toLocaleDateString()} - {new Date(campaign.endDate).toLocaleDateString()}
+                          </Text>
+                        </div>
+                      </Col>
+                      <Col xs={12} sm={6} md={4} lg={4}>
+                        <Text type="secondary">Budget:</Text>
+                        <div>
+                          <Text strong>AED {campaign.budget}</Text>
+                        </div>
+                      </Col>
+                      <Col xs={12} sm={6} md={4} lg={4}>
+                        <Text type="secondary">Impressions:</Text>
+                        <div>
+                          <Text strong>{campaign.impressions.toLocaleString()}</Text>
+                        </div>
+                      </Col>
+                      <Col xs={12} sm={6} md={4} lg={4}>
+                        <Text type="secondary">Clicks:</Text>
+                        <div>
+                          <Text strong>{campaign.clicks}</Text>
+                        </div>
+                      </Col>
+                      <Col xs={12} sm={6} md={4} lg={4}>
+                        <Text type="secondary">Bookings:</Text>
+                        <div>
+                          <Text strong>{campaign.bookings}</Text>
+                        </div>
+                      </Col>
+                    </Row>
+                    
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <Text type="secondary">Budget Used</Text>
+                        <Text>{Math.round((campaign.spent / campaign.budget) * 100)}%</Text>
+                      </div>
+                      <Progress 
+                        percent={Math.round((campaign.spent / campaign.budget) * 100)}
+                        strokeColor={{
+                          '0%': '#667eea',
+                          '100%': '#764ba2',
+                        }}
+                      />
                     </div>
                   </div>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Button
+                      type="text"
+                      icon={campaign.status === 'Active' ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+                      onClick={() => toggleCampaign(campaign.id)}
+                    />
+                    
+                    <Button
+                      type="text"
+                      icon={<BarChartOutlined />}
+                    />
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
+              </Card>
+            ))}
+          </Space>
+        </Card>
 
         {/* Advertising Packages */}
-        <div className="card border border-neutral-100">
-          <div className="p-6">
-            <div className="flex items-center space-x-6 mb-8">
-              <button
-                onClick={() => setActiveTab('internal')}
-                className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-200 ${
-                  activeTab === 'internal'
-                    ? 'bg-primary-500 text-white shadow-soft'
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                }`}
-              >
-                Platform Advertising
-              </button>
-              <button
-                onClick={() => setActiveTab('external')}
-                className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-200 ${
-                  activeTab === 'external'
-                    ? 'bg-primary-500 text-white shadow-soft'
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                }`}
-              >
-                Marketing Services
-              </button>
-            </div>
+        <Card>
+          <Tabs 
+            activeKey={activeTab} 
+            onChange={setActiveTab}
+            size="large"
+            style={{ marginBottom: '24px' }}
+          >
+            <TabPane tab="Platform Advertising" key="internal">
 
-            {/* Internal Packages */}
-            {activeTab === 'internal' && (
-              <div className="space-y-6">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-neutral-800 mb-2">Platform Advertising Packages</h2>
-                  <p className="text-neutral-600">Boost your visibility within the Set The Table platform</p>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {internalPackages.map((pkg) => (
-                    <div key={pkg.id} className="bg-gradient-to-br from-white to-neutral-50 rounded-3xl p-8 border border-neutral-200 hover:shadow-soft-lg transition-all duration-300">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xl font-bold text-neutral-800">{pkg.name}</h3>
-                        {pkg.isActive && (
-                          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">
-                            Active
-                          </span>
-                        )}
+              <div style={{ marginBottom: '24px' }}>
+                <Title level={3} style={{ marginBottom: '8px' }}>Platform Advertising Packages</Title>
+                <Text type="secondary">Boost your visibility within the Set The Table platform</Text>
+              </div>
+              
+              <Row gutter={[24, 24]}>
+                {internalPackages.map((pkg) => (
+                  <Col xs={24} md={12} lg={8} key={pkg.id}>
+                    <Card
+                      style={{ 
+                        height: '100%',
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                      hoverable
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                        <Title level={4} style={{ margin: 0 }}>{pkg.name}</Title>
+                        {pkg.isActive && <Badge status="success" text="Active" />}
                       </div>
                       
-                      <p className="text-neutral-600 mb-6">{pkg.description}</p>
+                      <Paragraph type="secondary" style={{ marginBottom: '24px' }}>
+                        {pkg.description}
+                      </Paragraph>
                       
-                      <div className="mb-6">
-                        <div className="text-3xl font-bold text-primary-600 mb-1">AED {pkg.price}</div>
-                        <div className="text-neutral-500">{pkg.duration}</div>
+                      <div style={{ marginBottom: '24px' }}>
+                        <Title level={2} style={{ color: '#667eea', margin: 0, marginBottom: '4px' }}>
+                          AED {pkg.price}
+                        </Title>
+                        <Text type="secondary">{pkg.duration}</Text>
                       </div>
                       
-                      <ul className="space-y-2 mb-6">
+                      <ul style={{ listStyle: 'none', padding: 0, marginBottom: '24px' }}>
                         {pkg.features.map((feature, index) => (
-                          <li key={index} className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                            <span className="text-neutral-700">{feature}</span>
+                          <li key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                            <div style={{ 
+                              width: '8px', 
+                              height: '8px', 
+                              backgroundColor: '#667eea', 
+                              borderRadius: '50%', 
+                              marginRight: '12px' 
+                            }}></div>
+                            <Text>{feature}</Text>
                           </li>
                         ))}
                       </ul>
                       
                       {pkg.isActive && (
-                        <div className="mb-6 p-4 bg-blue-50 rounded-2xl border border-blue-200">
-                          <h4 className="font-semibold text-blue-800 mb-2">Current Performance</h4>
-                          <div className="grid grid-cols-3 gap-2 text-sm">
-                            <div>
-                              <div className="font-bold text-blue-700">{pkg.metrics.impressions.toLocaleString()}</div>
-                              <div className="text-blue-600">Impressions</div>
-                            </div>
-                            <div>
-                              <div className="font-bold text-blue-700">{pkg.metrics.clicks}</div>
-                              <div className="text-blue-600">Clicks</div>
-                            </div>
-                            <div>
-                              <div className="font-bold text-blue-700">{pkg.metrics.bookings}</div>
-                              <div className="text-blue-600">Bookings</div>
-                            </div>
-                          </div>
-                        </div>
+                        <Card 
+                          size="small" 
+                          style={{ 
+                            marginBottom: '24px',
+                            background: '#e6f7ff',
+                            border: '1px solid #91d5ff'
+                          }}
+                        >
+                          <Title level={5} style={{ color: '#1890ff', marginBottom: '12px' }}>
+                            Current Performance
+                          </Title>
+                          <Row gutter={8}>
+                            <Col span={8} style={{ textAlign: 'center' }}>
+                              <div style={{ fontWeight: 'bold', color: '#1890ff' }}>
+                                {pkg.metrics.impressions.toLocaleString()}
+                              </div>
+                              <Text type="secondary" style={{ fontSize: '12px' }}>Impressions</Text>
+                            </Col>
+                            <Col span={8} style={{ textAlign: 'center' }}>
+                              <div style={{ fontWeight: 'bold', color: '#1890ff' }}>
+                                {pkg.metrics.clicks}
+                              </div>
+                              <Text type="secondary" style={{ fontSize: '12px' }}>Clicks</Text>
+                            </Col>
+                            <Col span={8} style={{ textAlign: 'center' }}>
+                              <div style={{ fontWeight: 'bold', color: '#1890ff' }}>
+                                {pkg.metrics.bookings}
+                              </div>
+                              <Text type="secondary" style={{ fontSize: '12px' }}>Bookings</Text>
+                            </Col>
+                          </Row>
+                        </Card>
                       )}
                       
-                      <button
-                        onClick={() => purchasePackage(pkg.id, 'internal')}
-                        className={`w-full py-3 rounded-2xl font-semibold transition-all duration-200 ${
-                          pkg.isActive
-                            ? 'bg-neutral-200 text-neutral-600 cursor-not-allowed'
-                            : 'bg-primary-500 hover:bg-primary-600 text-white shadow-soft hover:shadow-soft-lg'
-                        }`}
+                      <Button
+                        type={pkg.isActive ? "default" : "primary"}
+                        size="large"
+                        block
                         disabled={pkg.isActive}
+                        onClick={() => purchasePackage(pkg.id, 'internal')}
+                        style={!pkg.isActive ? { 
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          border: 'none'
+                        } : {}}
                       >
                         {pkg.isActive ? 'Currently Active' : 'Purchase Package'}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                      </Button>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </TabPane>
 
-            {/* External Services */}
-            {activeTab === 'external' && (
-              <div className="space-y-6">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-neutral-800 mb-2">Marketing Services</h2>
-                  <p className="text-neutral-600">Professional marketing services to grow your brand</p>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {externalServices.map((service) => (
-                    <div key={service.id} className="bg-gradient-to-br from-white to-neutral-50 rounded-3xl p-8 border border-neutral-200 hover:shadow-soft-lg transition-all duration-300">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xl font-bold text-neutral-800">{service.name}</h3>
-                        {service.isActive && (
-                          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">
-                            Active
-                          </span>
-                        )}
+            <TabPane tab="Marketing Services" key="external">
+
+              <div style={{ marginBottom: '24px' }}>
+                <Title level={3} style={{ marginBottom: '8px' }}>Marketing Services</Title>
+                <Text type="secondary">Professional marketing services to grow your brand</Text>
+              </div>
+              
+              <Row gutter={[24, 24]}>
+                {externalServices.map((service) => (
+                  <Col xs={24} md={12} lg={8} key={service.id}>
+                    <Card
+                      style={{ 
+                        height: '100%',
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                      hoverable
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                        <Title level={4} style={{ margin: 0 }}>{service.name}</Title>
+                        {service.isActive && <Badge status="success" text="Active" />}
                       </div>
                       
-                      <p className="text-neutral-600 mb-6">{service.description}</p>
+                      <Paragraph type="secondary" style={{ marginBottom: '24px' }}>
+                        {service.description}
+                      </Paragraph>
                       
-                      <div className="mb-6">
-                        <div className="text-3xl font-bold text-primary-600 mb-1">AED {service.price}</div>
-                        <div className="text-neutral-500">{service.duration}</div>
+                      <div style={{ marginBottom: '24px' }}>
+                        <Title level={2} style={{ color: '#667eea', margin: 0, marginBottom: '4px' }}>
+                          AED {service.price}
+                        </Title>
+                        <Text type="secondary">{service.duration}</Text>
                       </div>
                       
                       {service.platforms.length > 0 && (
-                        <div className="flex items-center space-x-2 mb-4">
-                          {service.platforms.map((platform) => {
-                            const PlatformIcon = getPlatformIcon(platform)
-                            return (
-                              <div key={platform} className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center">
-                                <PlatformIcon className="w-4 h-4 text-neutral-600" />
-                              </div>
-                            )
-                          })}
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                          {service.platforms.map((platform) => (
+                            <div 
+                              key={platform} 
+                              style={{ 
+                                width: '32px', 
+                                height: '32px', 
+                                backgroundColor: '#f5f5f5', 
+                                borderRadius: '50%', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center' 
+                              }}
+                            >
+                              {getPlatformIcon(platform)}
+                            </div>
+                          ))}
                         </div>
                       )}
                       
-                      <ul className="space-y-2 mb-6">
+                      <ul style={{ listStyle: 'none', padding: 0, marginBottom: '24px' }}>
                         {service.features.map((feature, index) => (
-                          <li key={index} className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                            <span className="text-neutral-700">{feature}</span>
+                          <li key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                            <div style={{ 
+                              width: '8px', 
+                              height: '8px', 
+                              backgroundColor: '#667eea', 
+                              borderRadius: '50%', 
+                              marginRight: '12px' 
+                            }}></div>
+                            <Text>{feature}</Text>
                           </li>
                         ))}
                       </ul>
                       
-                      <button
-                        onClick={() => purchasePackage(service.id, 'external')}
-                        className={`w-full py-3 rounded-2xl font-semibold transition-all duration-200 ${
-                          service.isActive
-                            ? 'bg-neutral-200 text-neutral-600 cursor-not-allowed'
-                            : 'bg-primary-500 hover:bg-primary-600 text-white shadow-soft hover:shadow-soft-lg'
-                        }`}
+                      <Button
+                        type={service.isActive ? "default" : "primary"}
+                        size="large"
+                        block
                         disabled={service.isActive}
+                        onClick={() => purchasePackage(service.id, 'external')}
+                        style={!service.isActive ? { 
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          border: 'none'
+                        } : {}}
                       >
                         {service.isActive ? 'Currently Active' : 'Get Started'}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+                      </Button>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </TabPane>
+          </Tabs>
+        </Card>
 
         {/* Contact CTA */}
-        <div className="card border border-neutral-100 bg-gradient-to-br from-primary-50 to-accent-50">
-          <div className="p-8 text-center">
-            <h2 className="text-2xl font-bold text-neutral-800 mb-4">Need Custom Marketing Solutions?</h2>
-            <p className="text-neutral-600 mb-6 max-w-2xl mx-auto">
-              Our marketing team can create tailored advertising strategies for your venue. 
-              Get in touch to discuss your specific needs and goals.
-            </p>
-            <button className="btn-primary">
-              Contact Marketing Team
-            </button>
-          </div>
-        </div>
+        <Card 
+          style={{ 
+            textAlign: 'center',
+            background: 'linear-gradient(135deg, #e0e7ff 0%, #fce7f3 100%)',
+            border: '1px solid #e5e7eb'
+          }}
+        >
+          <Title level={3} style={{ marginBottom: '16px' }}>
+            Need Custom Marketing Solutions?
+          </Title>
+          <Paragraph 
+            type="secondary" 
+            style={{ 
+              marginBottom: '24px', 
+              maxWidth: '600px', 
+              margin: '0 auto 24px auto' 
+            }}
+          >
+            Our marketing team can create tailored advertising strategies for your venue. 
+            Get in touch to discuss your specific needs and goals.
+          </Paragraph>
+          <Button 
+            type="primary" 
+            size="large"
+            style={{ 
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: 'none',
+              borderRadius: '8px'
+            }}
+          >
+            Contact Marketing Team
+          </Button>
+        </Card>
       </div>
     </MerchantLayout>
   )

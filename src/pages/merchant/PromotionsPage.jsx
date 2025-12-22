@@ -1,22 +1,44 @@
 import React, { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { 
-  Plus, 
-  Tag, 
-  Percent, 
-  Calendar, 
-  Users, 
-  Edit, 
-  Trash2, 
-  Copy,
-  ToggleLeft,
-  ToggleRight,
-  Gift,
-  Clock,
-  Target
-} from 'lucide-react'
+  Card, 
+  Button, 
+  Statistic, 
+  Progress, 
+  Tag as AntTag, 
+  Switch, 
+  Modal, 
+  Form, 
+  Input, 
+  Select, 
+  DatePicker, 
+  InputNumber,
+  Typography,
+  Space,
+  Dropdown,
+  message,
+  Empty,
+  Row,
+  Col
+} from 'antd'
+import { 
+  PlusOutlined,
+  TagOutlined,
+  PercentageOutlined,
+  UserOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  CopyOutlined,
+  AimOutlined,
+  GiftOutlined
+} from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
+
+const { Title, Text, Paragraph } = Typography
+const { Option } = Select
+const { RangePicker } = DatePicker
+const { TextArea } = Input
 
 const PromotionsPage = () => {
   const { merchant, isMerchantAuthenticated } = useMerchant()
@@ -90,16 +112,27 @@ const PromotionsPage = () => {
     applicableEvents: []
   })
 
-  const togglePromotion = (id) => {
+  const [form] = Form.useForm()
+
+  const togglePromotion = (id, checked) => {
     setPromotions(promotions.map(promo => 
-      promo.id === id ? { ...promo, isActive: !promo.isActive } : promo
+      promo.id === id ? { ...promo, isActive: checked } : promo
     ))
+    message.success(`Promotion ${checked ? 'activated' : 'deactivated'} successfully`)
   }
 
   const deletePromotion = (id) => {
-    if (window.confirm('Are you sure you want to delete this promotion?')) {
-      setPromotions(promotions.filter(promo => promo.id !== id))
-    }
+    Modal.confirm({
+      title: 'Delete Promotion',
+      content: 'Are you sure you want to delete this promotion? This action cannot be undone.',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk() {
+        setPromotions(promotions.filter(promo => promo.id !== id))
+        message.success('Promotion deleted successfully')
+      }
+    })
   }
 
   const duplicatePromotion = (promo) => {
@@ -113,35 +146,23 @@ const PromotionsPage = () => {
       createdAt: new Date().toISOString().split('T')[0]
     }
     setPromotions([...promotions, newPromo])
+    message.success('Promotion duplicated successfully')
   }
 
-  const handleCreatePromotion = (e) => {
-    e.preventDefault()
+  const handleCreatePromotion = (values) => {
     const promotion = {
-      ...newPromotion,
+      ...values,
       id: Date.now(),
       usedCount: 0,
       isActive: true,
-      createdAt: new Date().toISOString().split('T')[0]
+      createdAt: new Date().toISOString().split('T')[0],
+      startDate: values.dateRange[0].format('YYYY-MM-DD'),
+      endDate: values.dateRange[1].format('YYYY-MM-DD')
     }
     setPromotions([...promotions, promotion])
-    setNewPromotion({
-      name: '',
-      type: 'percentage',
-      value: '',
-      code: '',
-      description: '',
-      startDate: '',
-      endDate: '',
-      usageLimit: '',
-      minAmount: '',
-      applicableEvents: []
-    })
     setShowCreateModal(false)
-  }
-
-  const getPromotionTypeIcon = (type) => {
-    return type === 'percentage' ? Percent : Tag
+    form.resetFields()
+    message.success('Promotion created successfully')
   }
 
   const getPromotionStatus = (promo) => {
@@ -149,371 +170,366 @@ const PromotionsPage = () => {
     const start = new Date(promo.startDate)
     const end = new Date(promo.endDate)
     
-    if (!promo.isActive) return { status: 'Inactive', color: 'bg-neutral-100 text-neutral-700' }
-    if (now < start) return { status: 'Scheduled', color: 'bg-blue-100 text-blue-700' }
-    if (now > end) return { status: 'Expired', color: 'bg-red-100 text-red-700' }
-    if (promo.usedCount >= promo.usageLimit) return { status: 'Limit Reached', color: 'bg-yellow-100 text-yellow-700' }
-    return { status: 'Active', color: 'bg-green-100 text-green-700' }
+    if (!promo.isActive) return { status: 'Inactive', color: 'default' }
+    if (now < start) return { status: 'Scheduled', color: 'blue' }
+    if (now > end) return { status: 'Expired', color: 'red' }
+    if (promo.usedCount >= promo.usageLimit) return { status: 'Limit Reached', color: 'orange' }
+    return { status: 'Active', color: 'green' }
   }
+
+  const getPromotionActions = (promo) => [
+    {
+      key: 'duplicate',
+      label: 'Duplicate',
+      icon: <CopyOutlined />,
+      onClick: () => duplicatePromotion(promo)
+    },
+    {
+      key: 'edit',
+      label: 'Edit',
+      icon: <EditOutlined />
+    },
+    {
+      key: 'delete',
+      label: 'Delete',
+      icon: <DeleteOutlined />,
+      danger: true,
+      onClick: () => deletePromotion(promo.id)
+    }
+  ]
 
   return (
     <MerchantLayout>
-      <div className="space-y-6">
+      <div style={{ padding: '24px' }}>
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <h1 className="text-3xl font-bold text-neutral-800 mb-2">Promotions</h1>
-            <p className="text-neutral-600">Create and manage discounts to boost your sales</p>
+            <Title level={1} style={{ margin: 0, marginBottom: '8px' }}>Promotions</Title>
+            <Text type="secondary">Create and manage discounts to boost your sales</Text>
           </div>
-          <button 
+          <Button 
+            type="primary" 
+            size="large"
+            icon={<PlusOutlined />}
             onClick={() => setShowCreateModal(true)}
-            className="btn-primary flex items-center space-x-2 mt-4 md:mt-0"
+            style={{ 
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: 'none',
+              boxShadow: '0 4px 15px 0 rgba(116, 79, 168, 0.75)'
+            }}
           >
-            <Plus className="w-5 h-5" />
-            <span>Create Promotion</span>
-          </button>
+            Create Promotion
+          </Button>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Active Promotions</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">
-                    {promotions.filter(p => p.isActive).length}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center shadow-soft">
-                  <Tag className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Total Usage</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">
-                    {promotions.reduce((sum, p) => sum + p.usedCount, 0)}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-accent-400 to-accent-600 rounded-2xl flex items-center justify-center shadow-soft">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Avg. Discount</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">
-                    {Math.round(promotions.reduce((sum, p) => sum + (p.type === 'percentage' ? p.value : 0), 0) / promotions.filter(p => p.type === 'percentage').length)}%
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center shadow-soft">
-                  <Percent className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Success Rate</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">
-                    {Math.round((promotions.reduce((sum, p) => sum + p.usedCount, 0) / promotions.reduce((sum, p) => sum + p.usageLimit, 0)) * 100)}%
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-accent-400 to-primary-400 rounded-2xl flex items-center justify-center shadow-soft">
-                  <Target className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Active Promotions"
+                value={promotions.filter(p => p.isActive).length}
+                prefix={<TagOutlined style={{ color: '#667eea' }} />}
+                valueStyle={{ color: '#1f2937' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Total Usage"
+                value={promotions.reduce((sum, p) => sum + p.usedCount, 0)}
+                prefix={<UserOutlined style={{ color: '#f093fb' }} />}
+                valueStyle={{ color: '#1f2937' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Avg. Discount"
+                value={Math.round(promotions.reduce((sum, p) => sum + (p.type === 'percentage' ? p.value : 0), 0) / promotions.filter(p => p.type === 'percentage').length)}
+                suffix="%"
+                prefix={<PercentageOutlined style={{ color: '#667eea' }} />}
+                valueStyle={{ color: '#1f2937' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Success Rate"
+                value={Math.round((promotions.reduce((sum, p) => sum + p.usedCount, 0) / promotions.reduce((sum, p) => sum + p.usageLimit, 0)) * 100)}
+                suffix="%"
+                prefix={<AimOutlined style={{ color: '#f093fb' }} />}
+                valueStyle={{ color: '#1f2937' }}
+              />
+            </Card>
+          </Col>
+        </Row>
 
         {/* Promotions List */}
-        <div className="space-y-4">
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {promotions.map((promo) => {
-            const TypeIcon = getPromotionTypeIcon(promo.type)
             const status = getPromotionStatus(promo)
             
             return (
-              <div key={promo.id} className="card border border-neutral-100 hover:shadow-soft-lg transition-all duration-300">
-                <div className="p-6">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center shadow-soft">
-                        <TypeIcon className="w-6 h-6 text-white" />
-                      </div>
-                      
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-xl font-bold text-neutral-800">{promo.name}</h3>
-                          <span className={`px-3 py-1 rounded-full text-sm font-semibold ${status.color}`}>
-                            {status.status}
-                          </span>
-                        </div>
-                        
-                        <p className="text-neutral-600 mb-3">{promo.description}</p>
-                        
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                          <div>
-                            <span className="text-neutral-500">Code:</span>
-                            <div className="font-mono font-semibold text-primary-600">{promo.code}</div>
-                          </div>
-                          <div>
-                            <span className="text-neutral-500">Discount:</span>
-                            <div className="font-semibold text-neutral-800">
-                              {promo.type === 'percentage' ? `${promo.value}%` : `AED ${promo.value}`}
-                            </div>
-                          </div>
-                          <div>
-                            <span className="text-neutral-500">Usage:</span>
-                            <div className="font-semibold text-neutral-800">
-                              {promo.usedCount} / {promo.usageLimit}
-                            </div>
-                          </div>
-                          <div>
-                            <span className="text-neutral-500">Valid Until:</span>
-                            <div className="font-semibold text-neutral-800">
-                              {new Date(promo.endDate).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="mt-3">
-                          <div className="w-full bg-neutral-200 rounded-full h-2">
-                            <div 
-                              className="bg-primary-500 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${(promo.usedCount / promo.usageLimit) * 100}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
+              <Card 
+                key={promo.id}
+                style={{ 
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  transition: 'all 0.3s ease'
+                }}
+                hoverable
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+                  <div style={{ flex: 1, minWidth: '300px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                      <Title level={4} style={{ margin: 0 }}>{promo.name}</Title>
+                      <AntTag color={status.color}>{status.status}</AntTag>
                     </div>
                     
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => togglePromotion(promo.id)}
-                        className="p-2 text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
-                      >
-                        {promo.isActive ? (
-                          <ToggleRight className="w-6 h-6 text-green-500" />
-                        ) : (
-                          <ToggleLeft className="w-6 h-6" />
-                        )}
-                      </button>
-                      
-                      <button
-                        onClick={() => duplicatePromotion(promo)}
-                        className="p-2 text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
-                      >
-                        <Copy className="w-5 h-5" />
-                      </button>
-                      
-                      <button className="p-2 text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200">
-                        <Edit className="w-5 h-5" />
-                      </button>
-                      
-                      <button
-                        onClick={() => deletePromotion(promo.id)}
-                        className="p-2 text-neutral-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
+                    <Paragraph type="secondary" style={{ marginBottom: '16px' }}>
+                      {promo.description}
+                    </Paragraph>
+                    
+                    <Row gutter={[16, 8]} style={{ marginBottom: '16px' }}>
+                      <Col xs={12} sm={6}>
+                        <Text type="secondary">Code:</Text>
+                        <div>
+                          <Text code strong style={{ color: '#667eea' }}>{promo.code}</Text>
+                        </div>
+                      </Col>
+                      <Col xs={12} sm={6}>
+                        <Text type="secondary">Discount:</Text>
+                        <div>
+                          <Text strong>
+                            {promo.type === 'percentage' ? `${promo.value}%` : `AED ${promo.value}`}
+                          </Text>
+                        </div>
+                      </Col>
+                      <Col xs={12} sm={6}>
+                        <Text type="secondary">Usage:</Text>
+                        <div>
+                          <Text strong>{promo.usedCount} / {promo.usageLimit}</Text>
+                        </div>
+                      </Col>
+                      <Col xs={12} sm={6}>
+                        <Text type="secondary">Valid Until:</Text>
+                        <div>
+                          <Text strong>{new Date(promo.endDate).toLocaleDateString()}</Text>
+                        </div>
+                      </Col>
+                    </Row>
+                    
+                    <Progress 
+                      percent={Math.round((promo.usedCount / promo.usageLimit) * 100)}
+                      strokeColor={{
+                        '0%': '#667eea',
+                        '100%': '#764ba2',
+                      }}
+                      style={{ marginBottom: '8px' }}
+                    />
+                  </div>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Switch 
+                      checked={promo.isActive}
+                      onChange={(checked) => togglePromotion(promo.id, checked)}
+                      style={{ 
+                        background: promo.isActive ? '#667eea' : undefined
+                      }}
+                    />
+                    
+                    <Dropdown 
+                      menu={{ items: getPromotionActions(promo) }}
+                      trigger={['click']}
+                    >
+                      <Button type="text" icon={<EditOutlined />} />
+                    </Dropdown>
                   </div>
                 </div>
-              </div>
+              </Card>
             )
           })}
-        </div>
+        </Space>
 
         {promotions.length === 0 && (
-          <div className="card border border-neutral-100">
-            <div className="p-12 text-center">
-              <Tag className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-neutral-800 mb-2">No promotions yet</h3>
-              <p className="text-neutral-600 mb-6">
-                Create your first promotion to attract more customers and boost sales
-              </p>
-              <button 
+          <Card style={{ textAlign: 'center', padding: '48px 24px' }}>
+            <Empty
+              image={<GiftOutlined style={{ fontSize: '64px', color: '#d1d5db' }} />}
+              description={
+                <div>
+                  <Title level={4}>No promotions yet</Title>
+                  <Paragraph type="secondary">
+                    Create your first promotion to attract more customers and boost sales
+                  </Paragraph>
+                </div>
+              }
+            >
+              <Button 
+                type="primary" 
+                size="large"
+                icon={<PlusOutlined />}
                 onClick={() => setShowCreateModal(true)}
-                className="btn-primary"
+                style={{ 
+                  borderRadius: '8px',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  border: 'none'
+                }}
               >
                 Create Your First Promotion
-              </button>
-            </div>
-          </div>
+              </Button>
+            </Empty>
+          </Card>
         )}
 
         {/* Create Promotion Modal */}
-        {showCreateModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-8">
-                <h2 className="text-2xl font-bold text-neutral-800 mb-6">Create New Promotion</h2>
-                
-                <form onSubmit={handleCreatePromotion} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Promotion Name *
-                      </label>
-                      <input
-                        type="text"
-                        value={newPromotion.name}
-                        onChange={(e) => setNewPromotion({...newPromotion, name: e.target.value})}
-                        required
-                        className="input-field"
-                        placeholder="Weekend Special"
-                      />
-                    </div>
+        <Modal
+          title="Create New Promotion"
+          open={showCreateModal}
+          onCancel={() => {
+            setShowCreateModal(false)
+            form.resetFields()
+          }}
+          footer={null}
+          width={800}
+          style={{ top: 20 }}
+        >
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleCreatePromotion}
+            style={{ marginTop: '24px' }}
+          >
+            <Row gutter={16}>
+              <Col xs={24} sm={12}>
+                <Form.Item
+                  name="name"
+                  label="Promotion Name"
+                  rules={[{ required: true, message: 'Please enter promotion name' }]}
+                >
+                  <Input placeholder="Weekend Special" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Form.Item
+                  name="code"
+                  label="Promo Code"
+                  rules={[{ required: true, message: 'Please enter promo code' }]}
+                >
+                  <Input 
+                    placeholder="WEEKEND20" 
+                    style={{ fontFamily: 'monospace' }}
+                    onChange={(e) => {
+                      form.setFieldsValue({ code: e.target.value.toUpperCase() })
+                    }}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
 
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Promo Code *
-                      </label>
-                      <input
-                        type="text"
-                        value={newPromotion.code}
-                        onChange={(e) => setNewPromotion({...newPromotion, code: e.target.value.toUpperCase()})}
-                        required
-                        className="input-field font-mono"
-                        placeholder="WEEKEND20"
-                      />
-                    </div>
-                  </div>
+            <Form.Item
+              name="description"
+              label="Description"
+            >
+              <TextArea 
+                rows={3} 
+                placeholder="Brief description of the promotion..."
+              />
+            </Form.Item>
 
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Description
-                    </label>
-                    <textarea
-                      value={newPromotion.description}
-                      onChange={(e) => setNewPromotion({...newPromotion, description: e.target.value})}
-                      rows={3}
-                      className="input-field resize-none"
-                      placeholder="Brief description of the promotion..."
-                    />
-                  </div>
+            <Row gutter={16}>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  name="type"
+                  label="Discount Type"
+                  rules={[{ required: true, message: 'Please select discount type' }]}
+                  initialValue="percentage"
+                >
+                  <Select>
+                    <Option value="percentage">Percentage</Option>
+                    <Option value="fixed">Fixed Amount</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  name="value"
+                  label="Discount Value"
+                  rules={[{ required: true, message: 'Please enter discount value' }]}
+                >
+                  <InputNumber 
+                    style={{ width: '100%' }}
+                    placeholder="20"
+                    min={1}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  name="usageLimit"
+                  label="Usage Limit"
+                  rules={[{ required: true, message: 'Please enter usage limit' }]}
+                >
+                  <InputNumber 
+                    style={{ width: '100%' }}
+                    placeholder="100"
+                    min={1}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Discount Type *
-                      </label>
-                      <select
-                        value={newPromotion.type}
-                        onChange={(e) => setNewPromotion({...newPromotion, type: e.target.value})}
-                        required
-                        className="input-field"
-                      >
-                        <option value="percentage">Percentage</option>
-                        <option value="fixed">Fixed Amount</option>
-                      </select>
-                    </div>
+            <Row gutter={16}>
+              <Col xs={24} sm={16}>
+                <Form.Item
+                  name="dateRange"
+                  label="Promotion Period"
+                  rules={[{ required: true, message: 'Please select promotion period' }]}
+                >
+                  <RangePicker style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  name="minAmount"
+                  label="Minimum Amount"
+                >
+                  <InputNumber 
+                    style={{ width: '100%' }}
+                    placeholder="200"
+                    min={0}
+                    addonBefore="AED"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
 
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Discount Value *
-                      </label>
-                      <input
-                        type="number"
-                        value={newPromotion.value}
-                        onChange={(e) => setNewPromotion({...newPromotion, value: e.target.value})}
-                        required
-                        className="input-field"
-                        placeholder={newPromotion.type === 'percentage' ? '20' : '50'}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Usage Limit *
-                      </label>
-                      <input
-                        type="number"
-                        value={newPromotion.usageLimit}
-                        onChange={(e) => setNewPromotion({...newPromotion, usageLimit: e.target.value})}
-                        required
-                        className="input-field"
-                        placeholder="100"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Start Date *
-                      </label>
-                      <input
-                        type="date"
-                        value={newPromotion.startDate}
-                        onChange={(e) => setNewPromotion({...newPromotion, startDate: e.target.value})}
-                        required
-                        className="input-field"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        End Date *
-                      </label>
-                      <input
-                        type="date"
-                        value={newPromotion.endDate}
-                        onChange={(e) => setNewPromotion({...newPromotion, endDate: e.target.value})}
-                        required
-                        className="input-field"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Minimum Amount
-                      </label>
-                      <input
-                        type="number"
-                        value={newPromotion.minAmount}
-                        onChange={(e) => setNewPromotion({...newPromotion, minAmount: e.target.value})}
-                        className="input-field"
-                        placeholder="200"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end space-x-4">
-                    <button
-                      type="button"
-                      onClick={() => setShowCreateModal(false)}
-                      className="btn-secondary"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn-primary"
-                    >
-                      Create Promotion
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
+            <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
+              <Space>
+                <Button onClick={() => {
+                  setShowCreateModal(false)
+                  form.resetFields()
+                }}>
+                  Cancel
+                </Button>
+                <Button 
+                  type="primary" 
+                  htmlType="submit"
+                  style={{ 
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    border: 'none'
+                  }}
+                >
+                  Create Promotion
+                </Button>
+              </Space>
+            </Form.Item>
+          </Form>
+        </Modal>
       </div>
     </MerchantLayout>
   )

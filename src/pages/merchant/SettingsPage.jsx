@@ -1,30 +1,49 @@
 import React, { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { 
-  User, 
-  Building, 
-  CreditCard, 
-  Bell, 
-  Shield, 
-  Globe,
-  Mail,
-  Phone,
-  MapPin,
-  Save,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  CheckCircle
-} from 'lucide-react'
+  Card, 
+  Button, 
+  Form, 
+  Input, 
+  Switch, 
+  Alert, 
+  Typography,
+  Space,
+  Row,
+  Col,
+  Menu,
+  message
+} from 'antd'
+import { 
+  UserOutlined,
+  HomeOutlined,
+  CreditCardOutlined,
+  BellOutlined,
+  SafetyOutlined,
+  GlobalOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  EnvironmentOutlined,
+  SaveOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined
+} from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
+
+const { Title, Text, Paragraph } = Typography
+const { TextArea } = Input
+const { Password } = Input
 
 const SettingsPage = () => {
   const { merchant, updateMerchant, isMerchantAuthenticated } = useMerchant()
   const [activeTab, setActiveTab] = useState('profile')
-  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState({ type: '', text: '' })
+  const [alertMessage, setAlertMessage] = useState({ type: '', text: '' })
+  const [profileForm] = Form.useForm()
+  const [venueForm] = Form.useForm()
+  const [bankingForm] = Form.useForm()
+  const [securityForm] = Form.useForm()
 
   // Redirect to auth if not logged in
   if (!isMerchantAuthenticated) {
@@ -62,18 +81,9 @@ const SettingsPage = () => {
     confirmPassword: ''
   })
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    })
-    if (message.text) setMessage({ type: '', text: '' })
-  }
-
-  const handleSave = async (section) => {
+  const handleSave = async (section, values) => {
     setLoading(true)
-    setMessage({ type: '', text: '' })
+    setAlertMessage({ type: '', text: '' })
 
     try {
       // Mock save functionality
@@ -81,492 +91,484 @@ const SettingsPage = () => {
       
       if (section === 'profile') {
         updateMerchant({
-          businessName: formData.businessName,
-          email: formData.email,
-          phone: formData.phone
+          businessName: values.businessName,
+          email: values.email,
+          phone: values.phone
         })
       }
       
-      setMessage({ type: 'success', text: `${section} settings saved successfully!` })
+      setAlertMessage({ type: 'success', text: `${section} settings saved successfully!` })
+      message.success(`${section} settings saved successfully!`)
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to save settings. Please try again.' })
+      setAlertMessage({ type: 'error', text: 'Failed to save settings. Please try again.' })
+      message.error('Failed to save settings. Please try again.')
     }
     
     setLoading(false)
   }
 
-  const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'venue', label: 'Venue', icon: Building },
-    { id: 'banking', label: 'Banking', icon: CreditCard },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'security', label: 'Security', icon: Shield }
+  const menuItems = [
+    { key: 'profile', label: 'Profile', icon: <UserOutlined /> },
+    { key: 'venue', label: 'Venue', icon: <HomeOutlined /> },
+    { key: 'banking', label: 'Banking', icon: <CreditCardOutlined /> },
+    { key: 'notifications', label: 'Notifications', icon: <BellOutlined /> },
+    { key: 'security', label: 'Security', icon: <SafetyOutlined /> }
   ]
 
   return (
     <MerchantLayout>
-      <div className="space-y-6">
+      <div style={{ padding: '24px' }}>
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-neutral-800 mb-2">Settings</h1>
-          <p className="text-neutral-600">Manage your account and business preferences</p>
+        <div style={{ marginBottom: '32px' }}>
+          <Title level={1} style={{ margin: 0, marginBottom: '8px' }}>Settings</Title>
+          <Text type="secondary">Manage your account and business preferences</Text>
         </div>
 
         {/* Message */}
-        {message.text && (
-          <div className={`p-4 rounded-2xl flex items-center space-x-3 ${
-            message.type === 'success' 
-              ? 'bg-green-50 border border-green-200' 
-              : 'bg-red-50 border border-red-200'
-          }`}>
-            {message.type === 'success' ? (
-              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-            ) : (
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-            )}
-            <span className={message.type === 'success' ? 'text-green-700' : 'text-red-700'}>
-              {message.text}
-            </span>
-          </div>
+        {alertMessage.text && (
+          <Alert
+            message={alertMessage.text}
+            type={alertMessage.type}
+            showIcon
+            closable
+            onClose={() => setAlertMessage({ type: '', text: '' })}
+            style={{ marginBottom: '24px' }}
+          />
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <Row gutter={24}>
           {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="card border border-neutral-100 p-6">
-              <nav className="space-y-2">
-                {tabs.map((tab) => {
-                  const Icon = tab.icon
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 text-left ${
-                        activeTab === tab.id
-                          ? 'bg-primary-50 text-primary-700 border border-primary-200'
-                          : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800'
-                      }`}
-                    >
-                      <Icon className="w-5 h-5" />
-                      <span className="font-medium">{tab.label}</span>
-                    </button>
-                  )
-                })}
-              </nav>
-            </div>
-          </div>
+          <Col xs={24} lg={6}>
+            <Card>
+              <Menu
+                mode="vertical"
+                selectedKeys={[activeTab]}
+                onClick={({ key }) => setActiveTab(key)}
+                items={menuItems}
+                style={{ border: 'none' }}
+              />
+            </Card>
+          </Col>
 
           {/* Content */}
-          <div className="lg:col-span-3">
-            <div className="card border border-neutral-100">
-              <div className="p-8">
-                {/* Profile Settings */}
-                {activeTab === 'profile' && (
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-neutral-800">Profile Information</h2>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Business Name *
-                        </label>
-                        <div className="relative">
-                          <Building className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                          <input
-                            type="text"
-                            name="businessName"
-                            value={formData.businessName}
-                            onChange={handleInputChange}
-                            className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300"
+          <Col xs={24} lg={18}>
+            <Card>
+              {/* Profile Settings */}
+              {activeTab === 'profile' && (
+                <div>
+                  <Title level={3} style={{ marginBottom: '24px' }}>Profile Information</Title>
+                  
+                  <Form
+                    form={profileForm}
+                    layout="vertical"
+                    onFinish={(values) => handleSave('profile', values)}
+                    initialValues={{
+                      businessName: formData.businessName,
+                      email: formData.email,
+                      phone: formData.phone,
+                      website: formData.website,
+                      description: formData.description
+                    }}
+                  >
+                    <Row gutter={16}>
+                      <Col xs={24} md={12}>
+                        <Form.Item
+                          name="businessName"
+                          label="Business Name"
+                          rules={[{ required: true, message: 'Please enter business name' }]}
+                        >
+                          <Input 
+                            prefix={<HomeOutlined />}
+                            placeholder="Your Business Name"
                           />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Email Address *
-                        </label>
-                        <div className="relative">
-                          <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                          <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300"
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item
+                          name="email"
+                          label="Email Address"
+                          rules={[
+                            { required: true, message: 'Please enter email address' },
+                            { type: 'email', message: 'Please enter a valid email' }
+                          ]}
+                        >
+                          <Input 
+                            prefix={<MailOutlined />}
+                            placeholder="your@email.com"
                           />
-                        </div>
-                      </div>
+                        </Form.Item>
+                      </Col>
+                    </Row>
 
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Phone Number *
-                        </label>
-                        <div className="relative">
-                          <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                          <input
-                            type="tel"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleInputChange}
-                            className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300"
+                    <Row gutter={16}>
+                      <Col xs={24} md={12}>
+                        <Form.Item
+                          name="phone"
+                          label="Phone Number"
+                          rules={[{ required: true, message: 'Please enter phone number' }]}
+                        >
+                          <Input 
+                            prefix={<PhoneOutlined />}
+                            placeholder="+971 50 123 4567"
                           />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Website
-                        </label>
-                        <div className="relative">
-                          <Globe className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                          <input
-                            type="url"
-                            name="website"
-                            value={formData.website}
-                            onChange={handleInputChange}
-                            className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300"
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item
+                          name="website"
+                          label="Website"
+                          rules={[{ type: 'url', message: 'Please enter a valid URL' }]}
+                        >
+                          <Input 
+                            prefix={<GlobalOutlined />}
                             placeholder="https://yourwebsite.com"
                           />
-                        </div>
-                      </div>
-                    </div>
+                        </Form.Item>
+                      </Col>
+                    </Row>
 
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Business Description
-                      </label>
-                      <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleInputChange}
+                    <Form.Item
+                      name="description"
+                      label="Business Description"
+                    >
+                      <TextArea 
                         rows={4}
-                        className="w-full px-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300 resize-none"
                         placeholder="Tell customers about your business..."
                       />
-                    </div>
+                    </Form.Item>
 
-                    <button
-                      onClick={() => handleSave('profile')}
-                      disabled={loading}
-                      className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Save className="w-5 h-5" />
-                      <span>{loading ? 'Saving...' : 'Save Changes'}</span>
-                    </button>
-                  </div>
-                )}
+                    <Form.Item>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                        icon={<SaveOutlined />}
+                        size="large"
+                        style={{ 
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          border: 'none'
+                        }}
+                      >
+                        {loading ? 'Saving...' : 'Save Changes'}
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                </div>
+              )}
 
-                {/* Venue Settings */}
-                {activeTab === 'venue' && (
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-neutral-800">Venue Information</h2>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Venue Name *
-                        </label>
-                        <input
-                          type="text"
+              {/* Venue Settings */}
+              {activeTab === 'venue' && (
+                <div>
+                  <Title level={3} style={{ marginBottom: '24px' }}>Venue Information</Title>
+                  
+                  <Form
+                    form={venueForm}
+                    layout="vertical"
+                    onFinish={(values) => handleSave('venue', values)}
+                    initialValues={{
+                      venueName: formData.venueName,
+                      capacity: formData.capacity,
+                      address: formData.address,
+                      city: formData.city
+                    }}
+                  >
+                    <Row gutter={16}>
+                      <Col xs={24} md={12}>
+                        <Form.Item
                           name="venueName"
-                          value={formData.venueName}
-                          onChange={handleInputChange}
-                          className="input-field"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Capacity
-                        </label>
-                        <input
-                          type="number"
+                          label="Venue Name"
+                          rules={[{ required: true, message: 'Please enter venue name' }]}
+                        >
+                          <Input placeholder="Your Venue Name" />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item
                           name="capacity"
-                          value={formData.capacity}
-                          onChange={handleInputChange}
-                          className="input-field"
-                          placeholder="Maximum guests"
-                        />
-                      </div>
-                    </div>
+                          label="Capacity"
+                        >
+                          <Input 
+                            type="number"
+                            placeholder="Maximum guests"
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
 
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Address *
-                      </label>
-                      <div className="relative">
-                        <MapPin className="absolute left-4 top-4 text-neutral-400 w-5 h-5" />
-                        <textarea
-                          name="address"
-                          value={formData.address}
-                          onChange={handleInputChange}
-                          rows={3}
-                          className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300 resize-none"
-                          placeholder="Full venue address"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        City *
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        className="input-field"
-                      />
-                    </div>
-
-                    <button
-                      onClick={() => handleSave('venue')}
-                      disabled={loading}
-                      className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    <Form.Item
+                      name="address"
+                      label="Address"
+                      rules={[{ required: true, message: 'Please enter venue address' }]}
                     >
-                      <Save className="w-5 h-5" />
-                      <span>{loading ? 'Saving...' : 'Save Changes'}</span>
-                    </button>
-                  </div>
-                )}
+                      <TextArea 
+                        rows={3}
+                        placeholder="Full venue address"
+                        prefix={<EnvironmentOutlined />}
+                      />
+                    </Form.Item>
 
-                {/* Banking Settings */}
-                {activeTab === 'banking' && (
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-neutral-800">Banking Information</h2>
-                    
-                    <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Shield className="w-5 h-5 text-blue-600" />
-                        <span className="font-semibold text-blue-800">Secure Information</span>
-                      </div>
-                      <p className="text-blue-700 text-sm">
-                        Your banking information is encrypted and secure. This is used for payment processing only.
-                      </p>
-                    </div>
+                    <Form.Item
+                      name="city"
+                      label="City"
+                      rules={[{ required: true, message: 'Please enter city' }]}
+                    >
+                      <Input placeholder="Dubai" />
+                    </Form.Item>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Bank Name *
-                        </label>
-                        <input
-                          type="text"
+                    <Form.Item>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                        icon={<SaveOutlined />}
+                        size="large"
+                        style={{ 
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          border: 'none'
+                        }}
+                      >
+                        {loading ? 'Saving...' : 'Save Changes'}
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                </div>
+              )}
+
+              {/* Banking Settings */}
+              {activeTab === 'banking' && (
+                <div>
+                  <Title level={3} style={{ marginBottom: '24px' }}>Banking Information</Title>
+                  
+                  <Alert
+                    message="Secure Information"
+                    description="Your banking information is encrypted and secure. This is used for payment processing only."
+                    type="info"
+                    showIcon
+                    icon={<SafetyOutlined />}
+                    style={{ marginBottom: '24px' }}
+                  />
+
+                  <Form
+                    form={bankingForm}
+                    layout="vertical"
+                    onFinish={(values) => handleSave('banking', values)}
+                    initialValues={{
+                      bankName: formData.bankName,
+                      accountNumber: formData.accountNumber,
+                      iban: formData.iban
+                    }}
+                  >
+                    <Row gutter={16}>
+                      <Col xs={24} md={12}>
+                        <Form.Item
                           name="bankName"
-                          value={formData.bankName}
-                          onChange={handleInputChange}
-                          className="input-field"
-                          placeholder="Emirates NBD"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Account Number *
-                        </label>
-                        <input
-                          type="text"
+                          label="Bank Name"
+                          rules={[{ required: true, message: 'Please enter bank name' }]}
+                        >
+                          <Input placeholder="Emirates NBD" />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item
                           name="accountNumber"
-                          value={formData.accountNumber}
-                          onChange={handleInputChange}
-                          className="input-field"
-                          placeholder="Account number"
+                          label="Account Number"
+                          rules={[{ required: true, message: 'Please enter account number' }]}
+                        >
+                          <Input placeholder="Account number" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+
+                    <Form.Item
+                      name="iban"
+                      label="IBAN"
+                      rules={[{ required: true, message: 'Please enter IBAN' }]}
+                    >
+                      <Input placeholder="AE07 0331 2345 6789 0123 456" />
+                    </Form.Item>
+
+                    <Form.Item>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                        icon={<SaveOutlined />}
+                        size="large"
+                        style={{ 
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          border: 'none'
+                        }}
+                      >
+                        {loading ? 'Saving...' : 'Save Changes'}
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                </div>
+              )}
+
+              {/* Notifications Settings */}
+              {activeTab === 'notifications' && (
+                <div>
+                  <Title level={3} style={{ marginBottom: '24px' }}>Notification Preferences</Title>
+                  
+                  <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    <Card size="small" style={{ background: '#fafafa' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <Title level={5} style={{ margin: 0, marginBottom: '4px' }}>
+                            Email Notifications for Bookings
+                          </Title>
+                          <Text type="secondary">Get notified when customers make new bookings</Text>
+                        </div>
+                        <Switch 
+                          checked={formData.emailBookings}
+                          onChange={(checked) => setFormData({...formData, emailBookings: checked})}
                         />
                       </div>
-                    </div>
+                    </Card>
 
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        IBAN *
-                      </label>
-                      <input
-                        type="text"
-                        name="iban"
-                        value={formData.iban}
-                        onChange={handleInputChange}
-                        className="input-field"
-                        placeholder="AE07 0331 2345 6789 0123 456"
-                      />
-                    </div>
-
-                    <button
-                      onClick={() => handleSave('banking')}
-                      disabled={loading}
-                      className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Save className="w-5 h-5" />
-                      <span>{loading ? 'Saving...' : 'Save Changes'}</span>
-                    </button>
-                  </div>
-                )}
-
-                {/* Notifications Settings */}
-                {activeTab === 'notifications' && (
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-neutral-800">Notification Preferences</h2>
-                    
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
+                    <Card size="small" style={{ background: '#fafafa' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                          <h3 className="font-semibold text-neutral-800">Email Notifications for Bookings</h3>
-                          <p className="text-neutral-600 text-sm">Get notified when customers make new bookings</p>
+                          <Title level={5} style={{ margin: 0, marginBottom: '4px' }}>
+                            Promotional Emails
+                          </Title>
+                          <Text type="secondary">Receive marketing tips and platform updates</Text>
                         </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            name="emailBookings"
-                            checked={formData.emailBookings}
-                            onChange={handleInputChange}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
-                        </label>
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
-                        <div>
-                          <h3 className="font-semibold text-neutral-800">Promotional Emails</h3>
-                          <p className="text-neutral-600 text-sm">Receive marketing tips and platform updates</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            name="emailPromotions"
-                            checked={formData.emailPromotions}
-                            onChange={handleInputChange}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
-                        </label>
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
-                        <div>
-                          <h3 className="font-semibold text-neutral-800">SMS Reminders</h3>
-                          <p className="text-neutral-600 text-sm">Get SMS alerts for important updates</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            name="smsReminders"
-                            checked={formData.smsReminders}
-                            onChange={handleInputChange}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
-                        </label>
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
-                        <div>
-                          <h3 className="font-semibold text-neutral-800">Push Notifications</h3>
-                          <p className="text-neutral-600 text-sm">Receive push notifications in your browser</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            name="pushNotifications"
-                            checked={formData.pushNotifications}
-                            onChange={handleInputChange}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
-                        </label>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => handleSave('notifications')}
-                      disabled={loading}
-                      className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Save className="w-5 h-5" />
-                      <span>{loading ? 'Saving...' : 'Save Changes'}</span>
-                    </button>
-                  </div>
-                )}
-
-                {/* Security Settings */}
-                {activeTab === 'security' && (
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-neutral-800">Security Settings</h2>
-                    
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Shield className="w-5 h-5 text-yellow-600" />
-                        <span className="font-semibold text-yellow-800">Password Security</span>
-                      </div>
-                      <p className="text-yellow-700 text-sm">
-                        Use a strong password with at least 8 characters, including numbers and special characters.
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Current Password *
-                        </label>
-                        <div className="relative">
-                          <input
-                            type={showPassword ? 'text' : 'password'}
-                            name="currentPassword"
-                            value={formData.currentPassword}
-                            onChange={handleInputChange}
-                            className="input-field pr-12"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-                          >
-                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          New Password *
-                        </label>
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          name="newPassword"
-                          value={formData.newPassword}
-                          onChange={handleInputChange}
-                          className="input-field"
+                        <Switch 
+                          checked={formData.emailPromotions}
+                          onChange={(checked) => setFormData({...formData, emailPromotions: checked})}
                         />
                       </div>
+                    </Card>
 
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Confirm New Password *
-                        </label>
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          name="confirmPassword"
-                          value={formData.confirmPassword}
-                          onChange={handleInputChange}
-                          className="input-field"
+                    <Card size="small" style={{ background: '#fafafa' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <Title level={5} style={{ margin: 0, marginBottom: '4px' }}>
+                            SMS Reminders
+                          </Title>
+                          <Text type="secondary">Get SMS alerts for important updates</Text>
+                        </div>
+                        <Switch 
+                          checked={formData.smsReminders}
+                          onChange={(checked) => setFormData({...formData, smsReminders: checked})}
                         />
                       </div>
-                    </div>
+                    </Card>
 
-                    <button
-                      onClick={() => handleSave('security')}
-                      disabled={loading}
-                      className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    <Card size="small" style={{ background: '#fafafa' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <Title level={5} style={{ margin: 0, marginBottom: '4px' }}>
+                            Push Notifications
+                          </Title>
+                          <Text type="secondary">Receive push notifications in your browser</Text>
+                        </div>
+                        <Switch 
+                          checked={formData.pushNotifications}
+                          onChange={(checked) => setFormData({...formData, pushNotifications: checked})}
+                        />
+                      </div>
+                    </Card>
+                  </Space>
+
+                  <div style={{ marginTop: '32px' }}>
+                    <Button
+                      type="primary"
+                      loading={loading}
+                      icon={<SaveOutlined />}
+                      size="large"
+                      onClick={() => handleSave('notifications', formData)}
+                      style={{ 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        border: 'none'
+                      }}
                     >
-                      <Save className="w-5 h-5" />
-                      <span>{loading ? 'Saving...' : 'Update Password'}</span>
-                    </button>
+                      {loading ? 'Saving...' : 'Save Changes'}
+                    </Button>
                   </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+                </div>
+              )}
+
+              {/* Security Settings */}
+              {activeTab === 'security' && (
+                <div>
+                  <Title level={3} style={{ marginBottom: '24px' }}>Security Settings</Title>
+                  
+                  <Alert
+                    message="Password Security"
+                    description="Use a strong password with at least 8 characters, including numbers and special characters."
+                    type="warning"
+                    showIcon
+                    icon={<SafetyOutlined />}
+                    style={{ marginBottom: '24px' }}
+                  />
+
+                  <Form
+                    form={securityForm}
+                    layout="vertical"
+                    onFinish={(values) => handleSave('security', values)}
+                  >
+                    <Form.Item
+                      name="currentPassword"
+                      label="Current Password"
+                      rules={[{ required: true, message: 'Please enter current password' }]}
+                    >
+                      <Password placeholder="Enter current password" />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="newPassword"
+                      label="New Password"
+                      rules={[
+                        { required: true, message: 'Please enter new password' },
+                        { min: 8, message: 'Password must be at least 8 characters' }
+                      ]}
+                    >
+                      <Password placeholder="Enter new password" />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="confirmPassword"
+                      label="Confirm New Password"
+                      dependencies={['newPassword']}
+                      rules={[
+                        { required: true, message: 'Please confirm new password' },
+                        ({ getFieldValue }) => ({
+                          validator(_, value) {
+                            if (!value || getFieldValue('newPassword') === value) {
+                              return Promise.resolve()
+                            }
+                            return Promise.reject(new Error('Passwords do not match'))
+                          },
+                        }),
+                      ]}
+                    >
+                      <Password placeholder="Confirm new password" />
+                    </Form.Item>
+
+                    <Form.Item>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                        icon={<SaveOutlined />}
+                        size="large"
+                        style={{ 
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          border: 'none'
+                        }}
+                      >
+                        {loading ? 'Updating...' : 'Update Password'}
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                </div>
+              )}
+            </Card>
+          </Col>
+        </Row>
       </div>
     </MerchantLayout>
   )

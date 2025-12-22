@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Star, MapPin, Clock, Calendar, Users, ArrowRight, Gift } from 'lucide-react'
+import { Search, Star, MapPin, Clock, Calendar, Users, ArrowRight, Filter, Gift } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
-import { Card, CardContent } from '../components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
-import EventCard from '../components/EventCard'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 
 const EventsPage = () => {
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedLocation, setSelectedLocation] = useState('all')
 
   const featuredCategories = [
     { name: "Luxury Brunch", icon: "🥂", count: 45, image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop" },
@@ -115,108 +117,94 @@ const EventsPage = () => {
   const filteredEvents = upcomingEvents.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.venue.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesSearch
+    const matchesCategory = selectedCategory === 'all' || event.category.toLowerCase().includes(selectedCategory.toLowerCase())
+    const matchesLocation = selectedLocation === 'all' || event.location.toLowerCase().includes(selectedLocation.toLowerCase())
+    
+    return matchesSearch && matchesCategory && matchesLocation
   })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-pink-50">
-      {/* Elegant Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img 
-            src="https://images.unsplash.com/photo-1566737236500-c8ac43014a8e?w=1920&h=1080&fit=crop"
-            alt="Dubai Events"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-rose-900/60 via-pink-900/50 to-orange-900/60" />
+      {/* Hero Section */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-orange-500 via-pink-500 to-purple-600 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          }} />
         </div>
         
-        {/* Floating Elements */}
-        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-rose-300/20 to-pink-300/20 rounded-full blur-2xl animate-float" />
-        <div className="absolute bottom-20 right-10 w-40 h-40 bg-gradient-to-br from-orange-300/20 to-rose-300/20 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-br from-pink-300/15 to-orange-300/15 rounded-full blur-xl animate-float" style={{ animationDelay: '4s' }} />
-        
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          {/* Elegant Badge */}
-          <div className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full shadow-lg mb-8 animate-fadeInUp">
-            <Gift className="w-4 h-4 text-rose-300 mr-2" />
-            <span className="text-white font-medium">Discover Amazing Events</span>
-          </div>
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <Badge variant="secondary" className="mb-6 bg-white/20 text-white border-white/30 backdrop-blur-sm">
+            <Gift className="w-4 h-4 mr-2" />
+            Discover Amazing Events in Dubai
+          </Badge>
           
-          {/* Elegant Typography */}
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Find Your Perfect
             <br />
-            <span className="bg-gradient-to-r from-rose-300 via-pink-300 to-orange-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
               Event Experience
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
-            From intimate gatherings to grand celebrations, discover curated events that match your style
+          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
+            From luxury brunches to rooftop parties, discover curated events that match your style
           </p>
           
-          {/* Minimal Search Bar */}
-          <div className="max-w-2xl mx-auto mb-12 animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-rose-400/20 via-pink-400/20 to-orange-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <Card className="relative bg-white/90 backdrop-blur-xl border-0 shadow-xl rounded-3xl overflow-hidden">
-                <CardContent className="p-2">
-                  <div className="flex items-center">
-                    <div className="flex-1 flex items-center px-6 py-4">
-                      <Search className="w-5 h-5 text-gray-400 mr-4 group-hover:text-rose-500 transition-colors duration-300" />
-                      <Input
-                        placeholder="Search events, venues, or experiences..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="flex-1 text-lg border-0 bg-transparent focus:ring-0 placeholder:text-gray-400"
-                      />
-                    </div>
-                    <Button
-                      size="lg"
-                      className="m-2 px-8 py-4 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                    >
-                      Search
-                    </Button>
+          {/* Enhanced Search Bar */}
+          <Card className="max-w-4xl mx-auto mb-12 bg-white/95 backdrop-blur-sm border-0 shadow-2xl">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-2 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    placeholder="Search events, venues, or experiences..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 h-12 border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                  />
+                </div>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="luxury brunch">Luxury Brunch</SelectItem>
+                    <SelectItem value="party">Rooftop Parties</SelectItem>
+                    <SelectItem value="beach">Beach Clubs</SelectItem>
+                    <SelectItem value="corporate">Corporate</SelectItem>
+                    <SelectItem value="wedding">Weddings</SelectItem>
+                    <SelectItem value="music">Live Music</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button size="lg" className="h-12 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600">
+                  <Search className="w-4 h-4 mr-2" />
+                  Search
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+            {[
+              { label: "Active Events", value: "200+" },
+              { label: "Happy Guests", value: "50K+" },
+              { label: "Partner Venues", value: "150+" },
+              { label: "Average Rating", value: "4.8★" }
+            ].map((stat, index) => (
+              <Card key={index} className="bg-white/20 backdrop-blur-sm border-white/30 text-center">
+                <CardContent className="p-4">
+                  <div className="text-2xl md:text-3xl font-bold text-yellow-300 mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-white/80 text-sm">
+                    {stat.label}
                   </div>
                 </CardContent>
               </Card>
-            </div>
-            
-            {/* Elegant Quick Filters */}
-            <div className="flex flex-wrap justify-center gap-3 mt-6">
-              {['Tonight', 'This Weekend', 'Luxury Brunch', 'Rooftop Parties', 'Live Music'].map((filter, index) => (
-                <button
-                  key={filter}
-                  className="px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 hover:border-white/50 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 animate-fadeInUp"
-                  style={{ animationDelay: `${0.8 + index * 0.1}s` }}
-                >
-                  {filter}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Elegant Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '1s' }}>
-            {[
-              { label: "Active Events", value: "200+", icon: "🎉" },
-              { label: "Happy Guests", value: "50K+", icon: "😊" },
-              { label: "Partner Venues", value: "150+", icon: "🏛️" },
-              { label: "Average Rating", value: "4.8★", icon: "⭐" }
-            ].map((stat, index) => (
-              <div key={index} className="text-center group animate-fadeInUp" style={{ animationDelay: `${1.2 + index * 0.1}s` }}>
-                <div className="w-16 h-16 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
-                  <span className="text-2xl">{stat.icon}</span>
-                </div>
-                <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-gray-600 text-sm font-medium">
-                  {stat.label}
-                </div>
-              </div>
             ))}
           </div>
         </div>
@@ -291,7 +279,62 @@ const EventsPage = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
+              <Link key={event.id} to={`/events/${event.id}`}>
+                <Card className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden border-0 bg-white">
+                  <div className="relative">
+                    <img 
+                      src={event.image} 
+                      alt={event.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <Badge className="absolute top-4 left-4 bg-white/90 text-gray-900 hover:bg-white">
+                      {event.category}
+                    </Badge>
+                    <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm rounded-full p-2">
+                      <div className="flex items-center gap-1 text-white text-sm">
+                        <Users className="w-3 h-3" />
+                        {event.attendees}
+                      </div>
+                    </div>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        <span className="font-medium">{event.rating}</span>
+                      </div>
+                      <span className="text-gray-500">({event.reviews} reviews)</span>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
+                      {event.title}
+                    </h3>
+                    <p className="text-gray-600 mb-4">{event.venue}</p>
+                    <div className="space-y-2 mb-6">
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <MapPin className="w-4 h-4" />
+                        {event.location}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <Calendar className="w-4 h-4" />
+                        {event.date}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <Clock className="w-4 h-4" />
+                        {event.time}
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <span className="text-2xl font-bold text-orange-600">AED {event.price}</span>
+                        <span className="text-gray-500 text-sm ml-1">per person</span>
+                      </div>
+                      <Button size="sm" className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600">
+                        Book Now
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
 

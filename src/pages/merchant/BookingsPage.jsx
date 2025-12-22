@@ -1,21 +1,38 @@
 import React, { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { 
-  Search, 
-  Filter, 
-  Calendar, 
-  Users, 
-  DollarSign, 
-  Eye, 
-  Download,
-  Phone,
-  Mail,
-  Clock,
-  MapPin,
-  Star
-} from 'lucide-react'
+  Card,
+  Row,
+  Col,
+  Typography,
+  Button,
+  Input,
+  Select,
+  Table,
+  Tag,
+  Statistic,
+  Space,
+  Avatar
+} from 'antd'
+import { 
+  SearchOutlined,
+  FilterOutlined,
+  CalendarOutlined,
+  UserOutlined,
+  DollarOutlined,
+  EyeOutlined,
+  DownloadOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  ClockCircleOutlined,
+  EnvironmentOutlined,
+  StarFilled
+} from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
+
+const { Title, Text } = Typography
+const { Option } = Select
 
 const BookingsPage = () => {
   const { merchant, isMerchantAuthenticated } = useMerchant()
@@ -134,15 +151,15 @@ const BookingsPage = () => {
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case 'confirmed':
-        return 'bg-green-100 text-green-700'
+        return 'success'
       case 'completed':
-        return 'bg-blue-100 text-blue-700'
+        return 'processing'
       case 'cancelled':
-        return 'bg-red-100 text-red-700'
+        return 'error'
       case 'pending':
-        return 'bg-yellow-100 text-yellow-700'
+        return 'warning'
       default:
-        return 'bg-neutral-100 text-neutral-700'
+        return 'default'
     }
   }
 
@@ -155,254 +172,263 @@ const BookingsPage = () => {
   )
 
   const exportBookings = () => {
-    // Mock export functionality
     alert('Booking data exported successfully!')
   }
 
+  const columns = [
+    {
+      title: 'Booking',
+      dataIndex: 'bookingRef',
+      key: 'bookingRef',
+      render: (text, record) => (
+        <div>
+          <Text strong>{text}</Text>
+          <br />
+          <Text type="secondary" style={{ fontSize: '12px' }}>
+            Booked: {new Date(record.bookingDate).toLocaleDateString()}
+          </Text>
+        </div>
+      )
+    },
+    {
+      title: 'Customer',
+      dataIndex: 'customerName',
+      key: 'customerName',
+      render: (text, record) => (
+        <div>
+          <Text strong>{text}</Text>
+          <br />
+          <Space style={{ fontSize: '12px' }}>
+            <MailOutlined />
+            <Text type="secondary">{record.customerEmail}</Text>
+          </Space>
+          <br />
+          <Space style={{ fontSize: '12px' }}>
+            <PhoneOutlined />
+            <Text type="secondary">{record.customerPhone}</Text>
+          </Space>
+        </div>
+      )
+    },
+    {
+      title: 'Event',
+      dataIndex: 'event',
+      key: 'event',
+      render: (text, record) => (
+        <div>
+          <Text strong>{text}</Text>
+          <br />
+          <Text type="secondary" style={{ fontSize: '12px' }}>{record.package}</Text>
+        </div>
+      )
+    },
+    {
+      title: 'Date & Time',
+      dataIndex: 'date',
+      key: 'date',
+      render: (text, record) => (
+        <div>
+          <Space style={{ marginBottom: '4px' }}>
+            <CalendarOutlined style={{ color: '#1890ff' }} />
+            <Text strong>{text}</Text>
+          </Space>
+          <br />
+          <Space style={{ fontSize: '12px' }}>
+            <ClockCircleOutlined />
+            <Text type="secondary">{record.time}</Text>
+          </Space>
+        </div>
+      )
+    },
+    {
+      title: 'Guests',
+      dataIndex: 'guests',
+      key: 'guests',
+      render: (text) => (
+        <Space>
+          <UserOutlined style={{ color: '#1890ff' }} />
+          <Text strong>{text}</Text>
+        </Space>
+      )
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'amount',
+      key: 'amount',
+      render: (text, record) => (
+        <div>
+          <Text strong style={{ color: '#1890ff' }}>AED {text}</Text>
+          <br />
+          <Text type="secondary" style={{ fontSize: '12px' }}>
+            Commission: AED {record.commission}
+          </Text>
+        </div>
+      )
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (text, record) => (
+        <div>
+          <Tag color={getStatusColor(text)}>{text}</Tag>
+          {record.rating && (
+            <div style={{ marginTop: '4px' }}>
+              <Space>
+                <StarFilled style={{ color: '#faad14', fontSize: '12px' }} />
+                <Text style={{ fontSize: '12px' }}>{record.rating}</Text>
+              </Space>
+            </div>
+          )}
+        </div>
+      )
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: () => (
+        <Button type="text" icon={<EyeOutlined />} />
+      )
+    }
+  ]
+
   return (
     <MerchantLayout>
-      <div className="space-y-6">
+      <div style={{ padding: '24px' }}>
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-neutral-800 mb-2">Bookings</h1>
-            <p className="text-neutral-600">Manage customer bookings and reservations</p>
-          </div>
-          <button 
-            onClick={exportBookings}
-            className="btn-secondary flex items-center space-x-2 mt-4 md:mt-0"
-          >
-            <Download className="w-5 h-5" />
-            <span>Export Data</span>
-          </button>
-        </div>
+        <Row justify="space-between" align="middle" style={{ marginBottom: '32px' }}>
+          <Col>
+            <Title level={2} style={{ margin: 0, marginBottom: '8px' }}>Bookings</Title>
+            <Text type="secondary">Manage customer bookings and reservations</Text>
+          </Col>
+          <Col>
+            <Button 
+              onClick={exportBookings}
+              icon={<DownloadOutlined />}
+            >
+              Export Data
+            </Button>
+          </Col>
+        </Row>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Total Bookings</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">{filteredBookings.length}</p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center shadow-soft">
-                  <Calendar className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Total Revenue</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">AED {totalRevenue.toLocaleString()}</p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-accent-400 to-accent-600 rounded-2xl flex items-center justify-center shadow-soft">
-                  <DollarSign className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Commission Earned</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">AED {totalCommission.toFixed(2)}</p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center shadow-soft">
-                  <Star className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Total Guests</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">
-                    {filteredBookings.reduce((sum, booking) => sum + booking.guests, 0)}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-accent-400 to-primary-400 rounded-2xl flex items-center justify-center shadow-soft">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Total Bookings"
+                value={filteredBookings.length}
+                prefix={<CalendarOutlined />}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Total Revenue"
+                value={`AED ${totalRevenue.toLocaleString()}`}
+                prefix={<DollarOutlined />}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Commission Earned"
+                value={`AED ${totalCommission.toFixed(2)}`}
+                prefix={<StarFilled style={{ color: '#faad14' }} />}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Total Guests"
+                value={filteredBookings.reduce((sum, booking) => sum + booking.guests, 0)}
+                prefix={<UserOutlined />}
+              />
+            </Card>
+          </Col>
+        </Row>
 
         {/* Filters */}
-        <div className="card border border-neutral-100">
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search bookings..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300"
-                />
-              </div>
-
-              {/* Status Filter */}
-              <div className="relative">
-                <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full pl-12 pr-8 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300"
-                >
-                  <option value="all">All Status</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                  <option value="pending">Pending</option>
-                </select>
-              </div>
-
-              {/* Date Filter */}
-              <div className="relative">
-                <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                <select
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
-                  className="w-full pl-12 pr-8 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300"
-                >
-                  <option value="all">All Dates</option>
-                  <option value="today">Today</option>
-                  <option value="upcoming">Upcoming</option>
-                  <option value="past">Past</option>
-                </select>
-              </div>
-
-              <div className="text-right">
-                <span className="text-neutral-600 text-sm">
-                  {filteredBookings.length} booking{filteredBookings.length !== 1 ? 's' : ''} found
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Card style={{ marginBottom: '24px' }}>
+          <Row gutter={16} align="middle">
+            <Col flex="auto">
+              <Input
+                size="large"
+                placeholder="Search bookings..."
+                prefix={<SearchOutlined />}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                allowClear
+              />
+            </Col>
+            <Col>
+              <Select
+                size="large"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                style={{ width: 150 }}
+                suffixIcon={<FilterOutlined />}
+              >
+                <Option value="all">All Status</Option>
+                <Option value="confirmed">Confirmed</Option>
+                <Option value="completed">Completed</Option>
+                <Option value="cancelled">Cancelled</Option>
+                <Option value="pending">Pending</Option>
+              </Select>
+            </Col>
+            <Col>
+              <Select
+                size="large"
+                value={dateFilter}
+                onChange={setDateFilter}
+                style={{ width: 150 }}
+                suffixIcon={<CalendarOutlined />}
+              >
+                <Option value="all">All Dates</Option>
+                <Option value="today">Today</Option>
+                <Option value="upcoming">Upcoming</Option>
+                <Option value="past">Past</Option>
+              </Select>
+            </Col>
+            <Col>
+              <Text type="secondary" style={{ fontSize: '14px' }}>
+                {filteredBookings.length} booking{filteredBookings.length !== 1 ? 's' : ''} found
+              </Text>
+            </Col>
+          </Row>
+        </Card>
 
         {/* Bookings Table */}
-        <div className="card border border-neutral-100">
-          <div className="p-6">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-neutral-200">
-                    <th className="text-left py-4 px-2 font-semibold text-neutral-800">Booking</th>
-                    <th className="text-left py-4 px-2 font-semibold text-neutral-800">Customer</th>
-                    <th className="text-left py-4 px-2 font-semibold text-neutral-800">Event</th>
-                    <th className="text-left py-4 px-2 font-semibold text-neutral-800">Date & Time</th>
-                    <th className="text-left py-4 px-2 font-semibold text-neutral-800">Guests</th>
-                    <th className="text-left py-4 px-2 font-semibold text-neutral-800">Amount</th>
-                    <th className="text-left py-4 px-2 font-semibold text-neutral-800">Status</th>
-                    <th className="text-left py-4 px-2 font-semibold text-neutral-800">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredBookings.map((booking) => (
-                    <tr key={booking.id} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
-                      <td className="py-4 px-2">
-                        <div>
-                          <div className="font-semibold text-neutral-800">{booking.bookingRef}</div>
-                          <div className="text-sm text-neutral-500">
-                            Booked: {new Date(booking.bookingDate).toLocaleDateString()}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-2">
-                        <div>
-                          <div className="font-semibold text-neutral-800">{booking.customerName}</div>
-                          <div className="text-sm text-neutral-500 flex items-center space-x-1">
-                            <Mail className="w-3 h-3" />
-                            <span>{booking.customerEmail}</span>
-                          </div>
-                          <div className="text-sm text-neutral-500 flex items-center space-x-1">
-                            <Phone className="w-3 h-3" />
-                            <span>{booking.customerPhone}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-2">
-                        <div>
-                          <div className="font-semibold text-neutral-800">{booking.event}</div>
-                          <div className="text-sm text-neutral-500">{booking.package}</div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-2">
-                        <div>
-                          <div className="font-semibold text-neutral-800 flex items-center space-x-1">
-                            <Calendar className="w-4 h-4 text-primary-400" />
-                            <span>{booking.date}</span>
-                          </div>
-                          <div className="text-sm text-neutral-500 flex items-center space-x-1">
-                            <Clock className="w-3 h-3" />
-                            <span>{booking.time}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-2">
-                        <div className="flex items-center space-x-1">
-                          <Users className="w-4 h-4 text-primary-400" />
-                          <span className="font-semibold text-neutral-800">{booking.guests}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-2">
-                        <div>
-                          <div className="font-bold text-primary-600">AED {booking.amount}</div>
-                          <div className="text-sm text-neutral-500">
-                            Commission: AED {booking.commission}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-2">
-                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(booking.status)}`}>
-                          {booking.status}
-                        </span>
-                        {booking.rating && (
-                          <div className="flex items-center space-x-1 mt-1">
-                            <Star className="w-3 h-3 text-yellow-400 fill-current" />
-                            <span className="text-xs text-neutral-500">{booking.rating}</span>
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-4 px-2">
-                        <button className="p-2 text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200">
-                          <Eye className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {filteredBookings.length === 0 && (
-              <div className="text-center py-12">
-                <Calendar className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-neutral-800 mb-2">No bookings found</h3>
-                <p className="text-neutral-600">
-                  {searchTerm || statusFilter !== 'all' || dateFilter !== 'all'
-                    ? 'Try adjusting your search or filters'
-                    : 'Your bookings will appear here once customers start making reservations'
-                  }
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
+        <Card>
+          <Table
+            columns={columns}
+            dataSource={filteredBookings}
+            rowKey="id"
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} bookings`
+            }}
+            locale={{
+              emptyText: (
+                <div style={{ padding: '48px', textAlign: 'center' }}>
+                  <CalendarOutlined style={{ fontSize: '64px', color: '#d9d9d9', marginBottom: '16px' }} />
+                  <Title level={4}>No bookings found</Title>
+                  <Text type="secondary">
+                    {searchTerm || statusFilter !== 'all' || dateFilter !== 'all'
+                      ? 'Try adjusting your search or filters'
+                      : 'Your bookings will appear here once customers start making reservations'
+                    }
+                  </Text>
+                </div>
+              )
+            }}
+          />
+        </Card>
       </div>
     </MerchantLayout>
   )

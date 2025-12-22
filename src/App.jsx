@@ -1,5 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { ConfigProvider } from 'antd'
 import { AuthProvider } from './context/AuthContext'
 import { BookingProvider } from './context/BookingContext'
 import { MerchantProvider } from './context/MerchantContext'
@@ -53,10 +54,18 @@ import ReportsPage from './pages/admin/ReportsPage'
 
 function App() {
   return (
-    <AuthProvider>
-      <BookingProvider>
-        <MerchantProvider>
-          <Router>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#1890ff',
+          borderRadius: 6,
+        },
+      }}
+    >
+      <AuthProvider>
+        <BookingProvider>
+          <MerchantProvider>
+            <Router>
             <Routes>
               {/* Customer Routes */}
               <Route path="/*" element={
@@ -120,6 +129,7 @@ function App() {
         </MerchantProvider>
       </BookingProvider>
     </AuthProvider>
+    </ConfigProvider>
   )
 }
 

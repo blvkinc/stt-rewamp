@@ -1,39 +1,88 @@
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { 
-  LayoutDashboard, 
-  Calendar, 
-  Users, 
-  BarChart3, 
-  Settings, 
-  LogOut,
-  Menu,
-  X,
-  Building,
-  Plus,
-  Tag,
-  TrendingUp,
-  Bell,
-  Package
-} from 'lucide-react'
+  Layout, 
+  Menu, 
+  Button, 
+  Avatar, 
+  Badge, 
+  Typography, 
+  Space, 
+  Tag as AntTag,
+  Dropdown
+} from 'antd'
+import {
+  DashboardOutlined,
+  CalendarOutlined,
+  TeamOutlined,
+  BarChartOutlined,
+  SettingOutlined,
+  LogoutOutlined,
+  MenuOutlined,
+  ShopOutlined,
+  PlusOutlined,
+  TagOutlined,
+  ArrowUpOutlined,
+  BellOutlined,
+  InboxOutlined
+} from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 
+const { Header, Sider, Content } = Layout
+const { Text } = Typography
+
 const MerchantLayout = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { merchant, logoutMerchant } = useMerchant()
 
-  const navigation = [
-    { name: 'Dashboard', href: '/merchant/dashboard', icon: LayoutDashboard },
-    { name: 'Events', href: '/merchant/events', icon: Calendar },
-    { name: 'Packages', href: '/merchant/packages', icon: Package },
-    { name: 'Bookings', href: '/merchant/bookings', icon: Users },
-    { name: 'Customers', href: '/merchant/customers', icon: Users },
-    { name: 'Analytics', href: '/merchant/analytics', icon: BarChart3 },
-    { name: 'Promotions', href: '/merchant/promotions', icon: Tag },
-    { name: 'Advertising', href: '/merchant/advertising', icon: TrendingUp },
-    { name: 'Settings', href: '/merchant/settings', icon: Settings },
+  const menuItems = [
+    {
+      key: '/merchant/dashboard',
+      icon: <DashboardOutlined />,
+      label: <Link to="/merchant/dashboard">Dashboard</Link>,
+    },
+    {
+      key: '/merchant/events',
+      icon: <CalendarOutlined />,
+      label: <Link to="/merchant/events">Events</Link>,
+    },
+    {
+      key: '/merchant/packages',
+      icon: <InboxOutlined />,
+      label: <Link to="/merchant/packages">Packages</Link>,
+    },
+    {
+      key: '/merchant/bookings',
+      icon: <TeamOutlined />,
+      label: <Link to="/merchant/bookings">Bookings</Link>,
+    },
+    {
+      key: '/merchant/customers',
+      icon: <TeamOutlined />,
+      label: <Link to="/merchant/customers">Customers</Link>,
+    },
+    {
+      key: '/merchant/analytics',
+      icon: <BarChartOutlined />,
+      label: <Link to="/merchant/analytics">Analytics</Link>,
+    },
+    {
+      key: '/merchant/promotions',
+      icon: <TagOutlined />,
+      label: <Link to="/merchant/promotions">Promotions</Link>,
+    },
+    {
+      key: '/merchant/advertising',
+      icon: <ArrowUpOutlined />,
+      label: <Link to="/merchant/advertising">Advertising</Link>,
+    },
+    {
+      key: '/merchant/settings',
+      icon: <SettingOutlined />,
+      label: <Link to="/merchant/settings">Settings</Link>,
+    },
   ]
 
   const handleLogout = () => {
@@ -41,145 +90,209 @@ const MerchantLayout = ({ children }) => {
     navigate('/merchant/auth')
   }
 
-  const isActive = (path) => location.pathname === path
+  const userMenuItems = [
+    {
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: 'Sign Out',
+      onClick: handleLogout,
+      danger: true,
+    },
+  ]
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-soft-lg transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div className="flex flex-col h-screen">
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sider
+        collapsible
+        collapsed={collapsed}
+        onCollapse={setCollapsed}
+        width={280}
+        style={{
+          background: '#fff',
+          boxShadow: '2px 0 8px rgba(0,0,0,0.06)',
+        }}
+        breakpoint="lg"
+        collapsedWidth="0"
+      >
+        <div style={{ 
+          height: '100%', 
+          display: 'flex', 
+          flexDirection: 'column'
+        }}>
           {/* Logo */}
-          <div className="flex items-center justify-between p-6 border-b border-neutral-100">
-            <Link to="/merchant/dashboard" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center shadow-soft">
-                <Building className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-bold text-xl text-neutral-800">STT Business</span>
+          <div style={{ 
+            padding: '24px 16px', 
+            borderBottom: '1px solid #f0f0f0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: collapsed ? 'center' : 'flex-start'
+          }}>
+            <Link to="/merchant/dashboard" style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 12,
+              textDecoration: 'none'
+            }}>
+              <Avatar 
+                size={40} 
+                icon={<ShopOutlined />} 
+                style={{ 
+                  background: 'linear-gradient(135deg, #1890ff, #096dd9)',
+                  flexShrink: 0
+                }}
+              />
+              {!collapsed && (
+                <Text strong style={{ fontSize: 18, color: '#262626' }}>
+                  STT Business
+                </Text>
+              )}
             </Link>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-2 text-neutral-600 hover:bg-neutral-100 rounded-xl"
-            >
-              <X className="w-5 h-5" />
-            </button>
           </div>
 
           {/* Merchant Info */}
-          <div className="p-6 border-b border-neutral-100">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-primary-100 rounded-2xl flex items-center justify-center">
-                <Building className="w-6 h-6 text-primary-600" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-neutral-800 truncate">
-                  {merchant?.businessName}
-                </p>
-                <p className="text-sm text-neutral-600 truncate">{merchant?.email}</p>
-                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 ${
-                  merchant?.status === 'Approved' 
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-yellow-100 text-yellow-700'
-                }`}>
-                  {merchant?.status}
-                </span>
-              </div>
+          {!collapsed && (
+            <div style={{ 
+              padding: '24px 16px', 
+              borderBottom: '1px solid #f0f0f0' 
+            }}>
+              <Space align="start" size={12}>
+                <Avatar 
+                  size={48} 
+                  icon={<ShopOutlined />} 
+                  style={{ background: '#e6f7ff', color: '#1890ff' }}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <Text strong style={{ display: 'block' }}>
+                    {merchant?.businessName}
+                  </Text>
+                  <Text type="secondary" style={{ fontSize: 12, display: 'block' }}>
+                    {merchant?.email}
+                  </Text>
+                  <AntTag 
+                    color={merchant?.status === 'Approved' ? 'success' : 'warning'}
+                    style={{ marginTop: 4 }}
+                  >
+                    {merchant?.status}
+                  </AntTag>
+                </div>
+              </Space>
             </div>
-          </div>
+          )}
 
           {/* Navigation */}
-          <nav className="flex-1 p-6 space-y-2">
-            {navigation.map((item) => {
-              const Icon = item.icon
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 ${
-                    isActive(item.href)
-                      ? 'bg-primary-50 text-primary-700 border border-primary-200'
-                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800'
-                  }`}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.name}</span>
-                </Link>
-              )
-            })}
-          </nav>
+          <div style={{ flex: 1, padding: '16px 0' }}>
+            <Menu
+              mode="inline"
+              selectedKeys={[location.pathname]}
+              items={menuItems}
+              style={{ 
+                border: 'none',
+                background: 'transparent'
+              }}
+            />
+          </div>
 
           {/* Quick Actions */}
-          <div className="p-6 border-t border-neutral-100">
-            <Link
-              to="/merchant/events/create"
-              className="w-full btn-primary flex items-center justify-center space-x-2 mb-4"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Create Event</span>
+          <div style={{ 
+            padding: '16px', 
+            borderTop: '1px solid #f0f0f0',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8
+          }}>
+            <Link to="/merchant/events/create">
+              <Button 
+                type="primary" 
+                icon={<PlusOutlined />} 
+                block={!collapsed}
+                style={{ borderRadius: 8 }}
+              >
+                {!collapsed && 'Create Event'}
+              </Button>
             </Link>
             
-            <button
+            <Button 
+              icon={<LogoutOutlined />} 
               onClick={handleLogout}
-              className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-neutral-600 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all duration-200"
+              danger
+              block={!collapsed}
+              style={{ borderRadius: 8 }}
             >
-              <LogOut className="w-5 h-5" />
-              <span>Sign Out</span>
-            </button>
+              {!collapsed && 'Sign Out'}
+            </Button>
           </div>
         </div>
-      </div>
+      </Sider>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
-        <div className="bg-white shadow-soft border-b border-neutral-100 sticky top-0 z-30">
-          <div className="flex items-center justify-between px-6 py-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 text-neutral-600 hover:bg-neutral-100 rounded-xl"
+      <Layout>
+        <Header style={{ 
+          background: '#fff', 
+          padding: '0 24px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <Button
+            type="text"
+            icon={<MenuOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            className="lg:hidden"
+          />
+
+          <Space size={16} style={{ marginLeft: 'auto' }}>
+            {/* Notifications */}
+            <Badge count={5} size="small">
+              <Button 
+                type="text" 
+                icon={<BellOutlined />} 
+                size="large"
+                style={{ borderRadius: 8 }}
+              />
+            </Badge>
+
+            {/* Profile */}
+            <Dropdown
+              menu={{ items: userMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
             >
-              <Menu className="w-6 h-6" />
-            </button>
-
-            <div className="flex items-center space-x-4 ml-auto">
-              {/* Notifications */}
-              <button className="p-2 text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-2xl transition-all duration-200 relative">
-                <Bell className="w-6 h-6" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </button>
-
-              {/* Profile */}
-              <div className="flex items-center space-x-3">
-                <div className="text-right">
-                  <p className="font-semibold text-neutral-800 text-sm">
+              <Button type="text" style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 12,
+                height: 'auto',
+                padding: '8px 12px',
+                borderRadius: 8
+              }}>
+                <div style={{ textAlign: 'right' }}>
+                  <Text strong style={{ display: 'block', fontSize: 14 }}>
                     {merchant?.businessName}
-                  </p>
-                  <p className="text-neutral-600 text-xs">{merchant?.subscriptionType} Plan</p>
+                  </Text>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    {merchant?.subscriptionType} Plan
+                  </Text>
                 </div>
-                <div className="w-10 h-10 bg-primary-100 rounded-2xl flex items-center justify-center">
-                  <Building className="w-5 h-5 text-primary-600" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                <Avatar 
+                  icon={<ShopOutlined />} 
+                  style={{ background: '#e6f7ff', color: '#1890ff' }}
+                />
+              </Button>
+            </Dropdown>
+          </Space>
+        </Header>
 
-        {/* Page content */}
-        <main className="flex-1 p-6 overflow-auto">
+        <Content style={{ 
+          margin: '24px',
+          padding: '24px',
+          background: '#f5f5f5',
+          borderRadius: 8,
+          overflow: 'auto'
+        }}>
           {children}
-        </main>
-      </div>
-    </div>
+        </Content>
+      </Layout>
+    </Layout>
   )
 }
 

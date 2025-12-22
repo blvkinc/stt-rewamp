@@ -1,32 +1,49 @@
 import React, { useState } from 'react'
 import { Navigate, Link } from 'react-router-dom'
 import { 
-  Plus, 
-  Search, 
-  Filter,
-  Edit,
-  Trash2,
-  Copy,
-  Eye,
-  TrendingUp,
-  Users,
-  DollarSign,
-  Calendar,
-  MoreVertical,
-  Star,
-  CheckCircle,
-  XCircle,
-  Clock
-} from 'lucide-react'
+  Card,
+  Row,
+  Col,
+  Typography,
+  Button,
+  Input,
+  Select,
+  Tag,
+  Statistic,
+  Dropdown,
+  Space,
+  Empty,
+  Divider
+} from 'antd'
+import { 
+  PlusOutlined,
+  SearchOutlined,
+  FilterOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  CopyOutlined,
+  EyeOutlined,
+  ArrowUpOutlined,
+  UserOutlined,
+  DollarOutlined,
+  CalendarOutlined,
+  MoreOutlined,
+  StarFilled,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  ClockCircleOutlined
+} from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
+
+const { Title, Text } = Typography
+const { Option } = Select
 
 const PackagesPage = () => {
   const { merchant, isMerchantAuthenticated } = useMerchant()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
-  const [selectedPackages, setSelectedPackages] = useState([])
 
   // Redirect to auth if not logged in
   if (!isMerchantAuthenticated) {
@@ -86,61 +103,9 @@ const PackagesPage = () => {
       features: ['Private reception', 'VIP buffet', 'Premium champagne', '4-hour dining', 'Panoramic views', 'Personal sommelier', 'Spa access', 'Photography'],
       createdAt: '2024-01-20',
       lastModified: '2024-02-03'
-    },
-    {
-      id: 4,
-      name: 'Business Lunch Package',
-      description: 'Professional dining experience for corporate meetings',
-      price: 149,
-      originalPrice: 179,
-      status: 'active',
-      event: 'Business Lunch',
-      maxGuests: 4,
-      bookings: 28,
-      revenue: 4172,
-      rating: 4.5,
-      reviews: 18,
-      features: ['Private dining room', 'Business menu', 'Coffee & tea', 'WiFi', 'Presentation equipment'],
-      createdAt: '2024-01-25',
-      lastModified: '2024-01-30'
-    },
-    {
-      id: 5,
-      name: 'Romantic Dinner Package',
-      description: 'Intimate dining experience for couples',
-      price: 399,
-      originalPrice: 449,
-      status: 'draft',
-      event: 'Romantic Dinner',
-      maxGuests: 2,
-      bookings: 0,
-      revenue: 0,
-      rating: 0,
-      reviews: 0,
-      features: ['Private table', 'Candlelight setup', '5-course menu', 'Wine pairing', 'Live music', 'Roses'],
-      createdAt: '2024-02-10',
-      lastModified: '2024-02-10'
-    },
-    {
-      id: 6,
-      name: 'Family Celebration Package',
-      description: 'Perfect for family gatherings and celebrations',
-      price: 899,
-      originalPrice: 999,
-      status: 'inactive',
-      event: 'Family Events',
-      maxGuests: 8,
-      bookings: 15,
-      revenue: 13485,
-      rating: 4.6,
-      reviews: 12,
-      features: ['Private area', 'Family menu', 'Kids activities', 'Cake included', 'Decorations', 'Photography'],
-      createdAt: '2023-12-01',
-      lastModified: '2024-01-15'
     }
   ]
 
-  // Filter packages
   const filteredPackages = packages.filter(pkg => {
     const matchesSearch = pkg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          pkg.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -158,330 +123,289 @@ const PackagesPage = () => {
     avgRating: (packages.reduce((sum, p) => sum + p.rating, 0) / packages.filter(p => p.rating > 0).length).toFixed(1)
   }
 
-  const getStatusBadge = (status) => {
-    const styles = {
-      active: 'bg-green-100 text-green-700',
-      inactive: 'bg-gray-100 text-gray-700',
-      draft: 'bg-yellow-100 text-yellow-700'
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'active': return 'success'
+      case 'inactive': return 'default'
+      case 'draft': return 'warning'
+      default: return 'default'
     }
-    return styles[status] || styles.draft
   }
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'active': return <CheckCircle className="w-4 h-4" />
-      case 'inactive': return <XCircle className="w-4 h-4" />
-      case 'draft': return <Clock className="w-4 h-4" />
+      case 'active': return <CheckCircleOutlined />
+      case 'inactive': return <CloseCircleOutlined />
+      case 'draft': return <ClockCircleOutlined />
       default: return null
     }
   }
 
   return (
     <MerchantLayout>
-      <div className="space-y-6">
+      <div style={{ padding: '24px' }}>
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-neutral-800 mb-2">Packages</h1>
-            <p className="text-neutral-600">Create and manage your event packages</p>
-          </div>
-          <div className="mt-4 md:mt-0 flex space-x-3">
-            <button className="btn-secondary flex items-center space-x-2">
-              <Copy className="w-5 h-5" />
-              <span>Duplicate</span>
-            </button>
-            <Link to="/merchant/packages/create" className="btn-primary flex items-center space-x-2">
-              <Plus className="w-5 h-5" />
-              <span>Create Package</span>
-            </Link>
-          </div>
-        </div>
+        <Row justify="space-between" align="middle" style={{ marginBottom: '32px' }}>
+          <Col>
+            <Title level={2} style={{ margin: 0, marginBottom: '8px' }}>Packages</Title>
+            <Text type="secondary">Create and manage your event packages</Text>
+          </Col>
+          <Col>
+            <Space>
+              <Button icon={<CopyOutlined />}>
+                Duplicate
+              </Button>
+              <Link to="/merchant/packages/create">
+                <Button type="primary" icon={<PlusOutlined />}>
+                  Create Package
+                </Button>
+              </Link>
+            </Space>
+          </Col>
+        </Row>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Total Packages</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">{stats.total}</p>
-                  <p className="text-sm text-neutral-500 mt-1">{stats.active} active</p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Total Bookings</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">{stats.totalBookings}</p>
-                  <p className="text-sm text-green-600 mt-1">+12% this month</p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-accent-400 to-accent-600 rounded-2xl flex items-center justify-center">
-                  <Calendar className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Total Revenue</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">AED {stats.totalRevenue.toLocaleString()}</p>
-                  <p className="text-sm text-green-600 mt-1">+18% this month</p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Average Rating</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">{stats.avgRating}</p>
-                  <div className="flex items-center mt-1">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="text-sm text-neutral-500 ml-1">out of 5.0</span>
+        <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} sm={12} lg={5}>
+            <Card>
+              <Statistic
+                title="Total Packages"
+                value={stats.total}
+                prefix={<UserOutlined />}
+                suffix={<Text type="secondary" style={{ fontSize: '12px' }}>{stats.active} active</Text>}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={5}>
+            <Card>
+              <Statistic
+                title="Total Bookings"
+                value={stats.totalBookings}
+                prefix={<CalendarOutlined />}
+                suffix={
+                  <div style={{ fontSize: '12px', color: '#52c41a', marginTop: '4px' }}>
+                    <ArrowUpOutlined /> +12% this month
                   </div>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-accent-400 to-accent-600 rounded-2xl flex items-center justify-center">
-                  <Star className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-neutral-600 text-sm font-medium">Avg. Package Price</p>
-                  <p className="text-3xl font-bold text-neutral-800 mt-2">AED {Math.round(packages.reduce((sum, p) => sum + p.price, 0) / packages.length)}</p>
-                  <p className="text-sm text-neutral-500 mt-1">per person</p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                }
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={5}>
+            <Card>
+              <Statistic
+                title="Total Revenue"
+                value={`AED ${stats.totalRevenue.toLocaleString()}`}
+                prefix={<DollarOutlined />}
+                suffix={
+                  <div style={{ fontSize: '12px', color: '#52c41a', marginTop: '4px' }}>
+                    <ArrowUpOutlined /> +18% this month
+                  </div>
+                }
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={4}>
+            <Card>
+              <Statistic
+                title="Average Rating"
+                value={stats.avgRating}
+                prefix={<StarFilled style={{ color: '#faad14' }} />}
+                suffix={<Text type="secondary" style={{ fontSize: '12px' }}>out of 5.0</Text>}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={5}>
+            <Card>
+              <Statistic
+                title="Avg. Package Price"
+                value={`AED ${Math.round(packages.reduce((sum, p) => sum + p.price, 0) / packages.length)}`}
+                prefix={<ArrowUpOutlined />}
+                suffix={<Text type="secondary" style={{ fontSize: '12px' }}>per person</Text>}
+              />
+            </Card>
+          </Col>
+        </Row>
 
         {/* Search and Filters */}
-        <div className="card border border-neutral-100">
-          <div className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search packages by name, description, or event..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none"
-                />
-              </div>
-              
-              <div className="flex gap-3">
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none"
-                >
-                  <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="draft">Draft</option>
-                </select>
-                
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="btn-secondary flex items-center space-x-2"
-                >
-                  <Filter className="w-5 h-5" />
-                  <span>Filters</span>
-                </button>
-              </div>
-            </div>
-
-            {showFilters && (
-              <div className="mt-4 pt-4 border-t border-neutral-200">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">Price Range</label>
-                    <select className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-300 outline-none">
-                      <option>All Prices</option>
-                      <option>Under AED 200</option>
-                      <option>AED 200-400</option>
-                      <option>AED 400-600</option>
-                      <option>Above AED 600</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">Event Type</label>
-                    <select className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-300 outline-none">
-                      <option>All Events</option>
-                      <option>Weekend Brunch</option>
-                      <option>Business Lunch</option>
-                      <option>Romantic Dinner</option>
-                      <option>Family Events</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">Guest Capacity</label>
-                    <select className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-300 outline-none">
-                      <option>All Capacities</option>
-                      <option>1-2 guests</option>
-                      <option>3-4 guests</option>
-                      <option>5-6 guests</option>
-                      <option>7+ guests</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">Sort By</label>
-                    <select className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-300 outline-none">
-                      <option>Most Recent</option>
-                      <option>Most Popular</option>
-                      <option>Highest Revenue</option>
-                      <option>Best Rating</option>
-                      <option>Price: Low to High</option>
-                      <option>Price: High to Low</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <Card style={{ marginBottom: '24px' }}>
+          <Row gutter={16} align="middle">
+            <Col flex="auto">
+              <Input
+                size="large"
+                placeholder="Search packages by name, description, or event..."
+                prefix={<SearchOutlined />}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                allowClear
+              />
+            </Col>
+            <Col>
+              <Select
+                size="large"
+                value={filterStatus}
+                onChange={setFilterStatus}
+                style={{ width: 150 }}
+              >
+                <Option value="all">All Status</Option>
+                <Option value="active">Active</Option>
+                <Option value="inactive">Inactive</Option>
+                <Option value="draft">Draft</Option>
+              </Select>
+            </Col>
+            <Col>
+              <Button
+                size="large"
+                icon={<FilterOutlined />}
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                Filters
+              </Button>
+            </Col>
+          </Row>
+        </Card>
 
         {/* Packages Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
           {filteredPackages.map((pkg) => (
-            <div key={pkg.id} className="card border border-neutral-100 hover:shadow-soft-lg transition-all duration-300 relative">
-              {pkg.popular && (
-                <div className="absolute -top-3 left-6 z-10">
-                  <span className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                    Most Popular
-                  </span>
-                </div>
-              )}
-              
-              <div className="p-6">
-                {/* Header */}
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-neutral-800 mb-1">{pkg.name}</h3>
-                    <p className="text-sm text-neutral-600 mb-2">{pkg.description}</p>
-                    <p className="text-xs text-neutral-500">{pkg.event}</p>
+            <Col key={pkg.id} xs={24} md={12} lg={8}>
+              <Card
+                hoverable
+                style={{ position: 'relative' }}
+                actions={[
+                  <Button type="text" icon={<EyeOutlined />} key="view">View</Button>,
+                  <Button type="text" icon={<EditOutlined />} key="edit">Edit</Button>,
+                  <Button type="text" icon={<DeleteOutlined />} key="delete" danger>Delete</Button>
+                ]}
+                extra={
+                  <Dropdown
+                    menu={{
+                      items: [
+                        { key: 'edit', icon: <EditOutlined />, label: 'Edit' },
+                        { key: 'copy', icon: <CopyOutlined />, label: 'Duplicate' },
+                        { key: 'delete', icon: <DeleteOutlined />, label: 'Delete', danger: true }
+                      ]
+                    }}
+                  >
+                    <Button type="text" icon={<MoreOutlined />} />
+                  </Dropdown>
+                }
+              >
+                {pkg.popular && (
+                  <div style={{ position: 'absolute', top: '-12px', left: '24px', zIndex: 10 }}>
+                    <Tag color="gold">Most Popular</Tag>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(pkg.status)}`}>
-                      {getStatusIcon(pkg.status)}
-                      <span className="capitalize">{pkg.status}</span>
-                    </span>
-                    <button className="p-2 hover:bg-neutral-100 rounded-lg transition-colors">
-                      <MoreVertical className="w-4 h-4 text-neutral-600" />
-                    </button>
-                  </div>
-                </div>
+                )}
+                
+                <Card.Meta
+                  title={
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Text strong>{pkg.name}</Text>
+                      <Tag color={getStatusColor(pkg.status)} icon={getStatusIcon(pkg.status)}>
+                        {pkg.status}
+                      </Tag>
+                    </div>
+                  }
+                  description={
+                    <div>
+                      <Text type="secondary" style={{ fontSize: '13px' }}>{pkg.description}</Text>
+                      <br />
+                      <Text type="secondary" style={{ fontSize: '11px' }}>{pkg.event}</Text>
+                    </div>
+                  }
+                />
+
+                <Divider />
 
                 {/* Price */}
-                <div className="mb-4">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-2xl font-bold text-primary-600">AED {pkg.price}</span>
+                <div style={{ marginBottom: '16px' }}>
+                  <Space>
+                    <Text style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>
+                      AED {pkg.price}
+                    </Text>
                     {pkg.originalPrice > pkg.price && (
-                      <span className="text-lg text-neutral-500 line-through">AED {pkg.originalPrice}</span>
+                      <Text delete type="secondary">AED {pkg.originalPrice}</Text>
                     )}
-                  </div>
-                  <p className="text-sm text-neutral-500">per person</p>
+                  </Space>
+                  <br />
+                  <Text type="secondary" style={{ fontSize: '12px' }}>per person</Text>
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 mb-4 pb-4 border-b border-neutral-200">
-                  <div>
-                    <p className="text-xs text-neutral-500 mb-1">Bookings</p>
-                    <p className="text-lg font-bold text-neutral-800">{pkg.bookings}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-neutral-500 mb-1">Revenue</p>
-                    <p className="text-lg font-bold text-neutral-800">{pkg.revenue > 0 ? `${(pkg.revenue / 1000).toFixed(1)}K` : '0'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-neutral-500 mb-1">Rating</p>
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <p className="text-lg font-bold text-neutral-800">{pkg.rating > 0 ? pkg.rating : 'N/A'}</p>
+                <Row gutter={16} style={{ marginBottom: '16px' }}>
+                  <Col span={8} style={{ textAlign: 'center' }}>
+                    <Statistic
+                      title="Bookings"
+                      value={pkg.bookings}
+                      valueStyle={{ fontSize: '16px' }}
+                    />
+                  </Col>
+                  <Col span={8} style={{ textAlign: 'center' }}>
+                    <Statistic
+                      title="Revenue"
+                      value={pkg.revenue > 0 ? `${(pkg.revenue / 1000).toFixed(1)}K` : '0'}
+                      valueStyle={{ fontSize: '16px' }}
+                    />
+                  </Col>
+                  <Col span={8} style={{ textAlign: 'center' }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '12px', color: '#8c8c8c', marginBottom: '4px' }}>Rating</div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <StarFilled style={{ color: '#faad14', marginRight: '4px' }} />
+                        <Text style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                          {pkg.rating > 0 ? pkg.rating : 'N/A'}
+                        </Text>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </Col>
+                </Row>
+
+                <Divider />
 
                 {/* Features */}
-                <div className="mb-4">
-                  <p className="text-xs font-medium text-neutral-700 mb-2">Includes:</p>
-                  <div className="space-y-1">
+                <div>
+                  <Text strong style={{ fontSize: '12px' }}>Includes:</Text>
+                  <div style={{ marginTop: '8px' }}>
                     {pkg.features.slice(0, 3).map((feature, index) => (
-                      <div key={index} className="flex items-center space-x-2 text-xs text-neutral-600">
-                        <CheckCircle className="w-3 h-3 text-primary-600" />
-                        <span>{feature}</span>
+                      <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+                        <CheckCircleOutlined style={{ color: '#52c41a', marginRight: '8px', fontSize: '12px' }} />
+                        <Text style={{ fontSize: '12px' }}>{feature}</Text>
                       </div>
                     ))}
                     {pkg.features.length > 3 && (
-                      <p className="text-xs text-neutral-500">+{pkg.features.length - 3} more features</p>
+                      <Text type="secondary" style={{ fontSize: '11px' }}>
+                        +{pkg.features.length - 3} more features
+                      </Text>
                     )}
                   </div>
                 </div>
-
-                {/* Actions */}
-                <div className="grid grid-cols-3 gap-2">
-                  <button className="flex items-center justify-center space-x-1 px-3 py-2 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors text-sm">
-                    <Eye className="w-4 h-4" />
-                    <span>View</span>
-                  </button>
-                  <button className="flex items-center justify-center space-x-1 px-3 py-2 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors text-sm">
-                    <Edit className="w-4 h-4" />
-                    <span>Edit</span>
-                  </button>
-                  <button className="flex items-center justify-center space-x-1 px-3 py-2 border border-neutral-200 rounded-lg hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-colors text-sm">
-                    <Trash2 className="w-4 h-4" />
-                    <span>Delete</span>
-                  </button>
-                </div>
-              </div>
-            </div>
+              </Card>
+            </Col>
           ))}
-        </div>
+        </Row>
 
         {/* Empty State */}
         {filteredPackages.length === 0 && (
-          <div className="card border border-neutral-100">
-            <div className="p-12 text-center">
-              <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-neutral-400" />
-              </div>
-              <h3 className="text-xl font-bold text-neutral-800 mb-2">No packages found</h3>
-              <p className="text-neutral-600 mb-6">Try adjusting your search or filters</p>
-              <button
+          <Card>
+            <Empty
+              image={<UserOutlined style={{ fontSize: '64px', color: '#d9d9d9' }} />}
+              imageStyle={{ height: 80 }}
+              description={
+                <div>
+                  <Title level={4}>No packages found</Title>
+                  <Text type="secondary">Try adjusting your search or filters</Text>
+                </div>
+              }
+            >
+              <Button
                 onClick={() => {
                   setSearchTerm('')
                   setFilterStatus('all')
                 }}
-                className="btn-secondary"
               >
                 Clear Filters
-              </button>
-            </div>
-          </div>
+              </Button>
+            </Empty>
+          </Card>
         )}
       </div>
     </MerchantLayout>

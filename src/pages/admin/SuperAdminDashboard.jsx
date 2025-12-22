@@ -1,33 +1,53 @@
 import React, { useState } from 'react'
 import { Navigate, Link } from 'react-router-dom'
 import { 
-  BarChart3, 
-  Users, 
-  Building, 
-  Calendar, 
-  DollarSign, 
-  TrendingUp, 
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Star,
-  MapPin,
-  Eye,
-  Edit3,
-  Ban,
-  UserCheck,
-  Shield,
-  Database,
-  Activity,
-  FileText,
-  Settings,
-  Bell,
-  ArrowUpRight,
-  Plus
-} from 'lucide-react'
+  Card,
+  Row,
+  Col,
+  Typography,
+  Select,
+  Statistic,
+  Badge,
+  List,
+  Avatar,
+  Space,
+  Button,
+  Tag,
+  Table,
+  Progress,
+  Alert,
+  Divider
+} from 'antd'
+import { 
+  BarChartOutlined,
+  UserOutlined,
+  HomeOutlined,
+  CalendarOutlined,
+  DollarOutlined,
+  ArrowUpOutlined,
+  WarningOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  ClockCircleOutlined,
+  StarFilled,
+  EnvironmentOutlined,
+  EyeOutlined,
+  EditOutlined,
+  StopOutlined,
+  UserAddOutlined,
+  SafetyOutlined,
+  DatabaseOutlined,
+  ThunderboltOutlined,
+  FileTextOutlined,
+  SettingOutlined,
+  BellOutlined,
+  PlusOutlined
+} from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import SuperAdminLayout from '../../components/admin/SuperAdminLayout'
+
+const { Title, Text } = Typography
+const { Option } = Select
 
 const SuperAdminDashboard = () => {
   const { merchant, isMerchantAuthenticated } = useMerchant()
@@ -257,26 +277,43 @@ const SuperAdminDashboard = () => {
     }
   ]
 
-  const StatCard = ({ title, value, icon: Icon, change, color = "primary", subtitle }) => (
-    <div className="bg-white rounded-2xl p-6 border border-neutral-100 shadow-soft hover:shadow-soft-lg transition-all duration-300">
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-neutral-600 text-sm font-medium">{title}</p>
-          <p className="text-3xl font-bold text-neutral-800 mt-2">{value}</p>
-          {subtitle && <p className="text-neutral-500 text-sm mt-1">{subtitle}</p>}
-          {change && (
-            <div className="flex items-center mt-2">
-              <TrendingUp className="w-4 h-4 text-green-500" />
-              <span className="text-green-600 text-sm font-medium ml-1">+{change}%</span>
-              <span className="text-neutral-500 text-sm ml-1">vs last month</span>
-            </div>
-          )}
-        </div>
-        <div className={`w-14 h-14 bg-gradient-to-br from-${color}-400 to-${color}-600 rounded-2xl flex items-center justify-center shadow-soft`}>
-          <Icon className="w-7 h-7 text-white" />
-        </div>
-      </div>
-    </div>
+  const StatCard = ({ title, value, icon: Icon, change, color = "#1890ff", subtitle }) => (
+    <Card hoverable>
+      <Row justify="space-between" align="middle">
+        <Col>
+          <Statistic
+            title={title}
+            value={value}
+            valueStyle={{ color: '#262626', fontSize: '28px', fontWeight: 'bold' }}
+            suffix={
+              <div style={{ fontSize: '12px', marginTop: '4px' }}>
+                {subtitle && (
+                  <Text type="secondary" style={{ display: 'block', fontSize: '12px' }}>
+                    {subtitle}
+                  </Text>
+                )}
+                {change && (
+                  <Space style={{ marginTop: '8px' }}>
+                    <ArrowUpOutlined style={{ color: '#52c41a', fontSize: '12px' }} />
+                    <Text type="success" style={{ fontSize: '12px', fontWeight: 500 }}>
+                      +{change}%
+                    </Text>
+                    <Text type="secondary" style={{ fontSize: '11px' }}>vs last month</Text>
+                  </Space>
+                )}
+              </div>
+            }
+          />
+        </Col>
+        <Col>
+          <Avatar
+            size={56}
+            style={{ backgroundColor: color }}
+            icon={<Icon />}
+          />
+        </Col>
+      </Row>
+    </Card>
   )
 
   const getActivityIcon = (type) => {
@@ -324,442 +361,697 @@ const SuperAdminDashboard = () => {
 
   return (
     <SuperAdminLayout>
-      <div className="space-y-8">
+      <div style={{ padding: '24px' }}>
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-          <div>
-            <h1 className="text-4xl font-bold text-neutral-800 mb-2">
+        <Row justify="space-between" align="middle" style={{ marginBottom: '32px' }}>
+          <Col>
+            <Title level={1} style={{ margin: 0, marginBottom: '8px', fontSize: '32px' }}>
               System Administration Center
-            </h1>
-            <p className="text-neutral-600 text-lg">
+            </Title>
+            <Text type="secondary" style={{ fontSize: '16px' }}>
               Complete platform oversight and management
-            </p>
-          </div>
-          <div className="flex items-center space-x-3 mt-4 md:mt-0">
-            {/* System Health Indicator */}
-            <div className="flex items-center space-x-2 px-4 py-2 bg-green-50 text-green-700 rounded-xl border border-green-200">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium">System Health: {platformStats.systemHealth}%</span>
-            </div>
-            
-            <select
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-              className="px-4 py-2 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-red-300 focus:border-red-300 outline-none"
-            >
-              <option value="24h">Last 24 Hours</option>
-              <option value="7d">Last 7 Days</option>
-              <option value="30d">Last 30 Days</option>
-              <option value="90d">Last 90 Days</option>
-            </select>
-          </div>
-        </div>
+            </Text>
+          </Col>
+          <Col>
+            <Space>
+              {/* System Health Indicator */}
+              <Badge 
+                status="processing" 
+                text={
+                  <Text style={{ color: '#52c41a', fontWeight: 500 }}>
+                    System Health: {platformStats.systemHealth}%
+                  </Text>
+                }
+              />
+              
+              <Select
+                value={timeRange}
+                onChange={setTimeRange}
+                style={{ width: 150 }}
+              >
+                <Option value="24h">Last 24 Hours</Option>
+                <Option value="7d">Last 7 Days</Option>
+                <Option value="30d">Last 30 Days</Option>
+                <Option value="90d">Last 90 Days</Option>
+              </Select>
+            </Space>
+          </Col>
+        </Row>
 
         {/* System Overview Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          <StatCard
-            title="Platform Users"
-            value={platformStats.totalUsers}
-            subtitle="Admins & Merchants"
-            icon={Shield}
-            change={platformStats.monthlyGrowth.users}
-            color="red"
-          />
-          <StatCard
-            title="Pending Approvals"
-            value={platformStats.pendingApprovals}
-            subtitle="Awaiting review"
-            icon={Clock}
-            change={platformStats.monthlyGrowth.approvals}
-            color="yellow"
-          />
-          <StatCard
-            title="Active Venues"
-            value={platformStats.totalVenues}
-            subtitle="Operational venues"
-            icon={Building}
-            change={platformStats.monthlyGrowth.venues}
-            color="blue"
-          />
-          <StatCard
-            title="System Alerts"
-            value={platformStats.activeAlerts}
-            subtitle="Require attention"
-            icon={AlertTriangle}
-            color="orange"
-          />
-          <StatCard
-            title="Total Revenue"
-            value={`AED ${(platformStats.totalRevenue / 1000000).toFixed(1)}M`}
-            subtitle="Platform earnings"
-            icon={DollarSign}
-            change={platformStats.monthlyGrowth.revenue}
-            color="green"
-          />
-        </div>
+        <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} sm={12} lg={5}>
+            <StatCard
+              title="Platform Users"
+              value={platformStats.totalUsers}
+              subtitle="Admins & Merchants"
+              icon={SafetyOutlined}
+              change={platformStats.monthlyGrowth.users}
+              color="#ff4d4f"
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={5}>
+            <StatCard
+              title="Pending Approvals"
+              value={platformStats.pendingApprovals}
+              subtitle="Awaiting review"
+              icon={ClockCircleOutlined}
+              change={platformStats.monthlyGrowth.approvals}
+              color="#faad14"
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={5}>
+            <StatCard
+              title="Active Venues"
+              value={platformStats.totalVenues}
+              subtitle="Operational venues"
+              icon={HomeOutlined}
+              change={platformStats.monthlyGrowth.venues}
+              color="#1890ff"
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={4}>
+            <StatCard
+              title="System Alerts"
+              value={platformStats.activeAlerts}
+              subtitle="Require attention"
+              icon={WarningOutlined}
+              color="#fa8c16"
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={5}>
+            <StatCard
+              title="Total Revenue"
+              value={`AED ${(platformStats.totalRevenue / 1000000).toFixed(1)}M`}
+              subtitle="Platform earnings"
+              icon={DollarOutlined}
+              change={platformStats.monthlyGrowth.revenue}
+              color="#52c41a"
+            />
+          </Col>
+        </Row>
 
         {/* Secondary Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatCard
-            title="Total Bookings"
-            value={platformStats.totalBookings.toLocaleString()}
-            icon={Calendar}
-            change={12.8}
-            color="primary"
-          />
-          <StatCard
-            title="Conversion Rate"
-            value={`${platformStats.conversionRate}%`}
-            icon={TrendingUp}
-            change={2.3}
-            color="accent"
-          />
-          <StatCard
-            title="Avg Order Value"
-            value={`AED ${platformStats.averageOrderValue}`}
-            icon={DollarSign}
-            change={8.7}
-            color="primary"
-          />
-        </div>
+        <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} md={8}>
+            <StatCard
+              title="Total Bookings"
+              value={platformStats.totalBookings.toLocaleString()}
+              icon={CalendarOutlined}
+              change={12.8}
+              color="#1890ff"
+            />
+          </Col>
+          <Col xs={24} md={8}>
+            <StatCard
+              title="Conversion Rate"
+              value={`${platformStats.conversionRate}%`}
+              icon={ArrowUpOutlined}
+              change={2.3}
+              color="#722ed1"
+            />
+          </Col>
+          <Col xs={24} md={8}>
+            <StatCard
+              title="Avg Order Value"
+              value={`AED ${platformStats.averageOrderValue}`}
+              icon={DollarOutlined}
+              change={8.7}
+              color="#1890ff"
+            />
+          </Col>
+        </Row>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <Row gutter={[32, 32]} style={{ marginBottom: '32px' }}>
           {/* System Alerts & Activity */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* System Alerts */}
-            <div className="bg-white rounded-2xl border border-neutral-100 shadow-soft">
-              <div className="p-6 border-b border-neutral-100">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-neutral-800">System Alerts</h2>
-                  <div className="flex items-center space-x-2">
-                    <span className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">
-                      {systemAlerts.filter(a => a.status === 'active').length} active
-                    </span>
-                    <Link to="/admin/system" className="text-red-600 hover:text-red-700 text-sm font-medium">
-                      View All
-                    </Link>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="p-6">
-                <div className="space-y-4">
-                  {systemAlerts.map((alert) => (
-                    <div key={alert.id} className="flex items-start space-x-4 p-4 bg-neutral-50 rounded-xl hover:bg-neutral-100 transition-colors">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                        alert.severity === 'high' ? 'bg-red-100 text-red-600' :
-                        alert.severity === 'medium' ? 'bg-yellow-100 text-yellow-600' :
-                        'bg-blue-100 text-blue-600'
-                      }`}>
-                        {alert.type === 'security' ? <Shield className="w-5 h-5" /> :
-                         alert.type === 'performance' ? <Activity className="w-5 h-5" /> :
-                         <Database className="w-5 h-5" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-neutral-800">{alert.title}</h3>
-                        <p className="text-neutral-600 text-sm">{alert.description}</p>
-                        <div className="flex items-center space-x-3 mt-2">
-                          <span className="text-neutral-500 text-xs">{alert.timestamp}</span>
-                          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                            alert.status === 'active' ? 'bg-red-100 text-red-700' :
-                            alert.status === 'investigating' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-green-100 text-green-700'
-                          }`}>
-                            {alert.status}
-                          </span>
-                        </div>
-                      </div>
-                      <button className="text-neutral-400 hover:text-neutral-600 p-2">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* User Management Preview */}
-            <div className="bg-white rounded-2xl border border-neutral-100 shadow-soft">
-              <div className="p-6 border-b border-neutral-100">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-neutral-800">User Management</h2>
-                  <Link to="/admin/users" className="text-red-600 hover:text-red-700 text-sm font-medium">
-                    Manage All Users
-                  </Link>
-                </div>
-              </div>
-              
-              <div className="p-6">
-                <div className="space-y-4">
-                  {userManagement.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                          <UserCheck className="w-5 h-5 text-red-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-neutral-800">{user.name}</h3>
-                          <p className="text-neutral-600 text-sm">{user.email}</p>
-                          <div className="flex items-center space-x-2 text-xs text-neutral-500">
-                            <span>{user.role}</span>
-                            <span>•</span>
-                            <span>{user.assignedVenues} venues</span>
-                            <span>•</span>
-                            <span>Active {user.lastActive}</span>
+          <Col xs={24} lg={16}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {/* System Alerts */}
+              <Card>
+                <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                  <Col>
+                    <Title level={4} style={{ margin: 0 }}>System Alerts</Title>
+                  </Col>
+                  <Col>
+                    <Space>
+                      <Badge 
+                        count={systemAlerts.filter(a => a.status === 'active').length}
+                        style={{ backgroundColor: '#ff4d4f' }}
+                      >
+                        <Text>Active</Text>
+                      </Badge>
+                      <Link to="/admin/system">
+                        <Button type="link" style={{ padding: 0 }}>
+                          View All
+                        </Button>
+                      </Link>
+                    </Space>
+                  </Col>
+                </Row>
+                
+                <List
+                  dataSource={systemAlerts}
+                  renderItem={(alert) => (
+                    <List.Item
+                      style={{ 
+                        padding: '16px', 
+                        backgroundColor: '#fafafa', 
+                        borderRadius: '8px', 
+                        marginBottom: '8px' 
+                      }}
+                      actions={[
+                        <Button 
+                          type="text" 
+                          icon={<EyeOutlined />} 
+                          size="small"
+                        />
+                      ]}
+                    >
+                      <List.Item.Meta
+                        avatar={
+                          <Avatar
+                            style={{
+                              backgroundColor: 
+                                alert.severity === 'high' ? '#ff4d4f' :
+                                alert.severity === 'medium' ? '#faad14' : '#1890ff'
+                            }}
+                            icon={
+                              alert.type === 'security' ? <SafetyOutlined /> :
+                              alert.type === 'performance' ? <ThunderboltOutlined /> :
+                              <DatabaseOutlined />
+                            }
+                          />
+                        }
+                        title={<Text strong>{alert.title}</Text>}
+                        description={
+                          <div>
+                            <Text type="secondary" style={{ fontSize: '13px' }}>
+                              {alert.description}
+                            </Text>
+                            <div style={{ marginTop: '8px' }}>
+                              <Space>
+                                <Text type="secondary" style={{ fontSize: '11px' }}>
+                                  {alert.timestamp}
+                                </Text>
+                                <Tag 
+                                  color={
+                                    alert.status === 'active' ? 'red' :
+                                    alert.status === 'investigating' ? 'orange' : 'green'
+                                  }
+                                  style={{ fontSize: '10px' }}
+                                >
+                                  {alert.status}
+                                </Tag>
+                              </Space>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                          user.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                        }`}>
+                        }
+                      />
+                    </List.Item>
+                  )}
+                />
+              </Card>
+
+              {/* User Management Preview */}
+              <Card>
+                <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                  <Col>
+                    <Title level={4} style={{ margin: 0 }}>User Management</Title>
+                  </Col>
+                  <Col>
+                    <Link to="/admin/users">
+                      <Button type="link" style={{ padding: 0 }}>
+                        Manage All Users
+                      </Button>
+                    </Link>
+                  </Col>
+                </Row>
+                
+                <List
+                  dataSource={userManagement}
+                  renderItem={(user) => (
+                    <List.Item
+                      style={{ 
+                        padding: '16px', 
+                        backgroundColor: '#fafafa', 
+                        borderRadius: '8px', 
+                        marginBottom: '8px' 
+                      }}
+                      actions={[
+                        <Tag 
+                          color={user.status === 'Active' ? 'success' : 'warning'}
+                          key="status"
+                        >
                           {user.status}
-                        </span>
-                        <button className="text-neutral-600 hover:text-neutral-700 p-2">
-                          <Edit3 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                        </Tag>,
+                        <Button 
+                          type="text" 
+                          icon={<EditOutlined />} 
+                          size="small"
+                          key="edit"
+                        />
+                      ]}
+                    >
+                      <List.Item.Meta
+                        avatar={
+                          <Avatar
+                            style={{ backgroundColor: '#ff4d4f' }}
+                            icon={<UserAddOutlined />}
+                          />
+                        }
+                        title={<Text strong>{user.name}</Text>}
+                        description={
+                          <div>
+                            <Text type="secondary" style={{ fontSize: '13px', display: 'block' }}>
+                              {user.email}
+                            </Text>
+                            <Space style={{ fontSize: '11px', color: '#8c8c8c', marginTop: '4px' }}>
+                              <span>{user.role}</span>
+                              <span>•</span>
+                              <span>{user.assignedVenues} venues</span>
+                              <span>•</span>
+                              <span>Active {user.lastActive}</span>
+                            </Space>
+                          </div>
+                        }
+                      />
+                    </List.Item>
+                  )}
+                />
+              </Card>
             </div>
-          </div>
+          </Col>
 
           {/* Approval Queue */}
-          <div>
-            <div className="bg-white rounded-2xl border border-neutral-100 shadow-soft">
-              <div className="p-6 border-b border-neutral-100">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-neutral-800">Approval Queue</h2>
-                  <span className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">
-                    {approvalQueue.length} pending
-                  </span>
-                </div>
+          <Col xs={24} lg={8}>
+            <Card>
+              <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                <Col>
+                  <Title level={4} style={{ margin: 0 }}>Approval Queue</Title>
+                </Col>
+                <Col>
+                  <Badge 
+                    count={approvalQueue.length}
+                    style={{ backgroundColor: '#ff4d4f' }}
+                  >
+                    <Text>Pending</Text>
+                  </Badge>
+                </Col>
+              </Row>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {approvalQueue.map((item) => (
+                  <Card 
+                    key={item.id} 
+                    size="small"
+                    style={{ border: '1px solid #d9d9d9' }}
+                    hoverable
+                  >
+                    <Row justify="space-between" align="top" style={{ marginBottom: '8px' }}>
+                      <Col flex="auto">
+                        <Text strong style={{ fontSize: '13px', display: 'block' }}>
+                          {item.title}
+                        </Text>
+                        <Text type="secondary" style={{ fontSize: '11px' }}>
+                          {item.submittedBy}
+                        </Text>
+                      </Col>
+                      <Col>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end' }}>
+                          <Tag 
+                            color="red" 
+                            style={{ fontSize: '10px', margin: 0 }}
+                          >
+                            {item.type}
+                          </Tag>
+                          <Tag 
+                            color={
+                              item.priority === 'critical' ? 'red' :
+                              item.priority === 'high' ? 'orange' : 'gold'
+                            }
+                            style={{ fontSize: '10px', margin: 0 }}
+                          >
+                            {item.priority}
+                          </Tag>
+                        </div>
+                      </Col>
+                    </Row>
+                    
+                    <Row justify="space-between" align="middle" style={{ marginTop: '12px' }}>
+                      <Col>
+                        <Text type="secondary" style={{ fontSize: '11px' }}>
+                          {item.submittedAt}
+                        </Text>
+                      </Col>
+                      <Col>
+                        <Space size="small">
+                          <Button 
+                            type="text" 
+                            icon={<CheckCircleOutlined />} 
+                            size="small"
+                            style={{ color: '#52c41a' }}
+                          />
+                          <Button 
+                            type="text" 
+                            icon={<CloseCircleOutlined />} 
+                            size="small"
+                            style={{ color: '#ff4d4f' }}
+                          />
+                          <Button 
+                            type="text" 
+                            icon={<EyeOutlined />} 
+                            size="small"
+                          />
+                        </Space>
+                      </Col>
+                    </Row>
+                  </Card>
+                ))}
               </div>
               
-              <div className="p-6">
-                <div className="space-y-4">
-                  {approvalQueue.map((item) => (
-                    <div key={item.id} className="border border-neutral-200 rounded-xl p-4 hover:shadow-soft transition-all duration-300">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="font-semibold text-neutral-800 text-sm">{item.title}</h3>
-                          <p className="text-neutral-600 text-xs">{item.submittedBy}</p>
-                        </div>
-                        <div className="flex flex-col items-end space-y-1">
-                          <span className="capitalize text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-lg">
-                            {item.type}
-                          </span>
-                          <span className={`text-xs font-medium px-2 py-1 rounded-lg ${
-                            item.priority === 'critical' ? 'bg-red-100 text-red-700' :
-                            item.priority === 'high' ? 'bg-orange-100 text-orange-700' :
-                            'bg-yellow-100 text-yellow-700'
-                          }`}>
-                            {item.priority}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-between items-center mt-3">
-                        <span className="text-xs text-neutral-500">{item.submittedAt}</span>
-                        <div className="flex space-x-2">
-                          <button className="text-green-600 hover:text-green-700 p-1">
-                            <CheckCircle className="w-4 h-4" />
-                          </button>
-                          <button className="text-red-600 hover:text-red-700 p-1">
-                            <XCircle className="w-4 h-4" />
-                          </button>
-                          <button className="text-neutral-600 hover:text-neutral-700 p-1">
-                            <Eye className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                <Link to="/admin/approvals" className="w-full mt-4 btn-secondary text-sm block text-center">
+              <Link to="/admin/approvals">
+                <Button 
+                  block 
+                  style={{ marginTop: '16px' }}
+                >
                   View All Approvals
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
+                </Button>
+              </Link>
+            </Card>
+          </Col>
+        </Row>
 
         {/* Top Performing Venues */}
-        <div className="bg-white rounded-2xl border border-neutral-100 shadow-soft">
-          <div className="p-6 border-b border-neutral-100">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold text-neutral-800">Top Performing Venues</h2>
-              <button className="text-primary-600 hover:text-primary-700 text-sm font-medium">
+        <Card style={{ marginBottom: '32px' }}>
+          <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+            <Col>
+              <Title level={4} style={{ margin: 0 }}>Top Performing Venues</Title>
+            </Col>
+            <Col>
+              <Button type="link" style={{ padding: 0 }}>
                 View All Venues
-              </button>
-            </div>
-          </div>
+              </Button>
+            </Col>
+          </Row>
           
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-neutral-200">
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Venue</th>
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Revenue</th>
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Bookings</th>
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Rating</th>
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Growth</th>
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {topPerformingVenues.map((venue, index) => (
-                  <tr key={venue.id} className="border-b border-neutral-100 hover:bg-neutral-50">
-                    <td className="py-4 px-6">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center text-white font-bold text-sm">
-                          {index + 1}
-                        </div>
-                        <div>
-                          <div className="font-medium text-neutral-800">{venue.name}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="font-bold text-primary-600">AED {venue.revenue.toLocaleString()}</div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="text-neutral-800">{venue.bookings}</div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="font-medium text-neutral-800">{venue.rating}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center space-x-1 text-green-600">
-                        <TrendingUp className="w-4 h-4" />
-                        <span className="font-medium">+{venue.growth}%</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex space-x-2">
-                        <button className="text-primary-600 hover:text-primary-700 p-2 rounded-lg hover:bg-primary-50 transition-colors">
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button className="text-neutral-600 hover:text-neutral-700 p-2 rounded-lg hover:bg-neutral-50 transition-colors">
-                          <Edit3 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+          <Table
+            dataSource={topPerformingVenues}
+            pagination={false}
+            size="middle"
+            columns={[
+              {
+                title: 'Venue',
+                dataIndex: 'name',
+                key: 'name',
+                render: (name, record, index) => (
+                  <Space>
+                    <Avatar
+                      style={{ backgroundColor: '#1890ff' }}
+                      size="small"
+                    >
+                      {index + 1}
+                    </Avatar>
+                    <Text strong>{name}</Text>
+                  </Space>
+                )
+              },
+              {
+                title: 'Revenue',
+                dataIndex: 'revenue',
+                key: 'revenue',
+                render: (revenue) => (
+                  <Text strong style={{ color: '#1890ff' }}>
+                    AED {revenue.toLocaleString()}
+                  </Text>
+                )
+              },
+              {
+                title: 'Bookings',
+                dataIndex: 'bookings',
+                key: 'bookings'
+              },
+              {
+                title: 'Rating',
+                dataIndex: 'rating',
+                key: 'rating',
+                render: (rating) => (
+                  <Space>
+                    <StarFilled style={{ color: '#faad14' }} />
+                    <Text strong>{rating}</Text>
+                  </Space>
+                )
+              },
+              {
+                title: 'Growth',
+                dataIndex: 'growth',
+                key: 'growth',
+                render: (growth) => (
+                  <Space style={{ color: '#52c41a' }}>
+                    <ArrowUpOutlined />
+                    <Text strong style={{ color: '#52c41a' }}>+{growth}%</Text>
+                  </Space>
+                )
+              },
+              {
+                title: 'Actions',
+                key: 'actions',
+                render: () => (
+                  <Space>
+                    <Button type="text" icon={<EyeOutlined />} size="small" />
+                    <Button type="text" icon={<EditOutlined />} size="small" />
+                  </Space>
+                )
+              }
+            ]}
+          />
+        </Card>
 
         {/* Administrative Actions */}
-        <div className="bg-white rounded-2xl border border-neutral-100 shadow-soft">
-          <div className="p-6 border-b border-neutral-100">
-            <h2 className="text-xl font-bold text-neutral-800">Administrative Actions</h2>
-          </div>
+        <Card style={{ marginBottom: '32px' }}>
+          <Title level={4} style={{ marginBottom: '24px' }}>Administrative Actions</Title>
           
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Link to="/admin/users" className="p-6 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl border border-red-200 hover:shadow-soft-lg transition-all duration-300 text-left group">
-                <div className="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Shield className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-neutral-800 mb-2">User Management</h3>
-                <p className="text-neutral-600 text-sm">Manage admin users and roles</p>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} lg={6}>
+              <Link to="/admin/users">
+                <Card 
+                  hoverable
+                  style={{ 
+                    background: 'linear-gradient(135deg, #fff1f0 0%, #ffccc7 100%)',
+                    border: '1px solid #ffccc7',
+                    textAlign: 'center'
+                  }}
+                >
+                  <Avatar
+                    size={48}
+                    style={{ backgroundColor: '#ff4d4f', marginBottom: '16px' }}
+                    icon={<SafetyOutlined />}
+                  />
+                  <Title level={5} style={{ margin: 0, marginBottom: '8px' }}>
+                    User Management
+                  </Title>
+                  <Text type="secondary" style={{ fontSize: '13px' }}>
+                    Manage admin users and roles
+                  </Text>
+                </Card>
               </Link>
+            </Col>
 
-              <Link to="/admin/venues" className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border border-blue-200 hover:shadow-soft-lg transition-all duration-300 text-left group">
-                <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Building className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-neutral-800 mb-2">All Venues</h3>
-                <p className="text-neutral-600 text-sm">System-wide venue oversight</p>
+            <Col xs={24} sm={12} lg={6}>
+              <Link to="/admin/venues">
+                <Card 
+                  hoverable
+                  style={{ 
+                    background: 'linear-gradient(135deg, #f0f5ff 0%, #d6e4ff 100%)',
+                    border: '1px solid #d6e4ff',
+                    textAlign: 'center'
+                  }}
+                >
+                  <Avatar
+                    size={48}
+                    style={{ backgroundColor: '#1890ff', marginBottom: '16px' }}
+                    icon={<HomeOutlined />}
+                  />
+                  <Title level={5} style={{ margin: 0, marginBottom: '8px' }}>
+                    All Venues
+                  </Title>
+                  <Text type="secondary" style={{ fontSize: '13px' }}>
+                    System-wide venue oversight
+                  </Text>
+                </Card>
               </Link>
+            </Col>
 
-              <Link to="/admin/approvals" className="p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl border border-yellow-200 hover:shadow-soft-lg transition-all duration-300 text-left group">
-                <div className="w-12 h-12 bg-yellow-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <FileText className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-neutral-800 mb-2">Approval Queue</h3>
-                <p className="text-neutral-600 text-sm">Review pending submissions</p>
+            <Col xs={24} sm={12} lg={6}>
+              <Link to="/admin/approvals">
+                <Card 
+                  hoverable
+                  style={{ 
+                    background: 'linear-gradient(135deg, #fffbe6 0%, #fff1b8 100%)',
+                    border: '1px solid #fff1b8',
+                    textAlign: 'center'
+                  }}
+                >
+                  <Avatar
+                    size={48}
+                    style={{ backgroundColor: '#faad14', marginBottom: '16px' }}
+                    icon={<FileTextOutlined />}
+                  />
+                  <Title level={5} style={{ margin: 0, marginBottom: '8px' }}>
+                    Approval Queue
+                  </Title>
+                  <Text type="secondary" style={{ fontSize: '13px' }}>
+                    Review pending submissions
+                  </Text>
+                </Card>
               </Link>
+            </Col>
 
-              <Link to="/admin/system" className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border border-purple-200 hover:shadow-soft-lg transition-all duration-300 text-left group">
-                <div className="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Settings className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-neutral-800 mb-2">System Settings</h3>
-                <p className="text-neutral-600 text-sm">Platform configuration</p>
+            <Col xs={24} sm={12} lg={6}>
+              <Link to="/admin/system">
+                <Card 
+                  hoverable
+                  style={{ 
+                    background: 'linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%)',
+                    border: '1px solid #efdbff',
+                    textAlign: 'center'
+                  }}
+                >
+                  <Avatar
+                    size={48}
+                    style={{ backgroundColor: '#722ed1', marginBottom: '16px' }}
+                    icon={<SettingOutlined />}
+                  />
+                  <Title level={5} style={{ margin: 0, marginBottom: '8px' }}>
+                    System Settings
+                  </Title>
+                  <Text type="secondary" style={{ fontSize: '13px' }}>
+                    Platform configuration
+                  </Text>
+                </Card>
               </Link>
-            </div>
-          </div>
-        </div>
+            </Col>
+          </Row>
+        </Card>
 
         {/* System Status Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <Row gutter={[32, 32]}>
           {/* Platform Performance */}
-          <div className="bg-white rounded-2xl border border-neutral-100 shadow-soft">
-            <div className="p-6 border-b border-neutral-100">
-              <h2 className="text-xl font-bold text-neutral-800">Platform Performance</h2>
-            </div>
-            
-            <div className="p-6 space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-neutral-600">Server Uptime</span>
-                <span className="font-semibold text-green-600">99.9%</span>
+          <Col xs={24} md={12}>
+            <Card>
+              <Title level={4} style={{ marginBottom: '24px' }}>Platform Performance</Title>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <Row justify="space-between" align="middle">
+                  <Col>
+                    <Text type="secondary">Server Uptime</Text>
+                  </Col>
+                  <Col>
+                    <Text strong style={{ color: '#52c41a' }}>99.9%</Text>
+                  </Col>
+                </Row>
+                <Row justify="space-between" align="middle">
+                  <Col>
+                    <Text type="secondary">Response Time</Text>
+                  </Col>
+                  <Col>
+                    <Text strong style={{ color: '#1890ff' }}>145ms</Text>
+                  </Col>
+                </Row>
+                <Row justify="space-between" align="middle">
+                  <Col>
+                    <Text type="secondary">Active Sessions</Text>
+                  </Col>
+                  <Col>
+                    <Text strong>2,847</Text>
+                  </Col>
+                </Row>
+                <Row justify="space-between" align="middle">
+                  <Col>
+                    <Text type="secondary">Database Health</Text>
+                  </Col>
+                  <Col>
+                    <Text strong style={{ color: '#52c41a' }}>Optimal</Text>
+                  </Col>
+                </Row>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-neutral-600">Response Time</span>
-                <span className="font-semibold text-blue-600">145ms</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-neutral-600">Active Sessions</span>
-                <span className="font-semibold text-neutral-800">2,847</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-neutral-600">Database Health</span>
-                <span className="font-semibold text-green-600">Optimal</span>
-              </div>
-            </div>
-          </div>
+            </Card>
+          </Col>
 
           {/* Recent System Changes */}
-          <div className="bg-white rounded-2xl border border-neutral-100 shadow-soft">
-            <div className="p-6 border-b border-neutral-100">
-              <h2 className="text-xl font-bold text-neutral-800">Recent System Changes</h2>
-            </div>
-            
-            <div className="p-6 space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-neutral-700">Database backup completed</span>
-                <span className="text-xs text-neutral-500 ml-auto">2h ago</span>
+          <Col xs={24} md={12}>
+            <Card>
+              <Title level={4} style={{ marginBottom: '24px' }}>Recent System Changes</Title>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <Row justify="space-between" align="middle">
+                  <Col>
+                    <Space>
+                      <div style={{ 
+                        width: '8px', 
+                        height: '8px', 
+                        backgroundColor: '#52c41a', 
+                        borderRadius: '50%' 
+                      }} />
+                      <Text style={{ fontSize: '13px' }}>Database backup completed</Text>
+                    </Space>
+                  </Col>
+                  <Col>
+                    <Text type="secondary" style={{ fontSize: '11px' }}>2h ago</Text>
+                  </Col>
+                </Row>
+                <Row justify="space-between" align="middle">
+                  <Col>
+                    <Space>
+                      <div style={{ 
+                        width: '8px', 
+                        height: '8px', 
+                        backgroundColor: '#1890ff', 
+                        borderRadius: '50%' 
+                      }} />
+                      <Text style={{ fontSize: '13px' }}>Security patch deployed</Text>
+                    </Space>
+                  </Col>
+                  <Col>
+                    <Text type="secondary" style={{ fontSize: '11px' }}>6h ago</Text>
+                  </Col>
+                </Row>
+                <Row justify="space-between" align="middle">
+                  <Col>
+                    <Space>
+                      <div style={{ 
+                        width: '8px', 
+                        height: '8px', 
+                        backgroundColor: '#faad14', 
+                        borderRadius: '50%' 
+                      }} />
+                      <Text style={{ fontSize: '13px' }}>Performance optimization</Text>
+                    </Space>
+                  </Col>
+                  <Col>
+                    <Text type="secondary" style={{ fontSize: '11px' }}>1d ago</Text>
+                  </Col>
+                </Row>
+                <Row justify="space-between" align="middle">
+                  <Col>
+                    <Space>
+                      <div style={{ 
+                        width: '8px', 
+                        height: '8px', 
+                        backgroundColor: '#722ed1', 
+                        borderRadius: '50%' 
+                      }} />
+                      <Text style={{ fontSize: '13px' }}>New feature deployment</Text>
+                    </Space>
+                  </Col>
+                  <Col>
+                    <Text type="secondary" style={{ fontSize: '11px' }}>2d ago</Text>
+                  </Col>
+                </Row>
               </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm text-neutral-700">Security patch deployed</span>
-                <span className="text-xs text-neutral-500 ml-auto">6h ago</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <span className="text-sm text-neutral-700">Performance optimization</span>
-                <span className="text-xs text-neutral-500 ml-auto">1d ago</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <span className="text-sm text-neutral-700">New feature deployment</span>
-                <span className="text-xs text-neutral-500 ml-auto">2d ago</span>
-              </div>
-            </div>
-          </div>
-        </div>
+            </Card>
+          </Col>
+        </Row>
       </div>
     </SuperAdminLayout>
   )

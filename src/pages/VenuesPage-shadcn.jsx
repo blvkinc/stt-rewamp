@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Star, MapPin, Users, ArrowRight, Building, Trophy, HeadphonesIcon, Calendar } from 'lucide-react'
+import { Search, Star, MapPin, Users, ArrowRight, Building, Trophy, HeadphonesIcon, Calendar, Wifi, Car, Utensils } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
-import { Card, CardContent } from '../components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
-import VenueCard from '../components/VenueCard'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 
 const VenuesPage = () => {
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedLocation, setSelectedLocation] = useState('all')
 
   const venueCategories = [
     { name: "Beach Clubs", icon: "🏖️", count: 28, image: "https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=400&h=300&fit=crop" },
@@ -113,111 +115,110 @@ const VenuesPage = () => {
     { icon: HeadphonesIcon, title: "Expert Support", description: "Dedicated team to help you find the perfect venue" }
   ]
 
+  const getAmenityIcon = (amenity) => {
+    const iconMap = {
+      'WiFi': Wifi,
+      'Parking': Car,
+      'Valet Parking': Car,
+      'Catering': Utensils,
+      'AV Equipment': Building,
+      'Sound System': Building,
+      'Lighting': Building
+    }
+    return iconMap[amenity] || Building
+  }
+
   const filteredVenues = featuredVenues.filter(venue => {
     const matchesSearch = venue.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          venue.location.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesSearch
+    const matchesCategory = selectedCategory === 'all' || venue.category.toLowerCase().includes(selectedCategory.toLowerCase())
+    const matchesLocation = selectedLocation === 'all' || venue.location.toLowerCase().includes(selectedLocation.toLowerCase())
+    
+    return matchesSearch && matchesCategory && matchesLocation
   })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      {/* Elegant Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img 
-            src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=1920&h=1080&fit=crop"
-            alt="Dubai Venues"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/60 via-blue-900/50 to-indigo-900/60" />
+      {/* Hero Section */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          }} />
         </div>
         
-        {/* Floating Elements */}
-        <div className="absolute top-16 right-16 w-36 h-36 bg-gradient-to-br from-purple-300/20 to-blue-300/20 rounded-full blur-2xl animate-float" />
-        <div className="absolute bottom-16 left-16 w-28 h-28 bg-gradient-to-br from-blue-300/20 to-indigo-300/20 rounded-full blur-2xl animate-float" style={{ animationDelay: '3s' }} />
-        <div className="absolute top-1/3 right-1/4 w-20 h-20 bg-gradient-to-br from-indigo-300/15 to-purple-300/15 rounded-full blur-xl animate-float" style={{ animationDelay: '1.5s' }} />
-        
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          {/* Elegant Badge */}
-          <div className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full shadow-lg mb-8 animate-fadeInUp">
-            <Building className="w-4 h-4 text-purple-300 mr-2" />
-            <span className="text-white font-medium">Discover Premium Venues</span>
-          </div>
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <Badge variant="secondary" className="mb-6 bg-white/20 text-white border-white/30 backdrop-blur-sm">
+            <Building className="w-4 h-4 mr-2" />
+            Discover Premium Venues in Dubai
+          </Badge>
           
-          {/* Elegant Typography */}
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Find Your Perfect
             <br />
-            <span className="bg-gradient-to-r from-purple-300 via-blue-300 to-indigo-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent">
               Venue Space
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
+          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
             From beachfront clubs to rooftop bars, discover venues that make your events unforgettable
           </p>
           
-          {/* Minimal Search Bar */}
-          <div className="max-w-2xl mx-auto mb-12 animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 via-blue-400/20 to-indigo-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <Card className="relative bg-white/90 backdrop-blur-xl border-0 shadow-xl rounded-3xl overflow-hidden">
-                <CardContent className="p-2">
-                  <div className="flex items-center">
-                    <div className="flex-1 flex items-center px-6 py-4">
-                      <Search className="w-5 h-5 text-gray-400 mr-4 group-hover:text-purple-500 transition-colors duration-300" />
-                      <Input
-                        placeholder="Search venues by name or location..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="flex-1 text-lg border-0 bg-transparent focus:ring-0 placeholder:text-gray-400"
-                      />
-                    </div>
-                    <Button
-                      size="lg"
-                      className="m-2 px-8 py-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                    >
-                      Search
-                    </Button>
+          {/* Enhanced Search Bar */}
+          <Card className="max-w-4xl mx-auto mb-12 bg-white/95 backdrop-blur-sm border-0 shadow-2xl">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-2 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    placeholder="Search venues by name or location..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 h-12 border-gray-200 focus:border-purple-500 focus:ring-purple-500"
+                  />
+                </div>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="beach">Beach Clubs</SelectItem>
+                    <SelectItem value="rooftop">Rooftop Bars</SelectItem>
+                    <SelectItem value="fine dining">Fine Dining</SelectItem>
+                    <SelectItem value="conference">Conference Centers</SelectItem>
+                    <SelectItem value="banquet">Banquet Halls</SelectItem>
+                    <SelectItem value="garden">Garden Venues</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button size="lg" className="h-12 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                  <Search className="w-4 h-4 mr-2" />
+                  Search
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+            {[
+              { label: "Premium Venues", value: "150+" },
+              { label: "Happy Clients", value: "25K+" },
+              { label: "Events Hosted", value: "100K+" },
+              { label: "Average Rating", value: "4.9★" }
+            ].map((stat, index) => (
+              <Card key={index} className="bg-white/20 backdrop-blur-sm border-white/30 text-center">
+                <CardContent className="p-4">
+                  <div className="text-2xl md:text-3xl font-bold text-yellow-300 mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-white/80 text-sm">
+                    {stat.label}
                   </div>
                 </CardContent>
               </Card>
-            </div>
-            
-            {/* Elegant Quick Filters */}
-            <div className="flex flex-wrap justify-center gap-3 mt-6">
-              {['Beach Clubs', 'Rooftop Bars', 'Fine Dining', 'Conference Centers', 'Garden Venues'].map((filter, index) => (
-                <button
-                  key={filter}
-                  className="px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 hover:border-white/50 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 animate-fadeInUp"
-                  style={{ animationDelay: `${0.8 + index * 0.1}s` }}
-                >
-                  {filter}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Elegant Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '1s' }}>
-            {[
-              { label: "Premium Venues", value: "150+", icon: "🏛️" },
-              { label: "Happy Clients", value: "25K+", icon: "😊" },
-              { label: "Events Hosted", value: "100K+", icon: "🎉" },
-              { label: "Average Rating", value: "4.9★", icon: "⭐" }
-            ].map((stat, index) => (
-              <div key={index} className="text-center group animate-fadeInUp" style={{ animationDelay: `${1.2 + index * 0.1}s` }}>
-                <div className="w-16 h-16 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
-                  <span className="text-2xl">{stat.icon}</span>
-                </div>
-                <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-gray-600 text-sm font-medium">
-                  {stat.label}
-                </div>
-              </div>
             ))}
           </div>
         </div>
@@ -292,7 +293,69 @@ const VenuesPage = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredVenues.map((venue) => (
-              <VenueCard key={venue.id} venue={venue} />
+              <Link key={venue.id} to={`/venues/${venue.id}`}>
+                <Card className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden border-0 bg-white">
+                  <div className="relative">
+                    <img 
+                      src={venue.image} 
+                      alt={venue.name}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <Badge className="absolute top-4 left-4 bg-white/90 text-gray-900 hover:bg-white">
+                      {venue.category}
+                    </Badge>
+                    <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm rounded-full p-2">
+                      <div className="flex items-center gap-1 text-white text-sm">
+                        <Users className="w-3 h-3" />
+                        {venue.capacity}
+                      </div>
+                    </div>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        <span className="font-medium">{venue.rating}</span>
+                      </div>
+                      <span className="text-gray-500">({venue.reviews} reviews)</span>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
+                      {venue.name}
+                    </h3>
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                      <MapPin className="w-4 h-4" />
+                      {venue.location}
+                    </div>
+                    
+                    {/* Amenities */}
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {venue.amenities.slice(0, 3).map((amenity, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {amenity}
+                        </Badge>
+                      ))}
+                      {venue.amenities.length > 3 && (
+                        <Badge variant="secondary" className="text-xs">
+                          +{venue.amenities.length - 3} more
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="text-lg font-bold text-purple-600">{venue.priceRange}</div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Calendar className="w-3 h-3" />
+                          {venue.upcomingEvents} upcoming events
+                        </div>
+                      </div>
+                      <Button size="sm" className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                        View Details
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
 

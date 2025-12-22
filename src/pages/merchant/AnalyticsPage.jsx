@@ -1,20 +1,37 @@
 import React, { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { 
-  TrendingUp, 
-  DollarSign, 
-  Users, 
-  Calendar, 
-  Eye,
-  Star,
-  Download,
-  ArrowUpRight,
-  ArrowDownRight,
-  BarChart3,
-  PieChart
-} from 'lucide-react'
+  Card,
+  Row,
+  Col,
+  Typography,
+  Select,
+  Button,
+  Statistic,
+  Progress,
+  List,
+  Avatar,
+  Space,
+  Tag,
+  Divider
+} from 'antd'
+import { 
+  ArrowUpOutlined,
+  DollarOutlined,
+  UserOutlined,
+  CalendarOutlined,
+  EyeOutlined,
+  StarFilled,
+  DownloadOutlined,
+  ArrowDownOutlined,
+  BarChartOutlined,
+  PieChartOutlined
+} from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
+
+const { Title, Text } = Typography
+const { Option } = Select
 
 const AnalyticsPage = () => {
   const { merchant, isMerchantAuthenticated } = useMerchant()
@@ -82,33 +99,42 @@ const AnalyticsPage = () => {
     ]
   }
 
-  const StatCard = ({ title, value, change, icon: Icon, color = "primary", prefix = "", suffix = "" }) => (
-    <div className="card border border-neutral-100 hover:shadow-soft-lg transition-all duration-300">
-      <div className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-neutral-600 text-sm font-medium">{title}</p>
-            <p className="text-3xl font-bold text-neutral-800 mt-2">{prefix}{value}{suffix}</p>
-            {change !== undefined && (
-              <div className="flex items-center mt-2">
-                {change >= 0 ? (
-                  <ArrowUpRight className="w-4 h-4 text-green-500" />
-                ) : (
-                  <ArrowDownRight className="w-4 h-4 text-red-500" />
-                )}
-                <span className={`text-sm font-medium ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {Math.abs(change)}%
-                </span>
-                <span className="text-neutral-500 text-sm ml-1">vs last period</span>
-              </div>
-            )}
-          </div>
-          <div className={`w-12 h-12 bg-gradient-to-br from-${color}-400 to-${color}-600 rounded-2xl flex items-center justify-center shadow-soft`}>
-            <Icon className="w-6 h-6 text-white" />
-          </div>
-        </div>
-      </div>
-    </div>
+  const StatCard = ({ title, value, change, icon: Icon, color = "#1890ff", prefix = "", suffix = "" }) => (
+    <Card hoverable>
+      <Row justify="space-between" align="middle">
+        <Col>
+          <Statistic
+            title={title}
+            value={`${prefix}${value}${suffix}`}
+            valueStyle={{ color: '#262626', fontSize: '28px', fontWeight: 'bold' }}
+            suffix={
+              change !== undefined && (
+                <div style={{ fontSize: '14px', marginTop: '8px' }}>
+                  <Space>
+                    {change >= 0 ? (
+                      <ArrowUpOutlined style={{ color: '#52c41a' }} />
+                    ) : (
+                      <ArrowDownOutlined style={{ color: '#ff4d4f' }} />
+                    )}
+                    <Text type={change >= 0 ? 'success' : 'danger'} strong>
+                      {Math.abs(change)}%
+                    </Text>
+                    <Text type="secondary" style={{ fontSize: '12px' }}>vs last period</Text>
+                  </Space>
+                </div>
+              )
+            }
+          />
+        </Col>
+        <Col>
+          <Avatar
+            size={48}
+            style={{ backgroundColor: color }}
+            icon={<Icon />}
+          />
+        </Col>
+      </Row>
+    </Card>
   )
 
   const exportReport = () => {
@@ -117,242 +143,348 @@ const AnalyticsPage = () => {
 
   return (
     <MerchantLayout>
-      <div className="space-y-8">
+      <div style={{ padding: '24px' }}>
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-neutral-800 mb-2">Analytics</h1>
-            <p className="text-neutral-600">Track your performance and business insights</p>
-          </div>
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
-            <select
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-              className="px-4 py-2 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white"
-            >
-              <option value="7days">Last 7 days</option>
-              <option value="30days">Last 30 days</option>
-              <option value="90days">Last 90 days</option>
-              <option value="1year">Last year</option>
-            </select>
-            <button 
-              onClick={exportReport}
-              className="btn-secondary flex items-center space-x-2"
-            >
-              <Download className="w-5 h-5" />
-              <span>Export Report</span>
-            </button>
-          </div>
-        </div>
+        <Row justify="space-between" align="middle" style={{ marginBottom: '32px' }}>
+          <Col>
+            <Title level={2} style={{ margin: 0, marginBottom: '8px' }}>Analytics</Title>
+            <Text type="secondary">Track your performance and business insights</Text>
+          </Col>
+          <Col>
+            <Space>
+              <Select
+                value={timeRange}
+                onChange={setTimeRange}
+                style={{ width: 150 }}
+              >
+                <Option value="7days">Last 7 days</Option>
+                <Option value="30days">Last 30 days</Option>
+                <Option value="90days">Last 90 days</Option>
+                <Option value="1year">Last year</Option>
+              </Select>
+              <Button 
+                onClick={exportReport}
+                icon={<DownloadOutlined />}
+              >
+                Export Report
+              </Button>
+            </Space>
+          </Col>
+        </Row>
 
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            title="Total Revenue"
-            value={analytics.overview.totalRevenue.toLocaleString()}
-            change={analytics.overview.revenueGrowth}
-            icon={DollarSign}
-            color="primary"
-            prefix="AED "
-          />
-          <StatCard
-            title="Total Bookings"
-            value={analytics.overview.totalBookings}
-            change={analytics.overview.bookingsGrowth}
-            icon={Calendar}
-            color="accent"
-          />
-          <StatCard
-            title="Profile Views"
-            value={analytics.overview.totalViews.toLocaleString()}
-            change={analytics.overview.viewsGrowth}
-            icon={Eye}
-            color="primary"
-          />
-          <StatCard
-            title="Average Rating"
-            value={analytics.overview.avgRating}
-            change={analytics.overview.ratingChange > 0 ? analytics.overview.ratingChange * 10 : undefined}
-            icon={Star}
-            color="accent"
-          />
-        </div>
+        <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} sm={12} lg={6}>
+            <StatCard
+              title="Total Revenue"
+              value={analytics.overview.totalRevenue.toLocaleString()}
+              change={analytics.overview.revenueGrowth}
+              icon={DollarOutlined}
+              color="#52c41a"
+              prefix="AED "
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <StatCard
+              title="Total Bookings"
+              value={analytics.overview.totalBookings}
+              change={analytics.overview.bookingsGrowth}
+              icon={CalendarOutlined}
+              color="#722ed1"
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <StatCard
+              title="Profile Views"
+              value={analytics.overview.totalViews.toLocaleString()}
+              change={analytics.overview.viewsGrowth}
+              icon={EyeOutlined}
+              color="#1890ff"
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <StatCard
+              title="Average Rating"
+              value={analytics.overview.avgRating}
+              change={analytics.overview.ratingChange > 0 ? analytics.overview.ratingChange * 10 : undefined}
+              icon={StarFilled}
+              color="#faad14"
+            />
+          </Col>
+        </Row>
 
         {/* Revenue Chart */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-neutral-800">Revenue Trend</h2>
-                <BarChart3 className="w-5 h-5 text-neutral-400" />
-              </div>
+        <Row gutter={[32, 32]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} lg={12}>
+            <Card>
+              <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                <Col>
+                  <Title level={4} style={{ margin: 0 }}>Revenue Trend</Title>
+                </Col>
+                <Col>
+                  <BarChartOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
+                </Col>
+              </Row>
               
-              <div className="space-y-4">
-                {analytics.revenueData.slice(-6).map((data, index) => (
-                  <div key={data.month} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-3 h-3 bg-primary-500 rounded-full"></div>
-                      <span className="font-medium text-neutral-700">{data.month}</span>
+              <List
+                dataSource={analytics.revenueData.slice(-6)}
+                renderItem={(data) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={
+                        <div style={{ 
+                          width: '12px', 
+                          height: '12px', 
+                          backgroundColor: '#1890ff', 
+                          borderRadius: '50%' 
+                        }} />
+                      }
+                      title={<Text strong>{data.month}</Text>}
+                      description={`${data.bookings} bookings`}
+                    />
+                    <div style={{ textAlign: 'right' }}>
+                      <Text strong style={{ fontSize: '16px' }}>
+                        AED {data.revenue.toLocaleString()}
+                      </Text>
                     </div>
-                    <div className="text-right">
-                      <div className="font-bold text-neutral-800">AED {data.revenue.toLocaleString()}</div>
-                      <div className="text-sm text-neutral-500">{data.bookings} bookings</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+                  </List.Item>
+                )}
+              />
+            </Card>
+          </Col>
 
           {/* Top Events */}
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-neutral-800">Top Performing Events</h2>
-                <TrendingUp className="w-5 h-5 text-neutral-400" />
-              </div>
+          <Col xs={24} lg={12}>
+            <Card>
+              <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                <Col>
+                  <Title level={4} style={{ margin: 0 }}>Top Performing Events</Title>
+                </Col>
+                <Col>
+                  <ArrowUpOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
+                </Col>
+              </Row>
               
-              <div className="space-y-4">
-                {analytics.topEvents.slice(0, 5).map((event, index) => (
-                  <div key={event.name} className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center text-white font-bold text-sm">
-                        {index + 1}
-                      </div>
+              <List
+                dataSource={analytics.topEvents.slice(0, 5)}
+                renderItem={(event, index) => (
+                  <List.Item style={{ padding: '16px', backgroundColor: '#fafafa', borderRadius: '8px', marginBottom: '8px' }}>
+                    <List.Item.Meta
+                      avatar={
+                        <Avatar
+                          style={{ backgroundColor: '#1890ff' }}
+                          size="small"
+                        >
+                          {index + 1}
+                        </Avatar>
+                      }
+                      title={<Text strong>{event.name}</Text>}
+                      description={
+                        <Space>
+                          <Text type="secondary">{event.bookings} bookings</Text>
+                          <Text type="secondary">•</Text>
+                          <Text type="secondary">{event.views} views</Text>
+                        </Space>
+                      }
+                    />
+                    <div style={{ textAlign: 'right' }}>
+                      <Text strong style={{ color: '#1890ff', fontSize: '16px' }}>
+                        AED {event.revenue.toLocaleString()}
+                      </Text>
                       <div>
-                        <div className="font-semibold text-neutral-800">{event.name}</div>
-                        <div className="text-sm text-neutral-500">
-                          {event.bookings} bookings • {event.views} views
-                        </div>
+                        <Space>
+                          <StarFilled style={{ color: '#faad14', fontSize: '12px' }} />
+                          <Text type="secondary" style={{ fontSize: '12px' }}>{event.rating}</Text>
+                        </Space>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-bold text-primary-600">AED {event.revenue.toLocaleString()}</div>
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-3 h-3 text-yellow-400 fill-current" />
-                        <span className="text-sm text-neutral-500">{event.rating}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+                  </List.Item>
+                )}
+              />
+            </Card>
+          </Col>
+        </Row>
 
         {/* Customer Demographics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-neutral-800">Customer Age Groups</h2>
-                <PieChart className="w-5 h-5 text-neutral-400" />
-              </div>
+        <Row gutter={[32, 32]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} lg={12}>
+            <Card>
+              <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                <Col>
+                  <Title level={4} style={{ margin: 0 }}>Customer Age Groups</Title>
+                </Col>
+                <Col>
+                  <PieChartOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
+                </Col>
+              </Row>
               
-              <div className="space-y-4">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {analytics.customerDemographics.ageGroups.map((group) => (
-                  <div key={group.range} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-primary-500 rounded-full"></div>
-                      <span className="font-medium text-neutral-700">{group.range} years</span>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <div className="w-24 bg-neutral-200 rounded-full h-2">
-                        <div 
-                          className="bg-primary-500 h-2 rounded-full transition-all duration-500"
-                          style={{ width: `${group.percentage}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm font-semibold text-neutral-600 w-12 text-right">
-                        {group.percentage}%
-                      </span>
-                    </div>
-                  </div>
+                  <Row key={group.range} justify="space-between" align="middle">
+                    <Col>
+                      <Space>
+                        <div style={{ 
+                          width: '12px', 
+                          height: '12px', 
+                          backgroundColor: '#1890ff', 
+                          borderRadius: '50%' 
+                        }} />
+                        <Text strong>{group.range} years</Text>
+                      </Space>
+                    </Col>
+                    <Col>
+                      <Space>
+                        <Progress
+                          percent={group.percentage}
+                          size="small"
+                          style={{ width: '100px' }}
+                          showInfo={false}
+                        />
+                        <Text strong style={{ width: '40px', textAlign: 'right' }}>
+                          {group.percentage}%
+                        </Text>
+                      </Space>
+                    </Col>
+                  </Row>
                 ))}
               </div>
-            </div>
-          </div>
+            </Card>
+          </Col>
 
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-neutral-800">Booking Types</h2>
-                <Users className="w-5 h-5 text-neutral-400" />
-              </div>
+          <Col xs={24} lg={12}>
+            <Card>
+              <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                <Col>
+                  <Title level={4} style={{ margin: 0 }}>Booking Types</Title>
+                </Col>
+                <Col>
+                  <UserOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
+                </Col>
+              </Row>
               
-              <div className="space-y-6">
+              <Row gutter={[16, 16]} justify="space-around">
                 {analytics.customerDemographics.bookingTypes.map((type) => (
-                  <div key={type.type} className="text-center">
-                    <div className="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-soft">
-                      <span className="text-white font-bold text-lg">{type.percentage}%</span>
+                  <Col key={type.type} span={8} style={{ textAlign: 'center' }}>
+                    <Avatar
+                      size={64}
+                      style={{ 
+                        backgroundColor: '#1890ff',
+                        marginBottom: '12px',
+                        fontSize: '18px',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {type.percentage}%
+                    </Avatar>
+                    <div>
+                      <Text strong style={{ display: 'block' }}>{type.type}</Text>
+                      <Text type="secondary" style={{ fontSize: '12px' }}>
+                        {type.count} bookings
+                      </Text>
                     </div>
-                    <div className="font-semibold text-neutral-800">{type.type}</div>
-                    <div className="text-sm text-neutral-500">{type.count} bookings</div>
-                  </div>
+                  </Col>
                 ))}
-              </div>
-            </div>
-          </div>
-        </div>
+              </Row>
+            </Card>
+          </Col>
+        </Row>
 
         {/* Peak Times */}
-        <div className="card border border-neutral-100">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-neutral-800">Peak Booking Times</h2>
-              <BarChart3 className="w-5 h-5 text-neutral-400" />
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {analytics.peakTimes.map((time) => (
-                <div key={time.time} className="text-center p-4 bg-neutral-50 rounded-2xl">
-                  <div className="text-lg font-bold text-neutral-800 mb-1">{time.time}</div>
-                  <div className="text-2xl font-bold text-primary-600 mb-1">{time.bookings}</div>
-                  <div className="text-sm text-neutral-500">bookings</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <Card style={{ marginBottom: '32px' }}>
+          <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+            <Col>
+              <Title level={4} style={{ margin: 0 }}>Peak Booking Times</Title>
+            </Col>
+            <Col>
+              <BarChartOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
+            </Col>
+          </Row>
+          
+          <Row gutter={[16, 16]}>
+            {analytics.peakTimes.map((time) => (
+              <Col key={time.time} xs={12} sm={8} md={6} lg={4}>
+                <Card size="small" style={{ textAlign: 'center', backgroundColor: '#fafafa' }}>
+                  <Text strong style={{ display: 'block', marginBottom: '4px' }}>
+                    {time.time}
+                  </Text>
+                  <Text style={{ 
+                    fontSize: '24px', 
+                    fontWeight: 'bold', 
+                    color: '#1890ff',
+                    display: 'block',
+                    marginBottom: '4px'
+                  }}>
+                    {time.bookings}
+                  </Text>
+                  <Text type="secondary" style={{ fontSize: '12px' }}>
+                    bookings
+                  </Text>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </Card>
 
         {/* Insights */}
-        <div className="card border border-neutral-100">
-          <div className="p-6">
-            <h2 className="text-xl font-bold text-neutral-800 mb-6">Key Insights</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="p-4 bg-green-50 border border-green-200 rounded-2xl">
-                <div className="flex items-center space-x-2 mb-2">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
-                  <span className="font-semibold text-green-800">Revenue Growth</span>
-                </div>
-                <p className="text-green-700 text-sm">
+        <Card>
+          <Title level={4} style={{ marginBottom: '24px' }}>Key Insights</Title>
+          
+          <Row gutter={[24, 24]}>
+            <Col xs={24} md={8}>
+              <Card 
+                size="small" 
+                style={{ 
+                  backgroundColor: '#f6ffed', 
+                  border: '1px solid #b7eb8f' 
+                }}
+              >
+                <Space style={{ marginBottom: '12px' }}>
+                  <ArrowUpOutlined style={{ color: '#52c41a', fontSize: '16px' }} />
+                  <Text strong style={{ color: '#389e0d' }}>Revenue Growth</Text>
+                </Space>
+                <Text style={{ color: '#52c41a', fontSize: '14px' }}>
                   Your revenue increased by 12.5% compared to last period. Weekend brunches are your top performer.
-                </p>
-              </div>
+                </Text>
+              </Card>
+            </Col>
 
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-2xl">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Users className="w-5 h-5 text-blue-600" />
-                  <span className="font-semibold text-blue-800">Customer Preference</span>
-                </div>
-                <p className="text-blue-700 text-sm">
+            <Col xs={24} md={8}>
+              <Card 
+                size="small" 
+                style={{ 
+                  backgroundColor: '#f0f5ff', 
+                  border: '1px solid #91d5ff' 
+                }}
+              >
+                <Space style={{ marginBottom: '12px' }}>
+                  <UserOutlined style={{ color: '#1890ff', fontSize: '16px' }} />
+                  <Text strong style={{ color: '#096dd9' }}>Customer Preference</Text>
+                </Space>
+                <Text style={{ color: '#1890ff', fontSize: '14px' }}>
                   Couple bookings make up 45% of your reservations. Consider creating more romantic packages.
-                </p>
-              </div>
+                </Text>
+              </Card>
+            </Col>
 
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Star className="w-5 h-5 text-yellow-600" />
-                  <span className="font-semibold text-yellow-800">Rating Improvement</span>
-                </div>
-                <p className="text-yellow-700 text-sm">
+            <Col xs={24} md={8}>
+              <Card 
+                size="small" 
+                style={{ 
+                  backgroundColor: '#fffbe6', 
+                  border: '1px solid #ffe58f' 
+                }}
+              >
+                <Space style={{ marginBottom: '12px' }}>
+                  <StarFilled style={{ color: '#faad14', fontSize: '16px' }} />
+                  <Text strong style={{ color: '#d48806' }}>Rating Improvement</Text>
+                </Space>
+                <Text style={{ color: '#faad14', fontSize: '14px' }}>
                   Your average rating improved to 4.6. Keep focusing on service quality to reach 4.8+.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+                </Text>
+              </Card>
+            </Col>
+          </Row>
+        </Card>
       </div>
     </MerchantLayout>
   )

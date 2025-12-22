@@ -1,21 +1,40 @@
 import React, { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Eye, 
-  Edit, 
-  Copy, 
-  Trash2, 
-  Calendar,
-  Users,
-  DollarSign,
-  MoreVertical,
-  Star
-} from 'lucide-react'
+  Button,
+  Input,
+  Select,
+  Card,
+  Row,
+  Col,
+  Typography,
+  Tag,
+  Dropdown,
+  Space,
+  Statistic,
+  Empty,
+  Rate,
+  Avatar
+} from 'antd'
+import { 
+  PlusOutlined,
+  SearchOutlined,
+  FilterOutlined,
+  EyeOutlined,
+  EditOutlined,
+  CopyOutlined,
+  DeleteOutlined,
+  CalendarOutlined,
+  UserOutlined,
+  DollarOutlined,
+  MoreOutlined,
+  StarFilled
+} from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
+
+const { Title, Text } = Typography
+const { Option } = Select
 
 const EventsPage = () => {
   const { merchant, events, cloneEvent, deleteEvent, isMerchantAuthenticated } = useMerchant()
@@ -99,190 +118,208 @@ const EventsPage = () => {
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case 'published':
-        return 'bg-green-100 text-green-700'
+        return 'success'
       case 'draft':
-        return 'bg-yellow-100 text-yellow-700'
+        return 'warning'
       case 'pending approval':
-        return 'bg-blue-100 text-blue-700'
+        return 'processing'
       case 'rejected':
-        return 'bg-red-100 text-red-700'
+        return 'error'
       default:
-        return 'bg-neutral-100 text-neutral-700'
+        return 'default'
     }
   }
 
   return (
     <MerchantLayout>
-      <div className="space-y-6">
+      <div style={{ padding: '24px' }}>
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-neutral-800 mb-2">Events</h1>
-            <p className="text-neutral-600">Manage your dining experiences and events</p>
-          </div>
-          <Link to="/merchant/events/create" className="btn-primary flex items-center space-x-2 mt-4 md:mt-0">
-            <Plus className="w-5 h-5" />
-            <span>Create Event</span>
-          </Link>
-        </div>
+        <Row justify="space-between" align="middle" style={{ marginBottom: '32px' }}>
+          <Col>
+            <Title level={2} style={{ margin: 0, marginBottom: '8px' }}>Events</Title>
+            <Text type="secondary">Manage your dining experiences and events</Text>
+          </Col>
+          <Col>
+            <Link to="/merchant/events/create">
+              <Button type="primary" size="large" icon={<PlusOutlined />}>
+                Create Event
+              </Button>
+            </Link>
+          </Col>
+        </Row>
 
         {/* Filters */}
-        <div className="card border border-neutral-100">
-          <div className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              {/* Search */}
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search events..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300"
-                />
-              </div>
-
-              {/* Status Filter */}
-              <div className="relative">
-                <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="pl-12 pr-8 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300"
-                >
-                  <option value="all">All Status</option>
-                  <option value="published">Published</option>
-                  <option value="draft">Draft</option>
-                  <option value="pending approval">Pending Approval</option>
-                  <option value="rejected">Rejected</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Card style={{ marginBottom: '24px' }}>
+          <Row gutter={16}>
+            <Col flex="auto">
+              <Input
+                size="large"
+                placeholder="Search events..."
+                prefix={<SearchOutlined />}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                allowClear
+              />
+            </Col>
+            <Col>
+              <Select
+                size="large"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                style={{ width: 200 }}
+                suffixIcon={<FilterOutlined />}
+              >
+                <Option value="all">All Status</Option>
+                <Option value="published">Published</Option>
+                <Option value="draft">Draft</Option>
+                <Option value="pending approval">Pending Approval</Option>
+                <Option value="rejected">Rejected</Option>
+              </Select>
+            </Col>
+          </Row>
+        </Card>
 
         {/* Events Grid */}
         {filteredEvents.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Row gutter={[24, 24]}>
             {filteredEvents.map((event) => (
-              <div key={event.id} className="card border border-neutral-100 hover:shadow-soft-lg transition-all duration-300 group">
-                <div className="relative">
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="w-full h-48 object-cover rounded-t-2xl"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(event.status)}`}>
-                      {event.status}
-                    </span>
-                  </div>
-                  <div className="absolute top-4 right-4">
-                    <div className="relative">
-                      <button
-                        onClick={() => setShowDropdown(showDropdown === event.id ? null : event.id)}
-                        className="p-2 bg-white/90 backdrop-blur-sm rounded-2xl hover:bg-white transition-colors shadow-soft"
-                      >
-                        <MoreVertical className="w-4 h-4 text-neutral-600" />
-                      </button>
-                      
-                      {showDropdown === event.id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-soft-lg border border-neutral-100 py-2 z-10">
-                          <Link
-                            to={`/merchant/events/${event.id}/edit`}
-                            className="flex items-center space-x-3 px-4 py-2 text-neutral-700 hover:bg-neutral-50 transition-colors"
-                            onClick={() => setShowDropdown(null)}
-                          >
-                            <Edit className="w-4 h-4" />
-                            <span>Edit</span>
-                          </Link>
-                          <button
-                            onClick={() => handleCloneEvent(event.id)}
-                            className="w-full flex items-center space-x-3 px-4 py-2 text-neutral-700 hover:bg-neutral-50 transition-colors"
-                          >
-                            <Copy className="w-4 h-4" />
-                            <span>Clone</span>
-                          </button>
-                          <Link
-                            to={`/events/${event.id}`}
-                            className="flex items-center space-x-3 px-4 py-2 text-neutral-700 hover:bg-neutral-50 transition-colors"
-                            onClick={() => setShowDropdown(null)}
-                          >
-                            <Eye className="w-4 h-4" />
-                            <span>View Public</span>
-                          </Link>
-                          <hr className="my-2 border-neutral-100" />
-                          <button
-                            onClick={() => handleDeleteEvent(event.id)}
-                            className="w-full flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            <span>Delete</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-neutral-800 mb-2 group-hover:text-primary-600 transition-colors">
-                    {event.title}
-                  </h3>
-                  <p className="text-neutral-600 mb-4 line-clamp-2">{event.description}</p>
-
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="flex items-center space-x-2 text-sm text-neutral-600">
-                      <Calendar className="w-4 h-4 text-primary-400" />
-                      <span>{event.date}</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-sm text-neutral-600">
-                      <DollarSign className="w-4 h-4 text-primary-400" />
-                      <span>AED {event.price}</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4 pt-4 border-t border-neutral-100">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-primary-600">{event.bookings}</div>
-                      <div className="text-xs text-neutral-500">Bookings</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-primary-600">{event.views}</div>
-                      <div className="text-xs text-neutral-500">Views</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="flex items-center justify-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="text-lg font-bold text-primary-600">
-                          {event.rating || 'N/A'}
-                        </span>
+              <Col key={event.id} xs={24} md={12} lg={8}>
+                <Card
+                  hoverable
+                  cover={
+                    <div style={{ position: 'relative' }}>
+                      <img
+                        src={event.image}
+                        alt={event.title}
+                        style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                      />
+                      <div style={{ position: 'absolute', top: '12px', left: '12px' }}>
+                        <Tag color={getStatusColor(event.status)}>
+                          {event.status}
+                        </Tag>
                       </div>
-                      <div className="text-xs text-neutral-500">Rating</div>
+                      <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
+                        <Dropdown
+                          menu={{
+                            items: [
+                              {
+                                key: 'edit',
+                                icon: <EditOutlined />,
+                                label: <Link to={`/merchant/events/${event.id}/edit`}>Edit</Link>
+                              },
+                              {
+                                key: 'clone',
+                                icon: <CopyOutlined />,
+                                label: 'Clone',
+                                onClick: () => handleCloneEvent(event.id)
+                              },
+                              {
+                                key: 'view',
+                                icon: <EyeOutlined />,
+                                label: <Link to={`/events/${event.id}`}>View Public</Link>
+                              },
+                              { type: 'divider' },
+                              {
+                                key: 'delete',
+                                icon: <DeleteOutlined />,
+                                label: 'Delete',
+                                danger: true,
+                                onClick: () => handleDeleteEvent(event.id)
+                              }
+                            ]
+                          }}
+                          trigger={['click']}
+                        >
+                          <Button
+                            type="text"
+                            icon={<MoreOutlined />}
+                            style={{ 
+                              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                              backdropFilter: 'blur(8px)'
+                            }}
+                          />
+                        </Dropdown>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
+                  }
+                  actions={[
+                    <Space key="date">
+                      <CalendarOutlined />
+                      <Text type="secondary">{event.date}</Text>
+                    </Space>,
+                    <Space key="price">
+                      <DollarOutlined />
+                      <Text type="secondary">AED {event.price}</Text>
+                    </Space>
+                  ]}
+                >
+                  <Card.Meta
+                    title={event.title}
+                    description={
+                      <div>
+                        <Text type="secondary" ellipsis={{ rows: 2 }}>
+                          {event.description}
+                        </Text>
+                        <Row gutter={16} style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f0f0f0' }}>
+                          <Col span={8} style={{ textAlign: 'center' }}>
+                            <Statistic
+                              title="Bookings"
+                              value={event.bookings}
+                              valueStyle={{ fontSize: '16px', color: '#1890ff' }}
+                            />
+                          </Col>
+                          <Col span={8} style={{ textAlign: 'center' }}>
+                            <Statistic
+                              title="Views"
+                              value={event.views}
+                              valueStyle={{ fontSize: '16px', color: '#1890ff' }}
+                            />
+                          </Col>
+                          <Col span={8} style={{ textAlign: 'center' }}>
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{ fontSize: '12px', color: '#8c8c8c', marginBottom: '4px' }}>Rating</div>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <StarFilled style={{ color: '#faad14', marginRight: '4px' }} />
+                                <Text style={{ fontSize: '16px', color: '#1890ff', fontWeight: 'bold' }}>
+                                  {event.rating || 'N/A'}
+                                </Text>
+                              </div>
+                            </div>
+                          </Col>
+                        </Row>
+                      </div>
+                    }
+                  />
+                </Card>
+              </Col>
             ))}
-          </div>
+          </Row>
         ) : (
-          <div className="card border border-neutral-100">
-            <div className="p-12 text-center">
-              <Calendar className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-neutral-800 mb-2">No events found</h3>
-              <p className="text-neutral-600 mb-6">
-                {searchTerm || statusFilter !== 'all' 
-                  ? 'Try adjusting your search or filters'
-                  : 'Create your first event to start attracting customers'
-                }
-              </p>
+          <Card>
+            <Empty
+              image={<CalendarOutlined style={{ fontSize: '64px', color: '#d9d9d9' }} />}
+              imageStyle={{ height: 80 }}
+              description={
+                <div>
+                  <Title level={4}>No events found</Title>
+                  <Text type="secondary">
+                    {searchTerm || statusFilter !== 'all' 
+                      ? 'Try adjusting your search or filters'
+                      : 'Create your first event to start attracting customers'
+                    }
+                  </Text>
+                </div>
+              }
+            >
               {!searchTerm && statusFilter === 'all' && (
-                <Link to="/merchant/events/create" className="btn-primary">
-                  Create Your First Event
+                <Link to="/merchant/events/create">
+                  <Button type="primary" size="large" icon={<PlusOutlined />}>
+                    Create Your First Event
+                  </Button>
                 </Link>
               )}
-            </div>
-          </div>
+            </Empty>
+          </Card>
         )}
       </div>
     </MerchantLayout>

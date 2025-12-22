@@ -1,21 +1,42 @@
 import React, { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { 
-  Search, 
-  Filter, 
-  Download, 
-  Users, 
-  Star, 
-  Calendar, 
-  DollarSign,
-  Eye,
-  Mail,
-  Phone,
-  MapPin,
-  TrendingUp
-} from 'lucide-react'
+  Card, 
+  Button, 
+  Input, 
+  Select, 
+  Table, 
+  Tag, 
+  Avatar, 
+  Modal, 
+  Statistic, 
+  Typography,
+  Space,
+  Row,
+  Col,
+  Rate,
+  Descriptions,
+  List
+} from 'antd'
+import { 
+  SearchOutlined,
+  FilterOutlined,
+  DownloadOutlined,
+  UserOutlined,
+  StarOutlined,
+  DollarOutlined,
+  ArrowUpOutlined,
+  EyeOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  EnvironmentOutlined,
+  CloseOutlined
+} from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
+
+const { Title, Text } = Typography
+const { Option } = Select
 
 const CustomersPage = () => {
   const { merchant, isMerchantAuthenticated } = useMerchant()
@@ -115,291 +136,333 @@ const CustomersPage = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'VIP':
-        return 'bg-purple-100 text-purple-700'
+        return 'purple'
       case 'Regular':
-        return 'bg-blue-100 text-blue-700'
+        return 'blue'
       case 'New':
-        return 'bg-green-100 text-green-700'
+        return 'green'
       default:
-        return 'bg-neutral-100 text-neutral-700'
+        return 'default'
     }
   }
 
-  const StatCard = ({ title, value, icon: Icon, color = "primary" }) => (
-    <div className="bg-white rounded-2xl p-6 border border-neutral-100 shadow-soft">
-      <div className="flex items-center justify-between">
+  const columns = [
+    {
+      title: 'Customer',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text, record) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Avatar style={{ backgroundColor: '#667eea' }}>
+            {record.name.split(' ').map(n => n[0]).join('')}
+          </Avatar>
+          <div>
+            <div style={{ fontWeight: 500 }}>{record.name}</div>
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              <EnvironmentOutlined style={{ marginRight: '4px' }} />
+              {record.location}
+            </Text>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: 'Contact',
+      dataIndex: 'contact',
+      key: 'contact',
+      render: (_, record) => (
         <div>
-          <p className="text-neutral-600 text-sm font-medium">{title}</p>
-          <p className="text-2xl font-bold text-neutral-800 mt-1">{value}</p>
+          <div style={{ fontSize: '12px', marginBottom: '4px' }}>
+            <MailOutlined style={{ marginRight: '4px' }} />
+            {record.email}
+          </div>
+          <div style={{ fontSize: '12px' }}>
+            <PhoneOutlined style={{ marginRight: '4px' }} />
+            {record.phone}
+          </div>
         </div>
-        <div className={`w-12 h-12 bg-gradient-to-br from-${color}-400 to-${color}-600 rounded-2xl flex items-center justify-center shadow-soft`}>
-          <Icon className="w-6 h-6 text-white" />
+      ),
+    },
+    {
+      title: 'Bookings',
+      dataIndex: 'totalBookings',
+      key: 'totalBookings',
+      render: (bookings) => (
+        <div>
+          <div style={{ fontWeight: 500 }}>{bookings}</div>
+          <Text type="secondary" style={{ fontSize: '12px' }}>bookings</Text>
         </div>
-      </div>
-    </div>
-  )
+      ),
+    },
+    {
+      title: 'Total Spent',
+      dataIndex: 'totalSpent',
+      key: 'totalSpent',
+      render: (amount) => (
+        <Text style={{ color: '#667eea', fontWeight: 500 }}>
+          AED {amount.toLocaleString()}
+        </Text>
+      ),
+    },
+    {
+      title: 'Rating',
+      dataIndex: 'averageRating',
+      key: 'averageRating',
+      render: (rating) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <StarOutlined style={{ color: '#faad14' }} />
+          <span style={{ fontWeight: 500 }}>{rating}</span>
+        </div>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => <Tag color={getStatusColor(status)}>{status}</Tag>,
+    },
+    {
+      title: 'Last Booking',
+      dataIndex: 'lastBooking',
+      key: 'lastBooking',
+      render: (date) => <Text type="secondary">{date}</Text>,
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record) => (
+        <Button
+          type="text"
+          icon={<EyeOutlined />}
+          onClick={() => setSelectedCustomer(record)}
+        />
+      ),
+    },
+  ]
 
   return (
     <MerchantLayout>
-      <div className="space-y-6">
+      <div style={{ padding: '24px' }}>
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <h1 className="text-3xl font-bold text-neutral-800 mb-2">Customer Management</h1>
-            <p className="text-neutral-600">Manage your customer relationships and insights</p>
+            <Title level={1} style={{ margin: 0, marginBottom: '8px' }}>Customer Management</Title>
+            <Text type="secondary">Manage your customer relationships and insights</Text>
           </div>
-          <div className="flex space-x-3 mt-4 md:mt-0">
-            <button className="btn-secondary flex items-center space-x-2">
-              <Download className="w-5 h-5" />
-              <span>Export Data</span>
-            </button>
-          </div>
+          <Button 
+            icon={<DownloadOutlined />}
+            style={{ 
+              borderRadius: '8px'
+            }}
+          >
+            Export Data
+          </Button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            title="Total Customers"
-            value={customers.length}
-            icon={Users}
-            color="primary"
-          />
-          <StatCard
-            title="VIP Customers"
-            value={customers.filter(c => c.status === 'VIP').length}
-            icon={Star}
-            color="accent"
-          />
-          <StatCard
-            title="Avg. Customer Value"
-            value={`AED ${Math.round(customers.reduce((sum, c) => sum + c.totalSpent, 0) / customers.length)}`}
-            icon={DollarSign}
-            color="primary"
-          />
-          <StatCard
-            title="Retention Rate"
-            value="87%"
-            icon={TrendingUp}
-            color="accent"
-          />
-        </div>
+        <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Total Customers"
+                value={customers.length}
+                prefix={<UserOutlined style={{ color: '#667eea' }} />}
+                valueStyle={{ color: '#1f2937' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="VIP Customers"
+                value={customers.filter(c => c.status === 'VIP').length}
+                prefix={<StarOutlined style={{ color: '#f093fb' }} />}
+                valueStyle={{ color: '#1f2937' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Avg. Customer Value"
+                value={Math.round(customers.reduce((sum, c) => sum + c.totalSpent, 0) / customers.length)}
+                prefix={<DollarOutlined style={{ color: '#667eea' }} />}
+                suffix="AED"
+                valueStyle={{ color: '#1f2937' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Retention Rate"
+                value={87}
+                suffix="%"
+                prefix={<ArrowUpOutlined style={{ color: '#f093fb' }} />}
+                valueStyle={{ color: '#1f2937' }}
+              />
+            </Card>
+          </Col>
+        </Row>
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-2xl border border-neutral-100 shadow-soft p-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-              <input
-                type="text"
+        <Card style={{ marginBottom: '24px' }}>
+          <Row gutter={16} align="middle">
+            <Col xs={24} md={12} lg={14}>
+              <Input
                 placeholder="Search customers by name or email..."
+                prefix={<SearchOutlined />}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none"
+                size="large"
               />
-            </div>
-            <div className="flex space-x-3">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none"
-              >
-                <option value="all">All Status</option>
-                <option value="vip">VIP</option>
-                <option value="regular">Regular</option>
-                <option value="new">New</option>
-              </select>
-              <button className="btn-secondary flex items-center space-x-2">
-                <Filter className="w-5 h-5" />
-                <span>More Filters</span>
-              </button>
-            </div>
-          </div>
-        </div>
+            </Col>
+            <Col xs={24} md={12} lg={10}>
+              <Space>
+                <Select
+                  value={filterStatus}
+                  onChange={setFilterStatus}
+                  style={{ width: 120 }}
+                  size="large"
+                >
+                  <Option value="all">All Status</Option>
+                  <Option value="vip">VIP</Option>
+                  <Option value="regular">Regular</Option>
+                  <Option value="new">New</Option>
+                </Select>
+                <Button 
+                  icon={<FilterOutlined />}
+                  size="large"
+                >
+                  More Filters
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Card>
 
         {/* Customer List */}
-        <div className="bg-white rounded-2xl border border-neutral-100 shadow-soft">
-          <div className="p-6 border-b border-neutral-100">
-            <h2 className="text-xl font-bold text-neutral-800">
+        <Card>
+          <div style={{ marginBottom: '16px' }}>
+            <Title level={4} style={{ margin: 0 }}>
               Customers ({filteredCustomers.length})
-            </h2>
+            </Title>
           </div>
           
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-neutral-200">
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Customer</th>
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Contact</th>
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Bookings</th>
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Total Spent</th>
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Rating</th>
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Status</th>
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Last Booking</th>
-                  <th className="text-left py-4 px-6 font-medium text-neutral-600">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredCustomers.map((customer) => (
-                  <tr key={customer.id} className="border-b border-neutral-100 hover:bg-neutral-50">
-                    <td className="py-4 px-6">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                          <span className="font-semibold text-primary-600">
-                            {customer.name.split(' ').map(n => n[0]).join('')}
-                          </span>
-                        </div>
-                        <div>
-                          <div className="font-medium text-neutral-800">{customer.name}</div>
-                          <div className="text-sm text-neutral-600 flex items-center space-x-1">
-                            <MapPin className="w-3 h-3" />
-                            <span>{customer.location}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-1 text-sm text-neutral-600">
-                          <Mail className="w-3 h-3" />
-                          <span>{customer.email}</span>
-                        </div>
-                        <div className="flex items-center space-x-1 text-sm text-neutral-600">
-                          <Phone className="w-3 h-3" />
-                          <span>{customer.phone}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="font-medium text-neutral-800">{customer.totalBookings}</div>
-                      <div className="text-sm text-neutral-600">bookings</div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="font-medium text-primary-600">AED {customer.totalSpent.toLocaleString()}</div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="font-medium text-neutral-800">{customer.averageRating}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(customer.status)}`}>
-                        {customer.status}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="text-sm text-neutral-600">{customer.lastBooking}</div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <button
-                        onClick={() => setSelectedCustomer(customer)}
-                        className="text-primary-600 hover:text-primary-700 p-2 rounded-lg hover:bg-primary-50 transition-colors"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+          <Table
+            columns={columns}
+            dataSource={filteredCustomers}
+            rowKey="id"
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} customers`,
+            }}
+            scroll={{ x: 800 }}
+          />
+        </Card>
 
         {/* Customer Detail Modal */}
-        {selectedCustomer && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-neutral-100">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h2 className="text-2xl font-bold text-neutral-800">{selectedCustomer.name}</h2>
-                    <p className="text-neutral-600">Customer since {selectedCustomer.joinDate}</p>
-                  </div>
-                  <button
-                    onClick={() => setSelectedCustomer(null)}
-                    className="text-neutral-500 hover:text-neutral-700 p-2"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-              
-              <div className="p-6 space-y-6">
-                {/* Customer Stats */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary-600">{selectedCustomer.totalBookings}</div>
-                    <div className="text-sm text-neutral-600">Total Bookings</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary-600">AED {selectedCustomer.totalSpent.toLocaleString()}</div>
-                    <div className="text-sm text-neutral-600">Total Spent</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary-600">{selectedCustomer.averageRating}</div>
-                    <div className="text-sm text-neutral-600">Avg Rating</div>
-                  </div>
-                </div>
-
-                {/* Contact Info */}
-                <div>
-                  <h3 className="font-semibold text-neutral-800 mb-3">Contact Information</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <Mail className="w-4 h-4 text-neutral-500" />
-                      <span className="text-neutral-700">{selectedCustomer.email}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Phone className="w-4 h-4 text-neutral-500" />
-                      <span className="text-neutral-700">{selectedCustomer.phone}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="w-4 h-4 text-neutral-500" />
-                      <span className="text-neutral-700">{selectedCustomer.location}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Favorite Events */}
-                <div>
-                  <h3 className="font-semibold text-neutral-800 mb-3">Favorite Events</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedCustomer.favoriteEvents.map((event, index) => (
-                      <span key={index} className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
-                        {event}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Booking History */}
-                <div>
-                  <h3 className="font-semibold text-neutral-800 mb-3">Recent Bookings</h3>
-                  <div className="space-y-3">
-                    {selectedCustomer.bookingHistory.map((booking, index) => (
-                      <div key={index} className="flex justify-between items-center p-3 bg-neutral-50 rounded-xl">
-                        <div>
-                          <div className="font-medium text-neutral-800">{booking.event}</div>
-                          <div className="text-sm text-neutral-600">{booking.date}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-medium text-primary-600">AED {booking.amount}</div>
-                          <div className={`text-xs px-2 py-1 rounded-full ${
-                            booking.status === 'Completed' 
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-blue-100 text-blue-700'
-                          }`}>
-                            {booking.status}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+        <Modal
+          title={
+            <div>
+              <Title level={3} style={{ margin: 0 }}>{selectedCustomer?.name}</Title>
+              <Text type="secondary">Customer since {selectedCustomer?.joinDate}</Text>
             </div>
-          </div>
-        )}
+          }
+          open={!!selectedCustomer}
+          onCancel={() => setSelectedCustomer(null)}
+          footer={null}
+          width={800}
+          style={{ top: 20 }}
+        >
+          {selectedCustomer && (
+            <div>
+              {/* Customer Stats */}
+              <Row gutter={16} style={{ marginBottom: '24px' }}>
+                <Col span={8}>
+                  <Card size="small" style={{ textAlign: 'center' }}>
+                    <Statistic
+                      title="Total Bookings"
+                      value={selectedCustomer.totalBookings}
+                      valueStyle={{ color: '#667eea' }}
+                    />
+                  </Card>
+                </Col>
+                <Col span={8}>
+                  <Card size="small" style={{ textAlign: 'center' }}>
+                    <Statistic
+                      title="Total Spent"
+                      value={selectedCustomer.totalSpent}
+                      prefix="AED"
+                      valueStyle={{ color: '#667eea' }}
+                    />
+                  </Card>
+                </Col>
+                <Col span={8}>
+                  <Card size="small" style={{ textAlign: 'center' }}>
+                    <Statistic
+                      title="Avg Rating"
+                      value={selectedCustomer.averageRating}
+                      valueStyle={{ color: '#667eea' }}
+                    />
+                  </Card>
+                </Col>
+              </Row>
+
+              {/* Contact Info */}
+              <Card size="small" style={{ marginBottom: '16px' }}>
+                <Title level={5}>Contact Information</Title>
+                <Descriptions column={1} size="small">
+                  <Descriptions.Item label={<><MailOutlined /> Email</>}>
+                    {selectedCustomer.email}
+                  </Descriptions.Item>
+                  <Descriptions.Item label={<><PhoneOutlined /> Phone</>}>
+                    {selectedCustomer.phone}
+                  </Descriptions.Item>
+                  <Descriptions.Item label={<><EnvironmentOutlined /> Location</>}>
+                    {selectedCustomer.location}
+                  </Descriptions.Item>
+                </Descriptions>
+              </Card>
+
+              {/* Favorite Events */}
+              <Card size="small" style={{ marginBottom: '16px' }}>
+                <Title level={5}>Favorite Events</Title>
+                <Space wrap>
+                  {selectedCustomer.favoriteEvents.map((event, index) => (
+                    <Tag key={index} color="blue">{event}</Tag>
+                  ))}
+                </Space>
+              </Card>
+
+              {/* Booking History */}
+              <Card size="small">
+                <Title level={5}>Recent Bookings</Title>
+                <List
+                  dataSource={selectedCustomer.bookingHistory}
+                  renderItem={(booking, index) => (
+                    <List.Item>
+                      <List.Item.Meta
+                        title={booking.event}
+                        description={booking.date}
+                      />
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontWeight: 500, color: '#667eea' }}>
+                          AED {booking.amount}
+                        </div>
+                        <Tag color={booking.status === 'Completed' ? 'green' : 'blue'}>
+                          {booking.status}
+                        </Tag>
+                      </div>
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            </div>
+          )}
+        </Modal>
       </div>
     </MerchantLayout>
   )
