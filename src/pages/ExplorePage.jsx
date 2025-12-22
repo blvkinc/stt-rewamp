@@ -382,8 +382,8 @@ const ExplorePage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Elegant Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+      {/* Minimal Elegant Hero Section */}
+      <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img 
@@ -391,98 +391,42 @@ const ExplorePage = () => {
             alt="Dubai Experience"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/60 via-teal-900/50 to-cyan-900/60" />
+          <div className="absolute inset-0 bg-black/40" />
         </div>
         
-        {/* Floating Elements */}
-        <div className="absolute top-20 left-16 w-32 h-32 bg-gradient-to-br from-emerald-300/20 to-teal-300/20 rounded-full blur-2xl animate-float" />
-        <div className="absolute bottom-20 right-16 w-40 h-40 bg-gradient-to-br from-teal-300/20 to-cyan-300/20 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-gradient-to-br from-cyan-300/15 to-emerald-300/15 rounded-full blur-xl animate-float" style={{ animationDelay: '4s' }} />
-        
         <div className="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          {/* Elegant Badge */}
-          <div className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full shadow-lg mb-8 animate-fadeInUp">
-            <Gift className="w-4 h-4 text-emerald-300 mr-2" />
-            <span className="text-white font-medium">Discover Everything Dubai</span>
-          </div>
-          
-          {/* Elegant Typography */}
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-            Explore All
-            <br />
-            <span className="bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent">
-              Dubai Has to Offer
-            </span>
+          {/* Minimal Typography */}
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            Explore Dubai
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
-            From exclusive events to stunning venues and curated packages - find everything in one place
+          <p className="text-lg md:text-xl text-white/80 mb-12 max-w-xl mx-auto">
+            Discover events, venues, and experiences
           </p>
           
-          {/* Minimal Search Bar */}
-          <div className="max-w-2xl mx-auto mb-12 animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 via-teal-400/20 to-cyan-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <Card className="relative bg-white/90 backdrop-blur-xl border-0 shadow-xl rounded-3xl overflow-hidden">
-                <CardContent className="p-2">
-                  <form onSubmit={handleSearch}>
-                    <div className="flex items-center">
-                      <div className="flex-1 flex items-center px-6 py-4">
-                        <Search className="w-5 h-5 text-gray-400 mr-4 group-hover:text-emerald-500 transition-colors duration-300" />
-                        <Input
-                          placeholder="Search events, venues, packages, or experiences..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="flex-1 text-lg border-0 bg-transparent focus:ring-0 placeholder:text-gray-400"
-                        />
-                      </div>
-                      <Button
-                        type="submit"
-                        size="lg"
-                        className="m-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                      >
-                        Explore
-                      </Button>
-                    </div>
-                  </form>
-                </CardContent>
-              </Card>
-            </div>
-            
-            {/* Elegant Quick Filters */}
-            <div className="flex flex-wrap justify-center gap-3 mt-6">
-              {['All Categories', 'Tonight', 'This Weekend', 'Premium', 'Beach Clubs', 'Rooftops'].map((filter, index) => (
-                <button
-                  key={filter}
-                  className="px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 hover:border-white/50 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 animate-fadeInUp"
-                  style={{ animationDelay: `${0.8 + index * 0.1}s` }}
-                >
-                  {filter}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Elegant Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto animate-fadeInUp" style={{ animationDelay: '1s' }}>
-            {[
-              { label: "Total Results", value: results.total.toString(), icon: "🎯" },
-              { label: "Events", value: results.events.length.toString(), icon: "🎉" },
-              { label: "Venues", value: results.venues.length.toString(), icon: "🏛️" },
-              { label: "Packages", value: results.packages.length.toString(), icon: "📦" }
-            ].map((stat, index) => (
-              <div key={index} className="text-center group animate-fadeInUp" style={{ animationDelay: `${1.2 + index * 0.1}s` }}>
-                <div className="w-16 h-16 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
-                  <span className="text-2xl">{stat.icon}</span>
-                </div>
-                <div className="text-2xl md:text-3xl font-bold text-emerald-300 mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-white/80 text-sm font-medium">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+          {/* Ultra Minimal Search Bar */}
+          <div className="max-w-lg mx-auto">
+            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-2xl overflow-hidden">
+              <CardContent className="p-1">
+                <form onSubmit={handleSearch} className="flex items-center">
+                  <div className="flex-1 flex items-center px-4 py-3">
+                    <Search className="w-5 h-5 text-gray-400 mr-3" />
+                    <Input
+                      placeholder="Search experiences..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="flex-1 border-0 bg-transparent focus:ring-0 placeholder:text-gray-400"
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    className="m-1 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-xl font-medium"
+                  >
+                    Search
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

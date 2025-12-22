@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Star, MapPin, Clock, Heart, Share2, Calendar, Phone, Mail, ArrowLeft, ArrowRight, Users, Check } from 'lucide-react'
+import { Star, MapPin, Clock, Heart, Share2, Calendar, Phone, Mail, ArrowLeft, ArrowRight, Users, Check, ChevronDown } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 
 const EventDetailsPage = () => {
   const { id: _id } = useParams()
@@ -145,7 +146,7 @@ const EventDetailsPage = () => {
   return (
     <div className="min-h-screen bg-neutral-50">
       {/* Back Button */}
-      <div className="max-w-7xl mx-auto container-padding py-6">
+      <div className="max-w-7xl mx-auto container-padding pt-24 pb-6">
         <Link to="/events" className="inline-flex items-center space-x-2 text-neutral-600 hover:text-primary-500 transition-colors">
           <ArrowLeft className="w-5 h-5" />
           <span>Back to Events</span>
@@ -511,41 +512,63 @@ const EventDetailsPage = () => {
                 {/* Package Selection */}
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-slate-700 mb-3">Select Package</label>
-                  <div className="space-y-3">
-                    {event.packages.map((pkg) => (
-                      <div
-                        key={pkg.id}
-                        className={`p-4 border rounded-lg cursor-pointer transition-colors relative ${
-                          selectedPackage === pkg.id
-                            ? 'border-primary-500 bg-primary-50'
-                            : 'border-slate-200 hover:border-primary-300'
-                        }`}
-                        onClick={() => setSelectedPackage(pkg.id)}
-                      >
-                        {pkg.popular && (
-                          <div className="absolute -top-2 -right-2">
-                            <span className="bg-primary-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                              Popular
-                            </span>
+                  <Select value={selectedPackage} onValueChange={setSelectedPackage}>
+                    <SelectTrigger className="w-full h-14 px-4 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                      <SelectValue placeholder="Choose a package">
+                        {selectedPackage && (
+                          <div className="flex justify-between items-center w-full">
+                            <div className="flex flex-col items-start">
+                              <span className="font-medium text-slate-900">
+                                {event.packages.find(p => p.id === selectedPackage)?.name}
+                              </span>
+                              <span className="text-sm text-slate-600">
+                                Up to {event.packages.find(p => p.id === selectedPackage)?.maxGuests} guests
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-lg font-bold text-primary-500">
+                                AED {event.packages.find(p => p.id === selectedPackage)?.price}
+                              </span>
+                              {event.packages.find(p => p.id === selectedPackage)?.originalPrice > event.packages.find(p => p.id === selectedPackage)?.price && (
+                                <div className="text-sm text-slate-500 line-through">
+                                  AED {event.packages.find(p => p.id === selectedPackage)?.originalPrice}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         )}
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-medium text-slate-900">{pkg.name}</h4>
-                          <div className="text-right">
-                            <span className="text-lg font-bold text-primary-500">AED {pkg.price}</span>
-                            {pkg.originalPrice > pkg.price && (
-                              <div className="text-sm text-slate-500 line-through">AED {pkg.originalPrice}</div>
-                            )}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="w-full">
+                      {event.packages.map((pkg) => (
+                        <SelectItem key={pkg.id} value={pkg.id} className="p-4 cursor-pointer">
+                          <div className="flex justify-between items-start w-full">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-medium text-slate-900">{pkg.name}</h4>
+                                {pkg.popular && (
+                                  <span className="bg-primary-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                                    Popular
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-sm text-slate-600 mb-2">{pkg.description}</p>
+                              <div className="flex items-center space-x-2 text-xs text-slate-500">
+                                <Users className="w-3 h-3" />
+                                <span>Up to {pkg.maxGuests} guests</span>
+                              </div>
+                            </div>
+                            <div className="text-right ml-4">
+                              <span className="text-lg font-bold text-primary-500">AED {pkg.price}</span>
+                              {pkg.originalPrice > pkg.price && (
+                                <div className="text-sm text-slate-500 line-through">AED {pkg.originalPrice}</div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <p className="text-sm text-slate-600 mb-2">{pkg.description}</p>
-                        <div className="flex items-center space-x-2 text-xs text-slate-500">
-                          <Users className="w-3 h-3" />
-                          <span>Up to {pkg.maxGuests} guests</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Link 
                     to={`/packages/${event.id}`}
                     className="block text-center text-primary-600 hover:text-primary-700 font-medium text-sm mt-3"

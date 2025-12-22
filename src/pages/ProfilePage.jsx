@@ -43,11 +43,11 @@ const ProfilePage = () => {
           <CardContent className="p-8">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
               <div className="relative">
-                <div className="w-24 h-24 bg-gradient-to-br from-rose-400 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                <div className="w-24 h-24 bg-gradient-to-br from-brand-red to-brand-orange rounded-full flex items-center justify-center shadow-lg">
                   <User className="w-12 h-12 text-white" />
                 </div>
                 {user.accountType === "Premium" && (
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-brand-yellow to-brand-orange rounded-full flex items-center justify-center shadow-lg">
                     <Crown className="w-4 h-4 text-white" />
                   </div>
                 )}
@@ -63,7 +63,7 @@ const ProfilePage = () => {
                   
                   <div className="mt-6 md:mt-0">
                     <div className="flex flex-col items-start md:items-end gap-2">
-                      <Badge className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-4 py-2 text-sm font-semibold">
+                      <Badge className="bg-gradient-to-r from-brand-red to-brand-orange text-white px-4 py-2 text-sm font-semibold">
                         {user.accountType} Member
                       </Badge>
                       {user.accountType === "Premium" && (
@@ -80,24 +80,24 @@ const ProfilePage = () => {
             {/* Stats - Airbnb Style */}
             <div className="grid grid-cols-3 gap-6 mt-8 pt-8 border-t border-gray-200">
               <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-br from-rose-400 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                <div className="w-16 h-16 bg-gradient-to-br from-brand-red to-brand-orange rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
                   <Gift className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-3xl font-semibold text-rose-600 mb-1">{user.rewardPoints}</div>
+                <div className="text-3xl font-semibold text-brand-red mb-1">{user.rewardPoints}</div>
                 <div className="text-gray-600 font-medium">Reward Points</div>
               </div>
               <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                <div className="w-16 h-16 bg-gradient-to-br from-brand-orange to-brand-yellow rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
                   <Calendar className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-3xl font-semibold text-orange-600 mb-1">{user.totalBookings}</div>
+                <div className="text-3xl font-semibold text-brand-orange mb-1">{user.totalBookings}</div>
                 <div className="text-gray-600 font-medium">Total Bookings</div>
               </div>
               <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-br from-rose-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                <div className="w-16 h-16 bg-gradient-to-br from-brand-red to-brand-purple rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
                   <Heart className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-3xl font-semibold text-rose-600 mb-1">{user.favoriteVenues}</div>
+                <div className="text-3xl font-semibold text-brand-red mb-1">{user.favoriteVenues}</div>
                 <div className="text-gray-600 font-medium">Favorite Venues</div>
               </div>
             </div>
@@ -151,22 +151,22 @@ const ProfilePage = () => {
                             <p className="text-gray-600 font-medium mb-3">{booking.venue}</p>
                             <div className="flex items-center gap-6 text-gray-500">
                               <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-rose-400" />
+                                <Calendar className="w-4 h-4 text-brand-red" />
                                 <span className="text-sm">{booking.date}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-rose-400" />
+                                <Clock className="w-4 h-4 text-brand-red" />
                                 <span className="text-sm">{booking.time}</span>
                               </div>
                             </div>
                           </div>
                           
                           <div className="text-right mt-6 md:mt-0">
-                            <div className="text-2xl font-semibold text-rose-600 mb-2">AED {booking.price}</div>
+                            <div className="text-2xl font-semibold text-brand-red mb-2">AED {booking.price}</div>
                             <Badge className={`${
                               booking.status === 'Confirmed' 
                                 ? 'bg-green-100 text-green-700 hover:bg-green-100'
-                                : 'bg-blue-100 text-blue-700 hover:bg-blue-100'
+                                : 'bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/10'
                             }`}>
                               {booking.status}
                             </Badge>
@@ -174,7 +174,7 @@ const ProfilePage = () => {
                               <div className="mt-3">
                                 <Link
                                   to={`/review/${booking.id}`}
-                                  className="inline-flex items-center gap-2 text-rose-600 hover:text-rose-700 font-medium transition-colors text-sm"
+                                  className="inline-flex items-center gap-2 text-brand-red hover:text-brand-red/80 font-medium transition-colors text-sm"
                                 >
                                   <Star className="w-4 h-4" />
                                   <span>Leave Review</span>
@@ -213,7 +213,7 @@ const ProfilePage = () => {
                               <Star className="w-4 h-4 text-yellow-400 fill-current" />
                               <span className="text-sm font-medium">{favorite.rating}</span>
                             </div>
-                            <div className="text-rose-600 font-semibold">AED {favorite.price}</div>
+                            <div className="text-brand-red font-semibold">AED {favorite.price}</div>
                           </div>
                         </div>
                       </div>
@@ -230,18 +230,18 @@ const ProfilePage = () => {
               <Card className="border-0 shadow-sm">
                 <CardContent className="p-8">
                   <h2 className="text-2xl font-semibold text-gray-900 mb-6">Reward Points</h2>
-                  <div className="bg-gradient-to-br from-rose-500 via-pink-600 to-orange-500 rounded-3xl p-8 text-white shadow-lg">
+                  <div className="bg-gradient-to-br from-brand-red via-brand-orange to-brand-yellow rounded-3xl p-8 text-white shadow-lg">
                     <div className="flex justify-between items-start mb-6">
                       <div>
                         <div className="text-5xl font-bold mb-2">{user.rewardPoints}</div>
-                        <div className="text-rose-100 text-lg">Available Points</div>
+                        <div className="text-white/80 text-lg">Available Points</div>
                       </div>
                       <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
                         <Gift className="w-8 h-8 text-white" />
                       </div>
                     </div>
                     <div className="bg-white/10 rounded-2xl p-4 mb-4">
-                      <div className="text-rose-100 text-sm mb-1">Progress to {user.nextRewardTier}</div>
+                      <div className="text-white/80 text-sm mb-1">Progress to {user.nextRewardTier}</div>
                       <div className="w-full bg-white/20 rounded-full h-2">
                         <div 
                           className="bg-white rounded-full h-2 transition-all duration-500"
@@ -250,7 +250,7 @@ const ProfilePage = () => {
                       </div>
                       <div className="text-white text-sm mt-1">{user.pointsToNextTier} points to go</div>
                     </div>
-                    <div className="text-rose-100">
+                    <div className="text-white/80">
                       Redeem points for exclusive discounts and perks
                     </div>
                   </div>
@@ -262,24 +262,24 @@ const ProfilePage = () => {
                 <CardContent className="p-8">
                   <h3 className="text-2xl font-semibold text-gray-900 mb-6">Redeem Points</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card className="bg-gradient-to-br from-rose-50 to-pink-100 border-rose-200">
+                    <Card className="bg-gradient-to-br from-brand-red/10 to-brand-orange/10 border-brand-red/20">
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-4">
                           <h4 className="text-lg font-semibold text-gray-900">AED 50 Discount</h4>
-                          <Badge className="bg-rose-500 text-white hover:bg-rose-500">500 pts</Badge>
+                          <Badge className="bg-brand-red text-white hover:bg-brand-red">500 pts</Badge>
                         </div>
                         <p className="text-gray-600 mb-4">Get AED 50 off your next booking</p>
-                        <Button className="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600">
+                        <Button className="w-full bg-gradient-to-r from-brand-red to-brand-orange hover:from-brand-red/80 hover:to-brand-orange/80">
                           Redeem
                         </Button>
                       </CardContent>
                     </Card>
                     
-                    <Card className="bg-gradient-to-br from-orange-50 to-pink-100 border-orange-200">
+                    <Card className="bg-gradient-to-br from-brand-orange/10 to-brand-yellow/10 border-brand-orange/20">
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-4">
                           <h4 className="text-lg font-semibold text-gray-900">AED 100 Discount</h4>
-                          <Badge className="bg-orange-500 text-white hover:bg-orange-500">900 pts</Badge>
+                          <Badge className="bg-brand-orange text-white hover:bg-brand-orange">900 pts</Badge>
                         </div>
                         <p className="text-gray-600 mb-4">Get AED 100 off your next booking</p>
                         <Button className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600">
