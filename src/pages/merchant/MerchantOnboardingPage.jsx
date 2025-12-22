@@ -130,7 +130,7 @@ const MerchantOnboardingPage = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      <div className="max-w-4xl mx-auto container-padding py-12">
+      <div className="max-w-4xl mx-auto container-padding pt-24 pb-12">
         {/* Back Button */}
         <Link to="/merchant/auth" className="inline-flex items-center space-x-2 text-neutral-600 hover:text-primary-500 mb-8 transition-colors">
           <ArrowLeft className="w-5 h-5" />

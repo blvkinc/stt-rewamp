@@ -128,7 +128,7 @@ const PackageDetailPage = () => {
     <div className="min-h-screen bg-neutral-50">
       {/* Header */}
       <div className="bg-white shadow-soft border-b border-neutral-100">
-        <div className="max-w-7xl mx-auto container-padding py-6">
+        <div className="max-w-7xl mx-auto container-padding pt-24 pb-6">
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={() => navigate(-1)}

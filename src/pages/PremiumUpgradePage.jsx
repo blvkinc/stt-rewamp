@@ -99,7 +99,7 @@ const PremiumUpgradePage = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-primary-50 via-neutral-50 to-accent-50">
-            <div className="max-w-6xl mx-auto container-padding py-12">
+            <div className="max-w-6xl mx-auto container-padding pt-24 pb-12">
                 {/* Back Button */}
                 <Link to="/profile" className="inline-flex items-center space-x-2 text-neutral-600 hover:text-primary-500 mb-8 transition-colors">
                     <ArrowLeft className="w-5 h-5" />
