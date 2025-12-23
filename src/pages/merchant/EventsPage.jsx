@@ -220,7 +220,8 @@ const EventsPage = () => {
                             {
                               key: 'edit',
                               icon: <EditOutlined />,
-                              label: <Link to={`/merchant/events/${event.id}/edit`}>Edit</Link>
+                              label: 'Edit',
+                              onClick: () => handleEditEvent(event.id)
                             },
                             {
                               key: 'clone',
