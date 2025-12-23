@@ -46,15 +46,6 @@ const CreateEventPage = () => {
   const [success, setSuccess] = useState('')
   const navigate = useNavigate()
 
-  if (authLoading) {
-    return <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Loading...</div>
-  }
-
-  // Redirect to auth if not logged in
-  if (!isMerchantAuthenticated) {
-    return <Navigate to="/merchant/auth" replace />
-  }
-
   const [eventData, setEventData] = useState({
     title: '',
     description: '',
@@ -98,6 +89,15 @@ const CreateEventPage = () => {
       }
     }
   }, [isEditMode, id, events])
+
+  if (authLoading) {
+    return <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Loading...</div>
+  }
+
+  // Redirect to auth if not logged in
+  if (!isMerchantAuthenticated) {
+    return <Navigate to="/merchant/auth" replace />
+  }
 
   const eventTypes = [
     'Brunch',
