@@ -37,6 +37,7 @@ const { Title, Text } = Typography
 const { Option } = Select
 
 const EventsPage = () => {
+  const navigate = useNavigate()
   const { merchant, events, cloneEvent, deleteEvent, isMerchantAuthenticated } = useMerchant()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
