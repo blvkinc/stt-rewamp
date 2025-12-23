@@ -225,7 +225,7 @@ const AdvertisingPage = () => {
               value={67.4}
               suffix="K"
               prefix={<EyeOutlined style={{ color: '#667eea' }} />}
-              valueStyle={{ color: '#1f2937' }}
+              styles={{ content: { color: '#1f2937' } }}
             />
           </Card>
         </Col>
@@ -236,7 +236,7 @@ const AdvertisingPage = () => {
               value={3.2}
               suffix="%"
               prefix={<AimOutlined style={{ color: '#f093fb' }} />}
-              valueStyle={{ color: '#1f2937' }}
+              styles={{ content: { color: '#1f2937' } }}
             />
           </Card>
         </Col>
@@ -247,7 +247,7 @@ const AdvertisingPage = () => {
               value={588}
               prefix={<DollarOutlined style={{ color: '#667eea' }} />}
               suffix="AED"
-              valueStyle={{ color: '#1f2937' }}
+              styles={{ content: { color: '#1f2937' } }}
             />
           </Card>
         </Col>
@@ -257,7 +257,7 @@ const AdvertisingPage = () => {
               title="Bookings from Ads"
               value={57}
               prefix={<ArrowUpOutlined style={{ color: '#f093fb' }} />}
-              valueStyle={{ color: '#1f2937' }}
+              styles={{ content: { color: '#1f2937' } }}
             />
           </Card>
         </Col>

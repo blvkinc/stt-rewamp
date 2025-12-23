@@ -230,7 +230,7 @@ const PromotionsPage = () => {
               title="Active Promotions"
               value={promotions.filter(p => p.isActive).length}
               prefix={<TagOutlined style={{ color: '#667eea' }} />}
-              valueStyle={{ color: '#1f2937' }}
+              styles={{ content: { color: '#1f2937' } }}
             />
           </Card>
         </Col>
@@ -240,7 +240,7 @@ const PromotionsPage = () => {
               title="Total Usage"
               value={promotions.reduce((sum, p) => sum + p.usedCount, 0)}
               prefix={<UserOutlined style={{ color: '#f093fb' }} />}
-              valueStyle={{ color: '#1f2937' }}
+              styles={{ content: { color: '#1f2937' } }}
             />
           </Card>
         </Col>
@@ -251,7 +251,7 @@ const PromotionsPage = () => {
               value={Math.round(promotions.reduce((sum, p) => sum + (p.type === 'percentage' ? p.value : 0), 0) / promotions.filter(p => p.type === 'percentage').length)}
               suffix="%"
               prefix={<PercentageOutlined style={{ color: '#667eea' }} />}
-              valueStyle={{ color: '#1f2937' }}
+              styles={{ content: { color: '#1f2937' } }}
             />
           </Card>
         </Col>
@@ -262,7 +262,7 @@ const PromotionsPage = () => {
               value={Math.round((promotions.reduce((sum, p) => sum + p.usedCount, 0) / promotions.reduce((sum, p) => sum + p.usageLimit, 0)) * 100)}
               suffix="%"
               prefix={<AimOutlined style={{ color: '#f093fb' }} />}
-              valueStyle={{ color: '#1f2937' }}
+              styles={{ content: { color: '#1f2937' } }}
             />
           </Card>
         </Col>

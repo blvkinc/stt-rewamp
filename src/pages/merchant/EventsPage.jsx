@@ -274,9 +274,6 @@ const EventsPage = () => {
                           <Statistic
                             title="Bookings"
                             value={event.bookings}
-                            valueStyle={{ fontSize: '16px', color: '#1890ff' }} // Deprecated but styles.content not working in v4, checking version first. Assuming v5 based on warning.
-                            // If v5, use <Statistic styles={{ content: { fontSize: '16px', color: '#1890ff' } }} />
-                            // Since I don't know exact version but warning says 'styles.content', I will try to use it.
                             styles={{ content: { fontSize: '16px', color: '#1890ff' } }}
                           />
                         </Col>
