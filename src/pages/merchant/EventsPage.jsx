@@ -232,7 +232,8 @@ const EventsPage = () => {
                             {
                               key: 'view',
                               icon: <EyeOutlined />,
-                              label: <Link to={`/events/${event.id}`}>View Public</Link>
+                              label: 'View Public',
+                              onClick: () => navigate(`/events/${event.id}`)
                             },
                             { type: 'divider' },
                             {
