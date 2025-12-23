@@ -1,236 +1,393 @@
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import NotificationCenter from './NotificationCenter'
-import { 
-  LayoutDashboard, 
-  Building, 
-  Users, 
-  BarChart3, 
-  Settings, 
-  LogOut,
+import {
+  Layout,
   Menu,
-  X,
-  Shield,
-  Plus,
-  Bell,
-  Search,
-  Calendar,
-  AlertTriangle,
-  UserCheck,
-  Globe,
-  Database,
-  CreditCard,
-  FileText,
-  TrendingUp,
-  Clock
-} from 'lucide-react'
+  Button,
+  Avatar,
+  Badge,
+  Typography,
+  Space,
+  Input,
+  theme
+} from 'antd'
+import {
+  DashboardOutlined,
+  TeamOutlined,
+  ShopOutlined,
+  CalendarOutlined,
+  BarChartOutlined,
+  SettingOutlined,
+  LogoutOutlined,
+  MenuOutlined,
+  BellOutlined,
+  SafetyCertificateOutlined,
+  DatabaseOutlined,
+  FileTextOutlined,
+  SearchOutlined,
+  AlertOutlined,
+  CreditCardOutlined,
+  UserOutlined
+} from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
+import NotificationCenter from './NotificationCenter'
+
+const { Header, Sider, Content } = Layout
+const { Text, Title } = Typography
 
 const SuperAdminLayout = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
   const [notificationOpen, setNotificationOpen] = useState(false)
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { merchant, logoutMerchant } = useMerchant()
-
-  const navigation = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Users', href: '/admin/users', icon: Users },
-    { name: 'Venues', href: '/admin/venues', icon: Building },
-    { name: 'Merchants', href: '/admin/merchants', icon: UserCheck },
-    { name: 'Events', href: '/admin/events', icon: Calendar },
-    { name: 'Approvals', href: '/admin/approvals', icon: AlertTriangle },
-    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
-    { name: 'Payments', href: '/admin/payments', icon: CreditCard },
-    { name: 'System', href: '/admin/system', icon: Database },
-    { name: 'Settings', href: '/admin/settings', icon: Settings },
-    { name: 'System Logs', href: '/admin/logs', icon: FileText },
-    { name: 'Reports', href: '/admin/reports', icon: TrendingUp },
-    { name: 'Approval Queue', href: '/admin/approvals/queue', icon: Clock },
-  ]
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken()
 
   const handleLogout = () => {
     logoutMerchant()
     navigate('/merchant/auth')
   }
 
-  const isActive = (path) => location.pathname === path
+  const menuItems = [
+    {
+      key: '/admin/dashboard',
+      icon: <DashboardOutlined />,
+      label: <Link to="/admin/dashboard">Dashboard</Link>,
+    },
+    {
+      key: '/admin/users',
+      icon: <TeamOutlined />,
+      label: <Link to="/admin/users">Users</Link>,
+    },
+    {
+      key: '/admin/merchants',
+      icon: <UserOutlined />,
+      label: <Link to="/admin/merchants">Merchants</Link>,
+    },
+    {
+      key: '/admin/venues',
+      icon: <ShopOutlined />,
+      label: <Link to="/admin/venues">Venues</Link>,
+    },
+    {
+      key: '/admin/events',
+      icon: <CalendarOutlined />,
+      label: <Link to="/admin/events">Events</Link>,
+    },
+    {
+      key: '/admin/approvals',
+      icon: <AlertOutlined />,
+      label: <Link to="/admin/approvals">Approvals</Link>,
+    },
+    {
+      key: '/admin/analytics',
+      icon: <BarChartOutlined />,
+      label: <Link to="/admin/analytics">Analytics</Link>,
+    },
+    {
+      key: '/admin/payments',
+      icon: <CreditCardOutlined />,
+      label: <Link to="/admin/payments">Payments</Link>,
+    },
+    {
+      key: '/admin/system',
+      icon: <DatabaseOutlined />,
+      label: <Link to="/admin/system">System Health</Link>,
+    },
+    {
+      key: '/admin/logs',
+      icon: <FileTextOutlined />,
+      label: <Link to="/admin/logs">Logs</Link>,
+    },
+    {
+      key: '/admin/settings',
+      icon: <SettingOutlined />,
+      label: <Link to="/admin/settings">Settings</Link>,
+    },
+  ]
+
+
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-soft-lg transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div className="flex flex-col h-screen">
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sider
+        collapsible
+        collapsed={collapsed}
+        onCollapse={setCollapsed}
+        width={260}
+        style={{
+          background: '#1a1025', // Dark Brand Purple Theme
+          boxShadow: '2px 0 8px rgba(0,0,0,0.15)',
+          zIndex: 10
+        }}
+        breakpoint="lg"
+        collapsedWidth="80"
+      >
+        <div style={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
           {/* Logo */}
-          <div className="flex items-center justify-between p-6 border-b border-neutral-100 flex-shrink-0">
-            <Link to="/admin/dashboard" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-soft">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-bold text-xl text-neutral-800">STT Admin</span>
+          <div style={{
+            padding: '24px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: collapsed ? 'center' : 'flex-start',
+            background: 'rgba(255,255,255,0.05)'
+          }}>
+            <Link to="/admin/dashboard" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              textDecoration: 'none',
+              width: '100%',
+              justifyContent: collapsed ? 'center' : 'flex-start'
+            }}>
+              <Avatar
+                size={32}
+                icon={<SafetyCertificateOutlined />}
+                style={{
+                  background: 'linear-gradient(135deg, var(--brand-purple), var(--brand-blue))',
+                  flexShrink: 0
+                }}
+              />
+              {!collapsed && (
+                <Text strong style={{ fontSize: 18, color: '#fff', letterSpacing: '0.5px' }}>
+                  STT Admin
+                </Text>
+              )}
             </Link>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-2 text-neutral-600 hover:bg-neutral-100 rounded-xl"
-            >
-              <X className="w-5 h-5" />
-            </button>
           </div>
 
           {/* Admin Info */}
-          <div className="p-6 border-b border-neutral-100 flex-shrink-0">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center">
-                <Shield className="w-6 h-6 text-red-600" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-neutral-800 truncate">
-                  Super Administrator
-                </p>
-                <p className="text-sm text-neutral-600 truncate">Platform Management</p>
-                <span className="inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 bg-red-100 text-red-700">
-                  Full Access
-                </span>
+          {!collapsed && (
+            <div style={{
+              padding: '16px',
+              borderBottom: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <div style={{
+                background: 'rgba(255,255,255,0.05)',
+                padding: '12px',
+                borderRadius: 8
+              }}>
+                <Text style={{ color: '#fff', display: 'block', fontWeight: 600 }}>Super Admin</Text>
+                <Space align="center" size={4}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#52c41a' }} />
+                  <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>System Online</Text>
+                </Space>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Navigation */}
-          <nav className="flex-1 p-6 space-y-2 overflow-y-auto">
-            {navigation.map((item) => {
-              const Icon = item.icon
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 ${
-                    isActive(item.href)
-                      ? 'bg-red-50 text-red-700 border border-red-200'
-                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800'
-                  }`}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.name}</span>
-                </Link>
-              )
-            })}
-          </nav>
-
-          {/* Quick Actions */}
-          <div className="p-6 border-t border-neutral-100 flex-shrink-0">
-            <div className="space-y-3">
-              <Link
-                to="/admin/venues/create"
-                className="w-full btn-primary flex items-center justify-center space-x-2 mb-3"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Add Venue</span>
-              </Link>
-              
-              <Link
-                to="/admin/system/backup"
-                className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-neutral-600 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all duration-200"
-              >
-                <Database className="w-5 h-5" />
-                <span>System Backup</span>
-              </Link>
-              
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-neutral-600 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all duration-200"
-              >
-                <LogOut className="w-5 h-5" />
-                <span>Sign Out</span>
-              </button>
-            </div>
+          <div style={{ flex: 1, padding: '16px 0', overflowY: 'auto' }}>
+            <Menu
+              theme="dark"
+              mode="inline"
+              selectedKeys={[location.pathname]}
+              items={menuItems}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                fontWeight: 500
+              }}
+            />
           </div>
         </div>
-      </div>
+      </Sider>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
-        <div className="bg-white shadow-soft border-b border-neutral-100 sticky top-0 z-30 flex-shrink-0">
-          <div className="flex items-center justify-between px-6 py-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 text-neutral-600 hover:bg-neutral-100 rounded-xl"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
+      <Layout>
+        <Header style={{
+          background: colorBgContainer,
+          padding: '0 24px',
+          height: 72,
+          boxShadow: '0 1px 4px rgba(0,0,0,0.02)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          zIndex: 999
+        }}>
+          <Space>
+            <Button
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{
+                fontSize: '16px',
+                width: 48,
+                height: 48,
+              }}
+            />
 
             {/* Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-md mx-8">
-              <div className="relative w-full">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search venues, merchants, events..."
-                  className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-red-300 focus:border-red-300 outline-none bg-neutral-50 focus:bg-white transition-all duration-300"
-                />
-              </div>
+            <div className="hidden md:block">
+              <Input
+                prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+                placeholder="Search users, venues, logs..."
+                style={{
+                  width: 300,
+                  borderRadius: 8,
+                  background: '#f5f5f5',
+                  border: 'none',
+                  padding: '8px 12px'
+                }}
+              />
+            </div>
+          </Space>
+
+          <Space size={16}>
+            {/* System Status */}
+            <div className="hidden md:flex items-center space-x-2 px-3 py-1 bg-green-50 text-green-700 rounded-full border border-green-100">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-xs font-semibold">System Healthy</span>
             </div>
 
-            <div className="flex items-center space-x-4 ml-auto">
-              {/* System Status */}
-              <div className="hidden md:flex items-center space-x-2 px-3 py-2 bg-green-50 text-green-700 rounded-xl">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium">System Healthy</span>
-              </div>
-
-              {/* Notifications */}
-              <button 
+            {/* Notifications */}
+            <Badge count={3} size="small" offset={[-2, 2]}>
+              <Button
+                type="text"
+                icon={<BellOutlined style={{ fontSize: 18, color: '#595959' }} />}
+                shape="circle"
+                size="large"
                 onClick={() => setNotificationOpen(true)}
-                className="p-2 text-neutral-600 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all duration-200 relative"
+              />
+            </Badge>
+
+            {/* Profile Dropdown */}
+            <div style={{ position: 'relative' }}>
+              <div
+                style={{
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  transition: 'background 0.3s'
+                }}
+                className="hover:bg-gray-100"
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
               >
-                <Bell className="w-6 h-6" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </button>
-
-              {/* Global Actions */}
-              <button className="p-2 text-neutral-600 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all duration-200">
-                <Globe className="w-6 h-6" />
-              </button>
-
-              {/* Profile */}
-              <div className="flex items-center space-x-3">
-                <div className="text-right hidden sm:block">
-                  <p className="font-semibold text-neutral-800 text-sm">
-                    Super Admin
-                  </p>
-                  <p className="text-neutral-600 text-xs">Platform Manager</p>
-                </div>
-                <div className="w-10 h-10 bg-red-100 rounded-2xl flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-red-600" />
-                </div>
+                <Space>
+                  <div style={{ textAlign: 'right' }} className="hidden md:block">
+                    <Text strong style={{ display: 'block', fontSize: 14, color: '#262626' }}>
+                      Admin User
+                    </Text>
+                    <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>
+                      Root Access
+                    </Text>
+                  </div>
+                  <Avatar
+                    size={40}
+                    icon={<UserOutlined />}
+                    style={{ background: '#2a0a0a', color: '#fff' }}
+                  />
+                </Space>
               </div>
+
+              {/* Manual Dropdown Menu */}
+              {profileDropdownOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    width: '160px',
+                    marginTop: '4px',
+                    backgroundColor: '#fff',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    padding: '4px',
+                    zIndex: 2000,
+                    border: '1px solid #f0f0f0',
+                    transformOrigin: 'top right',
+                    animation: 'slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+                  }}
+                >
+                  <div
+                    onClick={() => {
+                      navigate('/admin/profile')
+                      setProfileDropdownOpen(false)
+                    }}
+                    style={{
+                      padding: '6px 12px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#262626',
+                      borderRadius: '4px',
+                      fontSize: '13px',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <UserOutlined style={{ fontSize: '14px' }} /> <span style={{ fontWeight: 500 }}>Admin Profile</span>
+                  </div>
+                  <div style={{ height: '1px', backgroundColor: '#f0f0f0', margin: '2px 0' }} />
+                  <div
+                    onClick={() => {
+                      handleLogout()
+                      setProfileDropdownOpen(false)
+                    }}
+                    style={{
+                      padding: '6px 12px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#ff4d4f',
+                      borderRadius: '4px',
+                      fontSize: '13px',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fff1f0'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <LogoutOutlined style={{ fontSize: '14px' }} /> <span style={{ fontWeight: 500 }}>Sign Out</span>
+                  </div>
+                  {/* Backdrop */}
+                  <div
+                    style={{
+                      position: 'fixed',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      zIndex: -1,
+                      cursor: 'default'
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setProfileDropdownOpen(false)
+                    }}
+                  />
+                </div>
+              )}
             </div>
-          </div>
-        </div>
+          </Space>
+        </Header>
 
-        {/* Page content */}
-        <main className="flex-1 p-6 overflow-y-auto">
+        <Content style={{
+          margin: '24px',
+          padding: 0,
+          minHeight: 280,
+          background: 'transparent'
+        }}>
           {children}
-        </main>
-      </div>
+        </Content>
 
-      {/* Notification Center */}
-      <NotificationCenter 
-        isOpen={notificationOpen} 
-        onClose={() => setNotificationOpen(false)} 
-      />
-    </div>
+        {/* Notification Drawer Component can be added here */}
+        <NotificationCenter
+          isOpen={notificationOpen}
+          onClose={() => setNotificationOpen(false)}
+        />
+      </Layout>
+    </Layout>
   )
 }
 

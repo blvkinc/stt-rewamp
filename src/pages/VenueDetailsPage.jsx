@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { MapPin, Star, Clock, Phone, Globe, Calendar, ArrowRight, Heart, Share2 } from 'lucide-react'
-import EventCard from '../components/EventCard'
+import { MapPin, Star, Clock, Phone, Globe, Calendar, ArrowRight, ArrowLeft, Heart, Share2, Check, Mail } from 'lucide-react'
+import { Button } from '../components/ui/button'
+import { Card, CardContent } from '../components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 
 const VenueDetailsPage = () => {
   const { id } = useParams()
@@ -13,7 +15,7 @@ const VenueDetailsPage = () => {
     const mockVenue = {
       id: parseInt(id),
       name: "Azure Beach Club",
-      description: "Experience luxury dining with breathtaking ocean views at Dubai's premier beachfront destination. Our award-winning chefs create culinary masterpieces while you enjoy the pristine beach setting.",
+      description: "Experience luxury dining with breathtaking ocean views at Dubai's premier beachfront destination. Our award-winning chefs create culinary masterpieces while you enjoy the pristine beach setting. Whether you are looking for a relaxing day by the pool or a vibrant nightlife experience, Azure Beach Club offers it all.",
       address: "Palm Jumeirah, Dubai, UAE",
       phone: "+971 4 123 4567",
       website: "www.azurebeachclub.ae",
@@ -21,9 +23,11 @@ const VenueDetailsPage = () => {
       reviews: 156,
       priceRange: "AED 200-500",
       images: [
-        "https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=800&h=600&fit=crop",
+        "https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=1600&h=900&fit=crop",
         "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
-        "https://images.unsplash.com/photo-1566737236500-c8ac43014a8e?w=800&h=600&fit=crop"
+        "https://images.unsplash.com/photo-1566737236500-c8ac43014a8e?w=800&h=600&fit=crop",
+        "https://images.unsplash.com/photo-1540541338287-41700207dee6?w=800&h=600&fit=crop",
+        "https://images.unsplash.com/photo-1571896349842-68c47e0f5550?w=800&h=600&fit=crop"
       ],
       amenities: [
         "Ocean View Terrace",
@@ -73,179 +77,198 @@ const VenueDetailsPage = () => {
 
   if (!venue) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-purple"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      {/* Hero Gallery */}
-      <div className="relative h-96 md:h-[500px] overflow-hidden">
-        <img 
-          src={venue.images[0]} 
-          alt={venue.name}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-        <div className="absolute bottom-6 left-6 right-6">
-          <div className="flex justify-between items-end">
-            <div className="text-white">
-              <h1 className="text-4xl md:text-5xl font-bold mb-2">{venue.name}</h1>
-              <div className="flex items-center space-x-4 text-lg">
-                <div className="flex items-center space-x-1">
-                  <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span>{venue.rating}</span>
-                  <span className="text-neutral-300">({venue.reviews} reviews)</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <MapPin className="w-5 h-5" />
-                  <span>{venue.address}</span>
-                </div>
-              </div>
+    <div className="min-h-screen bg-white">
+      {/* Back Button */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-6">
+        <Link to="/venues" className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors">
+          <ArrowLeft className="w-5 h-5" />
+          <span className="font-medium">Back to Venues</span>
+        </Link>
+      </div>
+
+      {/* Premium Image Gallery */}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[400px] md:h-[500px] rounded-3xl overflow-hidden shadow-sm">
+          <div className="md:col-span-2 relative h-full">
+            <img
+              src={venue.images[0]}
+              alt={venue.name}
+              className="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer"
+            />
+          </div>
+          <div className="hidden md:flex flex-col gap-2 h-full">
+            <div className="h-1/2 relative">
+              <img src={venue.images[1]} className="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" alt="Gallery" />
             </div>
-            <div className="flex space-x-3">
-              <button className="p-3 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-colors">
-                <Heart className="w-6 h-6" />
-              </button>
-              <button className="p-3 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-colors">
-                <Share2 className="w-6 h-6" />
-              </button>
+            <div className="h-1/2 relative">
+              <img src={venue.images[2]} className="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" alt="Gallery" />
+            </div>
+          </div>
+          <div className="hidden md:flex flex-col gap-2 h-full">
+            <div className="h-1/2 relative">
+              <img src={venue.images[3]} className="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" alt="Gallery" />
+            </div>
+            <div className="h-1/2 relative">
+              <img src={venue.images[4]} className="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" alt="Gallery" />
+              <div className="absolute bottom-4 right-4 bg-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-md">
+                Show all photos
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto container-padding py-12">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Main Content */}
           <div className="lg:col-span-2">
+
+            {/* Header */}
+            <div className="mb-8 border-b border-gray-100 pb-8">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h1 className="text-4xl font-bold text-gray-900 mb-2 tracking-tight">{venue.name}</h1>
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <span className="font-medium">{venue.address}</span>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button className="flex items-center space-x-1 text-gray-600 hover:text-red-500 transition-colors p-2 hover:bg-gray-100 rounded-full">
+                    <Heart className="w-5 h-5" />
+                  </button>
+                  <button className="flex items-center space-x-1 text-gray-600 hover:text-gray-900 transition-colors p-2 hover:bg-gray-100 rounded-full">
+                    <Share2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-gray-900 text-gray-900" />
+                  <span className="font-semibold text-lg">{venue.rating}</span>
+                  <span className="text-gray-500 text-sm underline">({venue.reviews} reviews)</span>
+                </div>
+                <div className="flex items-center gap-1 text-gray-600">
+                  <MapPin className="w-4 h-4" />
+                  <span className="text-sm underline">View on map</span>
+                </div>
+              </div>
+            </div>
+
+
             {/* Tabs */}
-            <div className="flex space-x-8 border-b border-neutral-200 mb-8">
-              {[
-                { id: 'overview', label: 'Overview' },
-                { id: 'events', label: 'Events' },
-                { id: 'reviews', label: 'Reviews' },
-                { id: 'gallery', label: 'Gallery' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`pb-4 px-2 font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? 'text-primary-600 border-b-2 border-primary-600'
-                      : 'text-neutral-600 hover:text-neutral-800'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+            <div className="mb-8">
+              <nav className="flex space-x-8 border-b border-gray-100">
+                {[
+                  { id: 'overview', label: 'Overview' },
+                  { id: 'events', label: 'Events' },
+                  { id: 'reviews', label: 'Reviews' },
+                  { id: 'gallery', label: 'Gallery' }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`pb-4 px-1 font-medium text-sm transition-all border-b-2 ${activeTab === tab.id
+                      ? 'border-gray-900 text-gray-900'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </nav>
             </div>
 
             {/* Tab Content */}
             {activeTab === 'overview' && (
-              <div className="space-y-8">
+              <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div>
-                  <h2 className="text-2xl font-bold text-neutral-800 mb-4">About {venue.name}</h2>
-                  <p className="text-neutral-600 text-lg leading-relaxed">{venue.description}</p>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">About the venue</h2>
+                  <p className="text-gray-600 leading-relaxed text-lg">{venue.description}</p>
                 </div>
 
-                <div>
-                  <h3 className="text-xl font-bold text-neutral-800 mb-4">Amenities & Features</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="border-t border-gray-100 pt-8">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-6">What this place offers</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {venue.amenities.map((amenity, index) => (
-                      <div key={index} className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                        <span className="text-neutral-700">{amenity}</span>
+                      <div key={index} className="flex items-center space-x-3">
+                        <Check className="w-5 h-5 text-gray-900" />
+                        <span className="text-gray-700">{amenity}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div>
-                    <h3 className="text-xl font-bold text-neutral-800 mb-4">Dress Code</h3>
-                    <p className="text-neutral-600">{venue.dressCode}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-neutral-800 mb-4">Highlights</h3>
-                    <ul className="space-y-2">
-                      {venue.highlights.map((highlight, index) => (
-                        <li key={index} className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-accent-500 rounded-full"></div>
-                          <span className="text-neutral-700">{highlight}</span>
-                        </li>
-                      ))}
-                    </ul>
+                <div className="border-t border-gray-100 pt-8">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-6">Venue Highlights</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {venue.highlights.map((highlight, index) => (
+                      <div key={index} className="bg-gray-50 p-4 rounded-xl">
+                        <span className="text-gray-800 font-medium">{highlight}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
             )}
 
             {activeTab === 'events' && (
-              <div>
-                <h2 className="text-2xl font-bold text-neutral-800 mb-6">Upcoming Events</h2>
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Upcoming Events</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {venue.upcomingEvents.map((event) => (
-                    <div key={event.id} className="bg-white rounded-2xl overflow-hidden shadow-soft border border-neutral-100">
-                      <img src={event.image} alt={event.title} className="w-full h-48 object-cover" />
-                      <div className="p-6">
-                        <h3 className="font-bold text-xl text-neutral-800 mb-2">{event.title}</h3>
-                        <div className="flex items-center space-x-4 text-neutral-600 mb-4">
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="w-4 h-4" />
-                            <span>{event.date}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{event.time}</span>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-2xl font-bold text-primary-600">AED {event.price}</span>
-                          <Link to={`/events/${event.id}`} className="btn-primary">
-                            View Event
-                          </Link>
+                    <Card key={event.id} className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-shadow group cursor-pointer">
+                      <div className="relative h-48 overflow-hidden">
+                        <img src={event.image} alt={event.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-gray-900">
+                          AED {event.price}
                         </div>
                       </div>
-                    </div>
+                      <div className="p-5">
+                        <div className="text-xs font-bold text-brand-purple mb-1 uppercase tracking-wide">{event.date}</div>
+                        <h3 className="font-bold text-lg text-gray-900 mb-1 group-hover:text-gray-600 transition-colors">{event.title}</h3>
+                        <div className="flex items-center text-gray-500 text-sm mb-4">
+                          <Clock className="w-4 h-4 mr-1" />
+                          {event.time}
+                        </div>
+                        <Button variant="outline" className="w-full rounded-xl border-gray-200 hover:border-gray-900 hover:bg-gray-50">
+                          View Details
+                        </Button>
+                      </div>
+                    </Card>
                   ))}
-                </div>
-                <div className="text-center mt-8">
-                  <Link to="/events" className="btn-secondary">
-                    See All Events
-                  </Link>
                 </div>
               </div>
             )}
 
             {activeTab === 'reviews' && (
-              <div>
-                <h2 className="text-2xl font-bold text-neutral-800 mb-6">Customer Reviews</h2>
-                <div className="space-y-6">
-                  {[1, 2, 3].map((review) => (
-                    <div key={review} className="bg-white rounded-2xl p-6 shadow-soft border border-neutral-100">
-                      <div className="flex items-start space-x-4">
-                        <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                          <span className="font-bold text-primary-600">JD</span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <span className="font-semibold text-neutral-800">John Doe</span>
-                            <div className="flex items-center">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <Star key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                              ))}
-                            </div>
-                          </div>
-                          <p className="text-neutral-600">
-                            Amazing experience! The food was exceptional and the ocean view was breathtaking. 
-                            Staff was very attentive and the atmosphere was perfect for our celebration.
-                          </p>
-                          <span className="text-sm text-neutral-500 mt-2 block">2 weeks ago</span>
+              <div className="space-y-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <Star className="w-8 h-8 fill-gray-900 text-gray-900" />
+                  <span className="text-3xl font-bold text-gray-900">{venue.rating}</span>
+                  <span className="text-xl text-gray-500">({venue.reviews} reviews)</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">JD</div>
+                        <div>
+                          <div className="font-semibold text-gray-900">John Doe</div>
+                          <div className="text-sm text-gray-500">October 2023</div>
                         </div>
                       </div>
+                      <p className="text-gray-600 leading-relaxed text-sm">
+                        Beautiful venue with amazing atmosphere. The service was top notch and the food was delicious. Highly recommended for a special occasion.
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -253,61 +276,83 @@ const VenueDetailsPage = () => {
             )}
 
             {activeTab === 'gallery' && (
-              <div>
-                <h2 className="text-2xl font-bold text-neutral-800 mb-6">Photo Gallery</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {venue.images.map((image, index) => (
-                    <div key={index} className="aspect-square rounded-2xl overflow-hidden">
-                      <img src={image} alt={`${venue.name} ${index + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
-                    </div>
-                  ))}
-                </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {venue.images.map((img, i) => (
+                  <div key={i} className="aspect-square rounded-2xl overflow-hidden cursor-pointer hover:opacity-95">
+                    <img src={img} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Gallery" />
+                  </div>
+                ))}
               </div>
             )}
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Contact Info */}
-            <div className="bg-white rounded-2xl p-6 shadow-soft border border-neutral-100">
-              <h3 className="text-xl font-bold text-neutral-800 mb-4">Contact Information</h3>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <MapPin className="w-5 h-5 text-neutral-500" />
-                  <span className="text-neutral-700">{venue.address}</span>
+          {/* Sticky Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-28 space-y-6">
+              <Card className="rounded-3xl shadow-xl border-0 overflow-hidden ring-1 ring-black/5 p-6 bg-white">
+                <div className="mb-6">
+                  <h3 className="text-xl font-bold text-gray-900">Request a Quote</h3>
+                  <p className="text-sm text-gray-500 mt-1">Starting from <span className="font-semibold text-gray-900">{venue.priceRange}</span></p>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <Phone className="w-5 h-5 text-neutral-500" />
-                  <span className="text-neutral-700">{venue.phone}</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Globe className="w-5 h-5 text-neutral-500" />
-                  <span className="text-neutral-700">{venue.website}</span>
-                </div>
-              </div>
-              <button className="w-full btn-primary mt-6">
-                Get Directions
-              </button>
-            </div>
 
-            {/* Opening Hours */}
-            <div className="bg-white rounded-2xl p-6 shadow-soft border border-neutral-100">
-              <h3 className="text-xl font-bold text-neutral-800 mb-4">Opening Hours</h3>
-              <div className="space-y-2">
-                {Object.entries(venue.openingHours).map(([day, hours]) => (
-                  <div key={day} className="flex justify-between">
-                    <span className="capitalize text-neutral-600">{day}</span>
-                    <span className="text-neutral-800">{hours}</span>
+                <div className="space-y-4">
+                  {/* Inputs Grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="col-span-2 space-y-1">
+                      <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Event Type</label>
+                      <Select>
+                        <SelectTrigger className="w-full rounded-xl border-gray-200 bg-gray-50 h-11">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="wedding">Wedding</SelectItem>
+                          <SelectItem value="corporate">Corporate Event</SelectItem>
+                          <SelectItem value="party">Private Party</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="col-span-1 space-y-1">
+                      <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Date</label>
+                      <input type="date" className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:ring-2 focus:ring-black/5" />
+                    </div>
+                    <div className="col-span-1 space-y-1">
+                      <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Guests</label>
+                      <input type="number" placeholder="50+" className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:ring-2 focus:ring-black/5" />
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
 
-            {/* Price Range */}
-            <div className="bg-white rounded-2xl p-6 shadow-soft border border-neutral-100">
-              <h3 className="text-xl font-bold text-neutral-800 mb-4">Price Range</h3>
-              <p className="text-2xl font-bold text-primary-600">{venue.priceRange}</p>
-              <p className="text-neutral-600 text-sm mt-2">Per person (average)</p>
+                  <Button className="w-full h-12 text-lg font-semibold rounded-xl bg-gradient-to-r from-brand-purple to-brand-orange text-white shadow-lg hover:opacity-90 transition-opacity mt-4">
+                    Check Availability
+                  </Button>
+
+                  <p className="text-xs text-center text-gray-400 mt-2">
+                    You won't be charged yet
+                  </p>
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-2 gap-3">
+                  <a href={`tel:${venue.phone}`} className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gray-50 text-gray-700 font-medium hover:bg-gray-100 transition-colors">
+                    <Phone className="w-4 h-4" /> Call
+                  </a>
+                  <a href={`mailto:info@${venue.website}`} className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gray-50 text-gray-700 font-medium hover:bg-gray-100 transition-colors">
+                    <Mail className="w-4 h-4" /> Email
+                  </a>
+                </div>
+              </Card>
+
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="bg-white p-2 rounded-full shadow-sm">
+                    <Mail className="w-5 h-5 text-gray-900" />
+                  </div>
+                  <span className="font-semibold text-gray-900">Get in touch</span>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Have questions about events or bookings? Contact the venue directly.</p>
+                <a href={`tel:${venue.phone}`} className="text-sm font-bold text-gray-900 underline block mb-1">{venue.phone}</a>
+                <a href={`mailto:info@${venue.website}`} className="text-sm font-bold text-gray-900 underline block">info@azurebeach.com</a>
+              </div>
             </div>
           </div>
         </div>

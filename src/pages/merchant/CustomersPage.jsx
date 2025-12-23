@@ -1,24 +1,24 @@
 import React, { useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { 
-  Card, 
-  Button, 
-  Input, 
-  Select, 
-  Table, 
-  Tag, 
-  Avatar, 
-  Modal, 
-  Statistic, 
+import {
+  Card,
+  Button,
+  Input,
+  Select,
+  Table,
+  Tag,
+  Avatar,
+  Modal,
+  Statistic,
   Typography,
   Space,
   Row,
   Col,
   Rate,
   Descriptions,
-  List
+
 } from 'antd'
-import { 
+import {
   SearchOutlined,
   FilterOutlined,
   DownloadOutlined,
@@ -128,7 +128,7 @@ const CustomersPage = () => {
 
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         customer.email.toLowerCase().includes(searchTerm.toLowerCase())
+      customer.email.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesFilter = filterStatus === 'all' || customer.status.toLowerCase() === filterStatus.toLowerCase()
     return matchesSearch && matchesFilter
   })
@@ -241,230 +241,235 @@ const CustomersPage = () => {
   ]
 
   return (
-    <MerchantLayout>
-      <div style={{ padding: '24px' }}>
-        {/* Header */}
-        <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-          <div>
-            <Title level={1} style={{ margin: 0, marginBottom: '8px' }}>Customer Management</Title>
-            <Text type="secondary">Manage your customer relationships and insights</Text>
-          </div>
-          <Button 
-            icon={<DownloadOutlined />}
-            style={{ 
-              borderRadius: '8px'
-            }}
-          >
-            Export Data
-          </Button>
+    <div style={{ padding: '24px' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <Title level={1} style={{ margin: 0, marginBottom: '8px' }}>Customer Management</Title>
+          <Text type="secondary">Manage your customer relationships and insights</Text>
         </div>
+        <Button
+          icon={<DownloadOutlined />}
+          style={{
+            borderRadius: '8px'
+          }}
+        >
+          Export Data
+        </Button>
+      </div>
 
-        {/* Stats */}
-        <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="Total Customers"
-                value={customers.length}
-                prefix={<UserOutlined style={{ color: '#667eea' }} />}
-                valueStyle={{ color: '#1f2937' }}
-              />
-            </Card>
+      {/* Stats */}
+      <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Total Customers"
+              value={customers.length}
+              prefix={<UserOutlined style={{ color: '#667eea' }} />}
+              styles={{ content: { color: '#1f2937' } }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="VIP Customers"
+              value={customers.filter(c => c.status === 'VIP').length}
+              prefix={<StarOutlined style={{ color: '#f093fb' }} />}
+              styles={{ content: { color: '#1f2937' } }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Avg. Customer Value"
+              value={Math.round(customers.reduce((sum, c) => sum + c.totalSpent, 0) / customers.length)}
+              prefix={<DollarOutlined style={{ color: '#667eea' }} />}
+              suffix="AED"
+              styles={{ content: { color: '#1f2937' } }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Retention Rate"
+              value={87}
+              suffix="%"
+              prefix={<ArrowUpOutlined style={{ color: '#f093fb' }} />}
+              styles={{ content: { color: '#1f2937' } }}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Filters and Search */}
+      <Card style={{ marginBottom: '24px' }}>
+        <Row gutter={16} align="middle">
+          <Col xs={24} md={12} lg={14}>
+            <Input
+              placeholder="Search customers by name or email..."
+              prefix={<SearchOutlined />}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              size="large"
+            />
           </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="VIP Customers"
-                value={customers.filter(c => c.status === 'VIP').length}
-                prefix={<StarOutlined style={{ color: '#f093fb' }} />}
-                valueStyle={{ color: '#1f2937' }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="Avg. Customer Value"
-                value={Math.round(customers.reduce((sum, c) => sum + c.totalSpent, 0) / customers.length)}
-                prefix={<DollarOutlined style={{ color: '#667eea' }} />}
-                suffix="AED"
-                valueStyle={{ color: '#1f2937' }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="Retention Rate"
-                value={87}
-                suffix="%"
-                prefix={<ArrowUpOutlined style={{ color: '#f093fb' }} />}
-                valueStyle={{ color: '#1f2937' }}
-              />
-            </Card>
+          <Col xs={24} md={12} lg={10}>
+            <Space>
+              <Select
+                value={filterStatus}
+                onChange={setFilterStatus}
+                style={{ width: 120 }}
+                size="large"
+              >
+                <Option value="all">All Status</Option>
+                <Option value="vip">VIP</Option>
+                <Option value="regular">Regular</Option>
+                <Option value="new">New</Option>
+              </Select>
+              <Button
+                icon={<FilterOutlined />}
+                size="large"
+              >
+                More Filters
+              </Button>
+            </Space>
           </Col>
         </Row>
+      </Card>
 
-        {/* Filters and Search */}
-        <Card style={{ marginBottom: '24px' }}>
-          <Row gutter={16} align="middle">
-            <Col xs={24} md={12} lg={14}>
-              <Input
-                placeholder="Search customers by name or email..."
-                prefix={<SearchOutlined />}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                size="large"
-              />
-            </Col>
-            <Col xs={24} md={12} lg={10}>
-              <Space>
-                <Select
-                  value={filterStatus}
-                  onChange={setFilterStatus}
-                  style={{ width: 120 }}
-                  size="large"
-                >
-                  <Option value="all">All Status</Option>
-                  <Option value="vip">VIP</Option>
-                  <Option value="regular">Regular</Option>
-                  <Option value="new">New</Option>
-                </Select>
-                <Button 
-                  icon={<FilterOutlined />}
-                  size="large"
-                >
-                  More Filters
-                </Button>
-              </Space>
-            </Col>
-          </Row>
-        </Card>
+      {/* Customer List */}
+      <Card>
+        <div style={{ marginBottom: '16px' }}>
+          <Title level={4} style={{ margin: 0 }}>
+            Customers ({filteredCustomers.length})
+          </Title>
+        </div>
 
-        {/* Customer List */}
-        <Card>
-          <div style={{ marginBottom: '16px' }}>
-            <Title level={4} style={{ margin: 0 }}>
-              Customers ({filteredCustomers.length})
-            </Title>
+        <Table
+          columns={columns}
+          dataSource={filteredCustomers}
+          rowKey="id"
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} customers`,
+          }}
+          scroll={{ x: 800 }}
+        />
+      </Card>
+
+      {/* Customer Detail Modal */}
+      <Modal
+        title={
+          <div>
+            <Title level={3} style={{ margin: 0 }}>{selectedCustomer?.name}</Title>
+            <Text type="secondary">Customer since {selectedCustomer?.joinDate}</Text>
           </div>
-          
-          <Table
-            columns={columns}
-            dataSource={filteredCustomers}
-            rowKey="id"
-            pagination={{
-              pageSize: 10,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} customers`,
-            }}
-            scroll={{ x: 800 }}
-          />
-        </Card>
+        }
+        open={!!selectedCustomer}
+        onCancel={() => setSelectedCustomer(null)}
+        footer={null}
+        width={800}
+        style={{ top: 20 }}
+      >
+        {selectedCustomer && (
+          <div>
+            {/* Customer Stats */}
+            <Row gutter={16} style={{ marginBottom: '24px' }}>
+              <Col span={8}>
+                <Card size="small" style={{ textAlign: 'center' }}>
+                  <Statistic
+                    title="Total Bookings"
+                    value={selectedCustomer.totalBookings}
+                    styles={{ content: { color: '#667eea' } }}
+                  />
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card size="small" style={{ textAlign: 'center' }}>
+                  <Statistic
+                    title="Total Spent"
+                    value={selectedCustomer.totalSpent}
+                    prefix="AED"
+                    styles={{ content: { color: '#667eea' } }}
+                  />
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card size="small" style={{ textAlign: 'center' }}>
+                  <Statistic
+                    title="Avg Rating"
+                    value={selectedCustomer.averageRating}
+                    styles={{ content: { color: '#667eea' } }}
+                  />
+                </Card>
+              </Col>
+            </Row>
 
-        {/* Customer Detail Modal */}
-        <Modal
-          title={
-            <div>
-              <Title level={3} style={{ margin: 0 }}>{selectedCustomer?.name}</Title>
-              <Text type="secondary">Customer since {selectedCustomer?.joinDate}</Text>
-            </div>
-          }
-          open={!!selectedCustomer}
-          onCancel={() => setSelectedCustomer(null)}
-          footer={null}
-          width={800}
-          style={{ top: 20 }}
-        >
-          {selectedCustomer && (
-            <div>
-              {/* Customer Stats */}
-              <Row gutter={16} style={{ marginBottom: '24px' }}>
-                <Col span={8}>
-                  <Card size="small" style={{ textAlign: 'center' }}>
-                    <Statistic
-                      title="Total Bookings"
-                      value={selectedCustomer.totalBookings}
-                      valueStyle={{ color: '#667eea' }}
-                    />
-                  </Card>
-                </Col>
-                <Col span={8}>
-                  <Card size="small" style={{ textAlign: 'center' }}>
-                    <Statistic
-                      title="Total Spent"
-                      value={selectedCustomer.totalSpent}
-                      prefix="AED"
-                      valueStyle={{ color: '#667eea' }}
-                    />
-                  </Card>
-                </Col>
-                <Col span={8}>
-                  <Card size="small" style={{ textAlign: 'center' }}>
-                    <Statistic
-                      title="Avg Rating"
-                      value={selectedCustomer.averageRating}
-                      valueStyle={{ color: '#667eea' }}
-                    />
-                  </Card>
-                </Col>
-              </Row>
+            {/* Contact Info */}
+            <Card size="small" style={{ marginBottom: '16px' }}>
+              <Title level={5}>Contact Information</Title>
+              <Descriptions column={1} size="small">
+                <Descriptions.Item label={<><MailOutlined /> Email</>}>
+                  {selectedCustomer.email}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><PhoneOutlined /> Phone</>}>
+                  {selectedCustomer.phone}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><EnvironmentOutlined /> Location</>}>
+                  {selectedCustomer.location}
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
 
-              {/* Contact Info */}
-              <Card size="small" style={{ marginBottom: '16px' }}>
-                <Title level={5}>Contact Information</Title>
-                <Descriptions column={1} size="small">
-                  <Descriptions.Item label={<><MailOutlined /> Email</>}>
-                    {selectedCustomer.email}
-                  </Descriptions.Item>
-                  <Descriptions.Item label={<><PhoneOutlined /> Phone</>}>
-                    {selectedCustomer.phone}
-                  </Descriptions.Item>
-                  <Descriptions.Item label={<><EnvironmentOutlined /> Location</>}>
-                    {selectedCustomer.location}
-                  </Descriptions.Item>
-                </Descriptions>
-              </Card>
+            {/* Favorite Events */}
+            <Card size="small" style={{ marginBottom: '16px' }}>
+              <Title level={5}>Favorite Events</Title>
+              <Space wrap>
+                {selectedCustomer.favoriteEvents.map((event, index) => (
+                  <Tag key={index} color="blue">{event}</Tag>
+                ))}
+              </Space>
+            </Card>
 
-              {/* Favorite Events */}
-              <Card size="small" style={{ marginBottom: '16px' }}>
-                <Title level={5}>Favorite Events</Title>
-                <Space wrap>
-                  {selectedCustomer.favoriteEvents.map((event, index) => (
-                    <Tag key={index} color="blue">{event}</Tag>
-                  ))}
-                </Space>
-              </Card>
-
-              {/* Booking History */}
-              <Card size="small">
-                <Title level={5}>Recent Bookings</Title>
-                <List
-                  dataSource={selectedCustomer.bookingHistory}
-                  renderItem={(booking, index) => (
-                    <List.Item>
-                      <List.Item.Meta
-                        title={booking.event}
-                        description={booking.date}
-                      />
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontWeight: 500, color: '#667eea' }}>
-                          AED {booking.amount}
-                        </div>
-                        <Tag color={booking.status === 'Completed' ? 'green' : 'blue'}>
-                          {booking.status}
-                        </Tag>
+            {/* Booking History */}
+            <Card size="small">
+              <Title level={5}>Recent Bookings</Title>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {selectedCustomer.bookingHistory.map((booking, index) => (
+                  <div key={index} style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px',
+                    backgroundColor: '#fafafa',
+                    borderRadius: '8px'
+                  }}>
+                    <div>
+                      <div style={{ fontWeight: 500 }}>{booking.event}</div>
+                      <Text type="secondary" style={{ fontSize: '13px' }}>{booking.date}</Text>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontWeight: 500, color: '#667eea' }}>
+                        AED {booking.amount}
                       </div>
-                    </List.Item>
-                  )}
-                />
-              </Card>
-            </div>
-          )}
-        </Modal>
-      </div>
-    </MerchantLayout>
+                      <Tag color={booking.status === 'Completed' ? 'green' : 'blue'}>
+                        {booking.status}
+                      </Tag>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        )}
+      </Modal>
+    </div>
+
   )
 }
 

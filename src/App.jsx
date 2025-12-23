@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { ConfigProvider } from 'antd'
+import { ConfigProvider, App as AntApp } from 'antd'
 import { AuthProvider } from './context/AuthContext'
 import { BookingProvider } from './context/BookingContext'
 import { MerchantProvider } from './context/MerchantContext'
@@ -21,6 +21,7 @@ import PremiumUpgradePage from './pages/PremiumUpgradePage'
 import ReviewPage from './pages/ReviewPage'
 
 // Merchant Pages
+import MerchantLayout from './components/merchant/MerchantLayout'
 import MerchantAuthPage from './pages/merchant/MerchantAuthPage'
 import MerchantOnboardingPage from './pages/merchant/MerchantOnboardingPage'
 import MerchantDashboard from './pages/merchant/MerchantDashboard'
@@ -47,10 +48,14 @@ import PaymentsManagement from './pages/admin/PaymentsManagement'
 import SystemSettings from './pages/admin/SystemSettings'
 import AnalyticsManagement from './pages/admin/AnalyticsManagement'
 import InviteMerchant from './pages/admin/InviteMerchant'
+import EditMerchantPage from './pages/admin/EditMerchantPage'
+import MerchantCreatePage from './pages/admin/MerchantCreatePage'
 import VenueDetailPage from './pages/admin/VenueDetailPage'
 import ApprovalQueuePage from './pages/admin/ApprovalQueuePage'
 import SystemLogsPage from './pages/admin/SystemLogsPage'
 import ReportsPage from './pages/admin/ReportsPage'
+import MerchantProfilePage from './pages/merchant/MerchantProfilePage'
+import AdminProfilePage from './pages/admin/AdminProfilePage'
 
 function App() {
   return (
@@ -62,73 +67,84 @@ function App() {
         },
       }}
     >
-      <AuthProvider>
-        <BookingProvider>
-          <MerchantProvider>
-            <Router>
-            <Routes>
-              {/* Customer Routes */}
-              <Route path="/*" element={
-                <div className="min-h-screen flex flex-col">
-                  <Navbar />
-                  <main className="flex-1">
-                    <Routes>
-                      <Route path="/" element={<HomePage />} />
-                      <Route path="/explore" element={<ExplorePage />} />
-                      <Route path="/events" element={<EventsPage />} />
-                      <Route path="/events/:id" element={<EventDetailsPage />} />
-                      <Route path="/venues" element={<VenuesPage />} />
-                      <Route path="/venues/:id" element={<VenueDetailsPage />} />
-                      <Route path="/packages/:eventId" element={<PackagesPage />} />
-                      <Route path="/packages/detail/:packageId" element={<PackageDetailPage />} />
-                      <Route path="/booking/:id" element={<BookingPage />} />
-                      <Route path="/profile" element={<ProfilePage />} />
-                      <Route path="/auth" element={<AuthPage />} />
-                      <Route path="/premium" element={<PremiumUpgradePage />} />
-                      <Route path="/review/:bookingId" element={<ReviewPage />} />
-                    </Routes>
-                  </main>
-                  <Footer />
-                </div>
-              } />
+      <AntApp>
+        <AuthProvider>
+          <BookingProvider>
+            <MerchantProvider>
+              <Router>
+                <Routes>
+                  {/* Customer Routes */}
+                  <Route path="/*" element={
+                    <div className="min-h-screen flex flex-col">
+                      <Navbar />
+                      <main className="flex-1">
+                        <Routes>
+                          <Route path="/" element={<HomePage />} />
+                          <Route path="/explore" element={<ExplorePage />} />
+                          <Route path="/events" element={<EventsPage />} />
+                          <Route path="/events/:id" element={<EventDetailsPage />} />
+                          <Route path="/venues" element={<VenuesPage />} />
+                          <Route path="/venues/:id" element={<VenueDetailsPage />} />
+                          <Route path="/packages/:eventId" element={<PackagesPage />} />
+                          <Route path="/packages/detail/:packageId" element={<PackageDetailPage />} />
+                          <Route path="/booking/:id" element={<BookingPage />} />
+                          <Route path="/profile" element={<ProfilePage />} />
+                          <Route path="/auth" element={<AuthPage />} />
+                          <Route path="/premium" element={<PremiumUpgradePage />} />
+                          <Route path="/review/:bookingId" element={<ReviewPage />} />
+                        </Routes>
+                      </main>
+                      <Footer />
+                    </div>
+                  } />
 
-              {/* Merchant Routes */}
-              <Route path="/merchant/auth" element={<MerchantAuthPage />} />
-              <Route path="/merchant/onboarding" element={<MerchantOnboardingPage />} />
-              <Route path="/merchant/dashboard" element={<MerchantDashboard />} />
-              <Route path="/merchant/events" element={<MerchantEventsPage />} />
-              <Route path="/merchant/events/create" element={<CreateEventPage />} />
-              <Route path="/merchant/packages" element={<MerchantPackagesPage />} />
-              <Route path="/merchant/packages/create" element={<CreatePackagePage />} />
-              <Route path="/merchant/bookings" element={<BookingsPage />} />
-              <Route path="/merchant/analytics" element={<AnalyticsPage />} />
-              <Route path="/merchant/promotions" element={<PromotionsPage />} />
-              <Route path="/merchant/advertising" element={<AdvertisingPage />} />
-              <Route path="/merchant/settings" element={<SettingsPage />} />
-              <Route path="/merchant/events/:id" element={<EventDetailPage />} />
-              <Route path="/merchant/customers" element={<CustomersPage />} />
+                  {/* Merchant Routes */}
+                  <Route path="/merchant/auth" element={<MerchantAuthPage />} />
+                  <Route path="/merchant/onboarding" element={<MerchantOnboardingPage />} />
 
-              {/* Super Admin Routes */}
-              <Route path="/admin/dashboard" element={<SuperAdminDashboard />} />
-              <Route path="/admin/venues" element={<VenuesManagement />} />
-              <Route path="/admin/venues/:venueId" element={<VenueDetailPage />} />
-              <Route path="/admin/merchants" element={<MerchantsManagement />} />
-              <Route path="/admin/merchants/invite" element={<InviteMerchant />} />
-              <Route path="/admin/users" element={<UsersManagement />} />
-              <Route path="/admin/events" element={<EventsManagement />} />
-              <Route path="/admin/approvals" element={<ApprovalsManagement />} />
-              <Route path="/admin/approvals/queue" element={<ApprovalQueuePage />} />
-              <Route path="/admin/payments" element={<PaymentsManagement />} />
-              <Route path="/admin/analytics" element={<AnalyticsManagement />} />
-              <Route path="/admin/system" element={<SystemSettings />} />
-              <Route path="/admin/settings" element={<SystemSettings />} />
-              <Route path="/admin/logs" element={<SystemLogsPage />} />
-              <Route path="/admin/reports" element={<ReportsPage />} />
-            </Routes>
-          </Router>
-        </MerchantProvider>
-      </BookingProvider>
-    </AuthProvider>
+                  <Route path="/merchant" element={<MerchantLayout />}>
+                    <Route path="dashboard" element={<MerchantDashboard />} />
+                    <Route path="events" element={<MerchantEventsPage />} />
+                    <Route path="events/create" element={<CreateEventPage />} />
+                    <Route path="events/:id/edit" element={<CreateEventPage />} />
+                    <Route path="packages" element={<MerchantPackagesPage />} />
+                    <Route path="packages/create" element={<CreatePackagePage />} />
+                    <Route path="packages/:id/edit" element={<CreatePackagePage />} />
+                    <Route path="bookings" element={<BookingsPage />} />
+                    <Route path="analytics" element={<AnalyticsPage />} />
+                    <Route path="promotions" element={<PromotionsPage />} />
+                    <Route path="advertising" element={<AdvertisingPage />} />
+                    <Route path="settings" element={<SettingsPage />} />
+                    <Route path="events/:id" element={<EventDetailPage />} />
+                    <Route path="customers" element={<CustomersPage />} />
+                    <Route path="profile" element={<MerchantProfilePage />} />
+                  </Route>
+
+                  {/* Super Admin Routes */}
+                  <Route path="/admin/dashboard" element={<SuperAdminDashboard />} />
+                  <Route path="/admin/venues" element={<VenuesManagement />} />
+                  <Route path="/admin/venues/:venueId" element={<VenueDetailPage />} />
+                  <Route path="/admin/merchants" element={<MerchantsManagement />} />
+                  <Route path="/admin/merchants/invite" element={<InviteMerchant />} />
+                  <Route path="/admin/merchants/new" element={<MerchantCreatePage />} />
+                  <Route path="/admin/merchants/:id/edit" element={<EditMerchantPage />} />
+                  <Route path="/admin/users" element={<UsersManagement />} />
+                  <Route path="/admin/events" element={<EventsManagement />} />
+                  <Route path="/admin/approvals" element={<ApprovalsManagement />} />
+                  <Route path="/admin/approvals/queue" element={<ApprovalQueuePage />} />
+                  <Route path="/admin/payments" element={<PaymentsManagement />} />
+                  <Route path="/admin/analytics" element={<AnalyticsManagement />} />
+                  <Route path="/admin/system" element={<SystemSettings />} />
+                  <Route path="/admin/settings" element={<SystemSettings />} />
+                  <Route path="/admin/logs" element={<SystemLogsPage />} />
+                  <Route path="/admin/reports" element={<ReportsPage />} />
+                  <Route path="/admin/profile" element={<AdminProfilePage />} />
+                </Routes>
+              </Router>
+            </MerchantProvider>
+          </BookingProvider>
+        </AuthProvider>
+      </AntApp>
     </ConfigProvider>
   )
 }

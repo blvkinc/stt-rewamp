@@ -1,7 +1,12 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Upload, MapPin, Phone, Mail, Building, CreditCard, AlertCircle, CheckCircle } from 'lucide-react'
+import { ArrowLeft, Upload, MapPin, Phone, Mail, Building, CreditCard, AlertCircle, CheckCircle, ChevronRight, Check } from 'lucide-react'
 import { useMerchant } from '../../context/MerchantContext'
+import { Button } from '../../components/ui/button'
+import { Input } from '../../components/ui/input'
+import { Label } from '../../components/ui/label'
+import { Textarea } from '../../components/ui/textarea'
+import { Card, CardContent } from '../../components/ui/card'
 
 const MerchantOnboardingPage = () => {
   const [step, setStep] = useState(1)
@@ -12,61 +17,44 @@ const MerchantOnboardingPage = () => {
   const { registerMerchant } = useMerchant()
 
   const [formData, setFormData] = useState({
-    // Business Info
     businessName: '',
     email: '',
     phone: '',
     password: '',
     confirmPassword: '',
-    
-    // Venue Info
     venueName: '',
     venueType: '',
     address: '',
     city: 'Dubai',
     description: '',
     capacity: '',
-    
-    // Documents
     businessLicense: null,
     tradeLicense: null,
-    
-    // Banking
     bankName: '',
     accountNumber: '',
     iban: '',
-    
-    // Additional
     website: '',
     instagram: '',
     facebook: ''
   })
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
+    setFormData({ ...formData, [e.target.name]: e.target.value })
     if (error) setError('')
   }
 
   const handleFileChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.files[0]
-    })
+    setFormData({ ...formData, [e.target.name]: e.target.files[0] })
   }
 
   const handleNext = () => {
-    if (step < 4) {
-      setStep(step + 1)
-    }
+    if (step < 4) setStep(step + 1)
+    window.scrollTo(0, 0)
   }
 
   const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1)
-    }
+    if (step > 1) setStep(step - 1)
+    window.scrollTo(0, 0)
   }
 
   const handleSubmit = async (e) => {
@@ -74,7 +62,6 @@ const MerchantOnboardingPage = () => {
     setLoading(true)
     setError('')
 
-    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match')
       setLoading(false)
@@ -101,191 +88,125 @@ const MerchantOnboardingPage = () => {
       })
 
       if (result.success) {
-        setSuccess('Application submitted successfully! You will be notified once approved.')
-        setTimeout(() => {
-          navigate('/merchant/dashboard')
-        }, 2000)
+        setSuccess('Application submitted successfully!')
+        setTimeout(() => navigate('/merchant/dashboard'), 2000)
       } else {
         setError(result.error || 'Registration failed')
       }
     } catch (err) {
       setError('Something went wrong. Please try again.')
     }
-
     setLoading(false)
   }
 
-  const venueTypes = [
-    'Restaurant',
-    'Cafe',
-    'Bar & Lounge',
-    'Hotel Restaurant',
-    'Beach Club',
-    'Rooftop Venue',
-    'Fine Dining',
-    'Casual Dining',
-    'Fast Casual',
-    'Other'
-  ]
+  const venueTypes = ['Restaurant', 'Cafe', 'Bar & Lounge', 'Hotel Restaurant', 'Beach Club', 'Rooftop Venue', 'Fine Dining', 'Casual Dining', 'Fast Casual', 'Other']
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <div className="max-w-4xl mx-auto container-padding pt-24 pb-12">
+    <div className="min-h-screen bg-slate-50 relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #000 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+
+      <div className="max-w-4xl mx-auto container-padding pt-16 pb-12 relative z-10">
         {/* Back Button */}
-        <Link to="/merchant/auth" className="inline-flex items-center space-x-2 text-neutral-600 hover:text-primary-500 mb-8 transition-colors">
-          <ArrowLeft className="w-5 h-5" />
+        <Link to="/merchant/auth" className="inline-flex items-center space-x-2 text-slate-500 hover:text-slate-800 mb-8 transition-colors font-medium">
+          <ArrowLeft className="w-4 h-4" />
           <span>Back to Login</span>
         </Link>
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-neutral-800 mb-4">Join Set The Table</h1>
-          <p className="text-xl text-neutral-600">Partner with Dubai's premier dining platform</p>
+          <h1 className="text-4xl font-bold text-slate-900 mb-3 tracking-tight">Become a Partner</h1>
+          <p className="text-lg text-slate-500">Join Dubai's exclusive network of premium venues</p>
         </div>
 
-        {/* Progress Steps */}
+        {/* Progress Stepper */}
         <div className="mb-12">
-          <div className="flex items-center justify-center space-x-4">
+          <div className="flex items-center justify-center">
             {[1, 2, 3, 4].map((stepNumber) => (
-              <div key={stepNumber} className="flex items-center">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-semibold shadow-soft transition-all duration-300 ${
-                  step >= stepNumber 
-                    ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white scale-110' 
-                    : 'bg-neutral-200 text-neutral-600'
-                }`}>
-                  {stepNumber}
+              <React.Fragment key={stepNumber}>
+                <div className="flex flex-col items-center relative z-10">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 border-2 ${step >= stepNumber
+                      ? 'bg-slate-900 border-slate-900 text-white shadow-lg'
+                      : 'bg-white border-slate-200 text-slate-400'
+                    }`}>
+                    {step > stepNumber ? <Check className="w-5 h-5" /> : stepNumber}
+                  </div>
+                  <div className={`absolute -bottom-8 text-xs font-semibold whitespace-nowrap transition-colors duration-300 ${step >= stepNumber ? 'text-slate-900' : 'text-slate-400'
+                    }`}>
+                    {stepNumber === 1 ? 'Business' : stepNumber === 2 ? 'Venue' : stepNumber === 3 ? 'Docs' : 'Review'}
+                  </div>
                 </div>
                 {stepNumber < 4 && (
-                  <div className={`w-20 h-2 mx-3 rounded-full transition-all duration-300 ${
-                    step > stepNumber ? 'bg-gradient-to-r from-primary-500 to-primary-600' : 'bg-neutral-200'
-                  }`}></div>
+                  <div className={`w-16 md:w-24 h-0.5 mx-2 transition-all duration-500 ${step > stepNumber ? 'bg-slate-900' : 'bg-slate-200'}`} />
                 )}
-              </div>
+              </React.Fragment>
             ))}
-          </div>
-          <div className="flex justify-center mt-6">
-            <div className="text-center">
-              <div className="text-lg font-semibold text-neutral-700">
-                Step {step} of 4: {
-                  step === 1 ? 'Business Information' :
-                  step === 2 ? 'Venue Details' :
-                  step === 3 ? 'Documents & Banking' :
-                  'Review & Submit'
-                }
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Form */}
-        <div className="card border border-neutral-100">
-          <div className="p-8">
-            {/* Error/Success Messages */}
+        {/* Form Card */}
+        <Card className="border-0 shadow-2xl shadow-slate-200/50 bg-white/80 backdrop-blur-sm rounded-3xl overflow-hidden">
+          <CardContent className="p-8 md:p-12">
+
+            {/* Messages */}
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center space-x-3">
-                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                <span className="text-red-700">{error}</span>
+              <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center space-x-3 text-red-600">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <span>{error}</span>
               </div>
             )}
-            
+
             {success && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-2xl flex items-center space-x-3">
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                <span className="text-green-700">{success}</span>
+              <div className="mb-8 p-4 bg-green-50 border border-green-100 rounded-xl flex items-center space-x-3 text-green-700">
+                <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                <span>{success}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit}>
               {/* Step 1: Business Information */}
               {step === 1 && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-neutral-800 mb-6">Business Information</h2>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Business Name *
-                    </label>
-                    <div className="relative">
-                      <Building className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                      <input
-                        type="text"
-                        name="businessName"
-                        value={formData.businessName}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300"
-                        placeholder="Your Restaurant Name"
-                      />
-                    </div>
+                <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                  <div className="border-b border-slate-100 pb-4 mb-4">
+                    <h2 className="text-2xl font-bold text-slate-900">Business Details</h2>
+                    <p className="text-slate-500 mt-1">Tell us about your company</p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Email Address *
-                      </label>
+                  <div className="grid gap-6">
+                    <div className="space-y-2">
+                      <Label>Business Name</Label>
                       <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300"
-                          placeholder="business@example.com"
-                        />
+                        <Building className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+                        <Input name="businessName" value={formData.businessName} onChange={handleInputChange} className="pl-10 h-12" placeholder="e.g. Acme Hospitality Group" required />
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Phone Number *
-                      </label>
-                      <div className="relative">
-                        <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300"
-                          placeholder="+971 4 123 4567"
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label>Email Address</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+                          <Input type="email" name="email" value={formData.email} onChange={handleInputChange} className="pl-10 h-12" placeholder="admin@company.com" required />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Phone Number</Label>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+                          <Input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} className="pl-10 h-12" placeholder="+971 50 000 0000" required />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Password *
-                      </label>
-                      <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        required
-                        className="input-field"
-                        placeholder="Minimum 6 characters"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Confirm Password *
-                      </label>
-                      <input
-                        type="password"
-                        name="confirmPassword"
-                        value={formData.confirmPassword}
-                        onChange={handleInputChange}
-                        required
-                        className="input-field"
-                        placeholder="Confirm your password"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label>Password</Label>
+                        <Input type="password" name="password" value={formData.password} onChange={handleInputChange} className="h-12" placeholder="Create a password" required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Confirm Password</Label>
+                        <Input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} className="h-12" placeholder="Confirm password" required />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -293,332 +214,168 @@ const MerchantOnboardingPage = () => {
 
               {/* Step 2: Venue Details */}
               {step === 2 && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-neutral-800 mb-6">Venue Details</h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Venue Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="venueName"
-                        value={formData.venueName}
-                        onChange={handleInputChange}
-                        required
-                        className="input-field"
-                        placeholder="Main venue name"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Venue Type *
-                      </label>
-                      <select
-                        name="venueType"
-                        value={formData.venueType}
-                        onChange={handleInputChange}
-                        required
-                        className="input-field"
-                      >
-                        <option value="">Select venue type</option>
-                        {venueTypes.map(type => (
-                          <option key={type} value={type}>{type}</option>
-                        ))}
-                      </select>
-                    </div>
+                <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                  <div className="border-b border-slate-100 pb-4 mb-4">
+                    <h2 className="text-2xl font-bold text-slate-900">Venue Information</h2>
+                    <p className="text-slate-500 mt-1">Details about your location</p>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Address *
-                    </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-4 top-4 text-neutral-400 w-5 h-5" />
-                      <textarea
-                        name="address"
-                        value={formData.address}
-                        onChange={handleInputChange}
-                        required
-                        rows={3}
-                        className="w-full pl-12 pr-4 py-3 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none bg-white transition-all duration-300 resize-none"
-                        placeholder="Full venue address"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        City *
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        required
-                        className="input-field"
-                        placeholder="Dubai"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Capacity (guests)
-                      </label>
-                      <input
-                        type="number"
-                        name="capacity"
-                        value={formData.capacity}
-                        onChange={handleInputChange}
-                        className="input-field"
-                        placeholder="Maximum capacity"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Venue Description *
-                    </label>
-                    <textarea
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      required
-                      rows={4}
-                      className="input-field resize-none"
-                      placeholder="Describe your venue, cuisine, ambiance, and unique features..."
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Step 3: Documents & Banking */}
-              {step === 3 && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-neutral-800 mb-6">Documents & Banking</h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Business License *
-                      </label>
-                      <div className="border-2 border-dashed border-neutral-300 rounded-2xl p-6 text-center hover:border-primary-400 transition-colors">
-                        <Upload className="w-8 h-8 text-neutral-400 mx-auto mb-2" />
-                        <input
-                          type="file"
-                          name="businessLicense"
-                          onChange={handleFileChange}
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          className="hidden"
-                          id="business-license"
-                        />
-                        <label htmlFor="business-license" className="cursor-pointer">
-                          <span className="text-primary-600 font-medium">Upload file</span>
-                          <p className="text-sm text-neutral-500 mt-1">PDF, JPG, PNG up to 5MB</p>
-                        </label>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Trade License *
-                      </label>
-                      <div className="border-2 border-dashed border-neutral-300 rounded-2xl p-6 text-center hover:border-primary-400 transition-colors">
-                        <Upload className="w-8 h-8 text-neutral-400 mx-auto mb-2" />
-                        <input
-                          type="file"
-                          name="tradeLicense"
-                          onChange={handleFileChange}
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          className="hidden"
-                          id="trade-license"
-                        />
-                        <label htmlFor="trade-license" className="cursor-pointer">
-                          <span className="text-primary-600 font-medium">Upload file</span>
-                          <p className="text-sm text-neutral-500 mt-1">PDF, JPG, PNG up to 5MB</p>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-neutral-50 rounded-2xl p-6">
-                    <h3 className="text-lg font-semibold text-neutral-800 mb-4 flex items-center">
-                      <CreditCard className="w-5 h-5 mr-2" />
-                      Banking Information
-                    </h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Bank Name *
-                        </label>
-                        <input
-                          type="text"
-                          name="bankName"
-                          value={formData.bankName}
-                          onChange={handleInputChange}
-                          required
-                          className="input-field"
-                          placeholder="Emirates NBD"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Account Number *
-                        </label>
-                        <input
-                          type="text"
-                          name="accountNumber"
-                          value={formData.accountNumber}
-                          onChange={handleInputChange}
-                          required
-                          className="input-field"
-                          placeholder="Account number"
-                        />
-                      </div>
-
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          IBAN *
-                        </label>
-                        <input
-                          type="text"
-                          name="iban"
-                          value={formData.iban}
-                          onChange={handleInputChange}
-                          required
-                          className="input-field"
-                          placeholder="AE07 0331 2345 6789 0123 456"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold text-neutral-800 mb-4">Social Media (Optional)</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Website
-                        </label>
-                        <input
-                          type="url"
-                          name="website"
-                          value={formData.website}
-                          onChange={handleInputChange}
-                          className="input-field"
-                          placeholder="https://yourwebsite.com"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Instagram
-                        </label>
-                        <input
-                          type="text"
-                          name="instagram"
-                          value={formData.instagram}
-                          onChange={handleInputChange}
-                          className="input-field"
-                          placeholder="@yourrestaurant"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Facebook
-                        </label>
-                        <input
-                          type="text"
-                          name="facebook"
-                          value={formData.facebook}
-                          onChange={handleInputChange}
-                          className="input-field"
-                          placeholder="Facebook page name"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 4: Review & Submit */}
-              {step === 4 && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-neutral-800 mb-6">Review & Submit</h2>
-                  
-                  <div className="bg-neutral-50 rounded-2xl p-6">
-                    <h3 className="text-lg font-semibold text-neutral-800 mb-4">Application Summary</h3>
-                    
+                  <div className="grid gap-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <h4 className="font-medium text-neutral-700 mb-2">Business Information</h4>
-                        <p className="text-neutral-600">Business: {formData.businessName}</p>
-                        <p className="text-neutral-600">Email: {formData.email}</p>
-                        <p className="text-neutral-600">Phone: {formData.phone}</p>
+                      <div className="space-y-2">
+                        <Label>Venue Name</Label>
+                        <Input name="venueName" value={formData.venueName} onChange={handleInputChange} className="h-12" placeholder="e.g. The Rooftop Lounge" required />
                       </div>
-                      
-                      <div>
-                        <h4 className="font-medium text-neutral-700 mb-2">Venue Details</h4>
-                        <p className="text-neutral-600">Venue: {formData.venueName}</p>
-                        <p className="text-neutral-600">Type: {formData.venueType}</p>
-                        <p className="text-neutral-600">City: {formData.city}</p>
+                      <div className="space-y-2">
+                        <Label>Venue Type</Label>
+                        <select name="venueType" value={formData.venueType} onChange={handleInputChange} required className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                          <option value="">Select type</option>
+                          {venueTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
-                    <h4 className="font-semibold text-blue-800 mb-2">What happens next?</h4>
-                    <ul className="text-blue-700 space-y-1">
-                      <li>• Your application will be reviewed within 2-3 business days</li>
-                      <li>• We'll verify your documents and venue information</li>
-                      <li>• You'll receive an email notification about the approval status</li>
-                      <li>• Once approved, you can start creating events and managing bookings</li>
-                    </ul>
+                    <div className="space-y-2">
+                      <Label>Address</Label>
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-3 text-slate-400 w-5 h-5" />
+                        <Textarea name="address" value={formData.address} onChange={handleInputChange} className="pl-10 min-h-[80px]" placeholder="Full address" required />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label>City</Label>
+                        <Input name="city" value={formData.city} onChange={handleInputChange} className="h-12" placeholder="Dubai" required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Guest Capacity</Label>
+                        <Input type="number" name="capacity" value={formData.capacity} onChange={handleInputChange} className="h-12" placeholder="Max guests" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Description</Label>
+                      <Textarea name="description" value={formData.description} onChange={handleInputChange} className="min-h-[120px]" placeholder="Tell us what makes your venue special..." required />
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Navigation Buttons */}
-              <div className="flex justify-between mt-8">
+              {/* Step 3: Docs */}
+              {step === 3 && (
+                <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                  <div className="border-b border-slate-100 pb-4 mb-4">
+                    <h2 className="text-2xl font-bold text-slate-900">Verification & Banking</h2>
+                    <p className="text-slate-500 mt-1">Required for payouts and authenticity</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-6 border-2 border-dashed border-slate-200 rounded-2xl text-center hover:border-blue-500 hover:bg-blue-50/50 transition-all cursor-pointer group">
+                      <Upload className="w-8 h-8 mx-auto text-slate-400 group-hover:text-blue-500 mb-3" />
+                      <Label className="cursor-pointer block">
+                        <span className="text-slate-900 font-semibold block mb-1">Business License</span>
+                        <span className="text-slate-500 text-xs">Upload PDF/JPG</span>
+                        <input type="file" name="businessLicense" onChange={handleFileChange} className="hidden" accept=".pdf,.jpg,.png" />
+                      </Label>
+                    </div>
+                    <div className="p-6 border-2 border-dashed border-slate-200 rounded-2xl text-center hover:border-blue-500 hover:bg-blue-50/50 transition-all cursor-pointer group">
+                      <Upload className="w-8 h-8 mx-auto text-slate-400 group-hover:text-blue-500 mb-3" />
+                      <Label className="cursor-pointer block">
+                        <span className="text-slate-900 font-semibold block mb-1">Trade License</span>
+                        <span className="text-slate-500 text-xs">Upload PDF/JPG</span>
+                        <input type="file" name="tradeLicense" onChange={handleFileChange} className="hidden" accept=".pdf,.jpg,.png" />
+                      </Label>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 p-6 rounded-2xl space-y-4">
+                    <h3 className="font-semibold text-slate-900 flex items-center"><CreditCard className="w-5 h-5 mr-2" /> Bank Details</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Bank Name</Label>
+                        <Input name="bankName" value={formData.bankName} onChange={handleInputChange} className="bg-white h-11" placeholder="e.g. ENBD" required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Account Number</Label>
+                        <Input name="accountNumber" value={formData.accountNumber} onChange={handleInputChange} className="bg-white h-11" placeholder="XXXXXXXX" required />
+                      </div>
+                      <div className="md:col-span-2 space-y-2">
+                        <Label>IBAN</Label>
+                        <Input name="iban" value={formData.iban} onChange={handleInputChange} className="bg-white h-11" placeholder="AE00 0000 0000 0000 000" required />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 4: Review */}
+              {step === 4 && (
+                <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                  <div className="border-b border-slate-100 pb-4 mb-4">
+                    <h2 className="text-2xl font-bold text-slate-900">Review Application</h2>
+                    <p className="text-slate-500 mt-1">Please confirm your details</p>
+                  </div>
+
+                  <div className="bg-slate-50 rounded-2xl p-6 space-y-6">
+                    <div className="pb-4 border-b border-slate-200 last:border-0 last:pb-0">
+                      <h4 className="text-sm uppercase tracking-wider text-slate-500 font-semibold mb-3">Business</h4>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <span className="text-slate-600">Company:</span>
+                        <span className="text-slate-900 font-medium text-right">{formData.businessName}</span>
+                        <span className="text-slate-600">Email:</span>
+                        <span className="text-slate-900 font-medium text-right">{formData.email}</span>
+                        <span className="text-slate-600">Phone:</span>
+                        <span className="text-slate-900 font-medium text-right">{formData.phone}</span>
+                      </div>
+                    </div>
+
+                    <div className="pb-4 border-b border-slate-200 last:border-0 last:pb-0">
+                      <h4 className="text-sm uppercase tracking-wider text-slate-500 font-semibold mb-3">Venue</h4>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <span className="text-slate-600">Name:</span>
+                        <span className="text-slate-900 font-medium text-right">{formData.venueName}</span>
+                        <span className="text-slate-600">Type:</span>
+                        <span className="text-slate-900 font-medium text-right">{formData.venueType}</span>
+                        <span className="text-slate-600">City:</span>
+                        <span className="text-slate-900 font-medium text-right">{formData.city}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-xl flex items-start gap-3">
+                    <div className="bg-blue-100 p-1.5 rounded-full mt-0.5">
+                      <Check className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-blue-900 text-sm">Review Process</h4>
+                      <p className="text-blue-700 text-sm mt-1">Your application will be reviewed by our administration team within 48 hours. You will receive an email confirmation once approved.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation */}
+              <div className="flex justify-between pt-8 mt-4 border-t border-slate-100">
                 {step > 1 && (
-                  <button
-                    type="button"
-                    onClick={handleBack}
-                    className="btn-secondary"
-                  >
-                    Previous
-                  </button>
+                  <Button type="button" variant="ghost" onClick={handleBack} className="text-slate-500 hover:text-slate-900">
+                    Back
+                  </Button>
                 )}
-                
+
                 {step < 4 ? (
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    className="btn-primary ml-auto"
-                  >
-                    Next
-                  </button>
+                  <Button type="button" onClick={handleNext} className="ml-auto bg-slate-900 text-white hover:bg-slate-800 px-8 rounded-xl h-12 shadow-lg shadow-slate-200">
+                    Next Step <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
                 ) : (
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="btn-primary ml-auto disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
+                  <Button type="submit" disabled={loading} className="ml-auto bg-blue-600 text-white hover:bg-blue-500 px-8 rounded-xl h-12 shadow-lg shadow-blue-200 font-semibold">
                     {loading ? 'Submitting...' : 'Submit Application'}
-                  </button>
+                  </Button>
                 )}
               </div>
             </form>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

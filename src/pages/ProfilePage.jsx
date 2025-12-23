@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { User, Calendar, Heart, Gift, Star, Clock, Settings, Crown, MapPin } from 'lucide-react'
+import { User, Calendar, Heart, Gift, Star, Clock, Settings, Crown, MapPin, Sparkles, Mail } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card'
@@ -36,39 +36,53 @@ const ProfilePage = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20 py-12">
-        {/* Profile Header - Airbnb Style */}
-        <Card className="mb-8 border-0 shadow-sm">
+    <div className="min-h-screen bg-gradient-to-br from-brand-purple/5 via-white to-brand-blue/5">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-brand-purple/5 to-transparent -z-10" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20 pt-32 pb-12">
+        {/* Profile Header - Airbnb Style with Rich Touches */}
+        <Card className="mb-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm overflow-hidden relative group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-purple via-brand-blue to-brand-orange" />
+
           <CardContent className="p-8">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
               <div className="relative">
-                <div className="w-24 h-24 bg-gradient-to-br from-brand-red to-brand-orange rounded-full flex items-center justify-center shadow-lg">
-                  <User className="w-12 h-12 text-white" />
+                <div className="w-28 h-28 p-1 rounded-full bg-gradient-brand shadow-xl">
+                  <div className="w-full h-full bg-white rounded-full flex items-center justify-center border-4 border-white overflow-hidden">
+                    <User strokeWidth={1.5} className="w-12 h-12 text-gray-300" />
+                  </div>
                 </div>
                 {user.accountType === "Premium" && (
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-brand-yellow to-brand-orange rounded-full flex items-center justify-center shadow-lg">
-                    <Crown className="w-4 h-4 text-white" />
+                  <div className="absolute -top-1 -right-1 w-8 h-8 bg-brand-purple rounded-full flex items-center justify-center border-2 border-white shadow-md animate-bounce-slow">
+                    <Crown strokeWidth={1.5} className="w-4 h-4 text-white" />
                   </div>
                 )}
               </div>
-              
+
               <div className="flex-1">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between">
                   <div>
-                    <h1 className="text-3xl font-semibold text-gray-900 mb-2">{user.name}</h1>
-                    <p className="text-gray-600 text-lg mb-1">{user.email}</p>
-                    <p className="text-gray-500">Member since {user.memberSince}</p>
+                    <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 mb-2">
+                      {user.name}
+                    </h1>
+                    <p className="text-gray-600 text-lg mb-2 flex items-center gap-2">
+                      <Mail strokeWidth={1.5} className="w-4 h-4 text-brand-purple" /> {user.email}
+                    </p>
+                    <p className="text-gray-500 text-sm bg-gray-100 inline-block px-3 py-1 rounded-full">
+                      Member since {user.memberSince}
+                    </p>
                   </div>
-                  
+
                   <div className="mt-6 md:mt-0">
-                    <div className="flex flex-col items-start md:items-end gap-2">
-                      <Badge className="bg-gradient-to-r from-brand-red to-brand-orange text-white px-4 py-2 text-sm font-semibold">
+                    <div className="flex flex-col items-start md:items-end gap-3">
+                      <Badge variant="outline" className="border-brand-purple text-brand-purple px-4 py-1.5 text-sm font-semibold rounded-full bg-brand-purple/5">
                         {user.accountType} Member
                       </Badge>
                       {user.accountType === "Premium" && (
-                        <div className="text-sm text-gray-500">
-                          {user.pointsToNextTier} points to {user.nextRewardTier}
+                        <div className="text-sm font-medium text-gray-500 flex items-center gap-1.5">
+                          <Sparkles strokeWidth={1.5} className="w-3.5 h-3.5 text-brand-yellow" />
+                          <span>{user.pointsToNextTier} points to {user.nextRewardTier}</span>
                         </div>
                       )}
                     </div>
@@ -76,29 +90,29 @@ const ProfilePage = () => {
                 </div>
               </div>
             </div>
-            
-            {/* Stats - Airbnb Style */}
-            <div className="grid grid-cols-3 gap-6 mt-8 pt-8 border-t border-gray-200">
-              <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-br from-brand-red to-brand-orange rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                  <Gift className="w-8 h-8 text-white" />
+
+            {/* Stats - Airbnb Style containing rich icons */}
+            <div className="grid grid-cols-3 gap-6 mt-10 pt-8 border-t border-gray-100">
+              <div className="text-center group/stat cursor-pointer p-4 rounded-2xl hover:bg-brand-purple/5 transition-all duration-300">
+                <div className="w-12 h-12 mx-auto mb-3 bg-brand-purple/10 rounded-full flex items-center justify-center group-hover/stat:scale-110 transition-transform">
+                  <Gift strokeWidth={1.5} className="w-6 h-6 text-brand-purple" />
                 </div>
-                <div className="text-3xl font-semibold text-brand-red mb-1">{user.rewardPoints}</div>
-                <div className="text-gray-600 font-medium">Reward Points</div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">{user.rewardPoints}</div>
+                <div className="text-gray-500 font-medium text-sm uppercase tracking-wide">Reward Points</div>
               </div>
-              <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-br from-brand-orange to-brand-yellow rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                  <Calendar className="w-8 h-8 text-white" />
+              <div className="text-center group/stat cursor-pointer p-4 rounded-2xl hover:bg-brand-blue/5 transition-all duration-300">
+                <div className="w-12 h-12 mx-auto mb-3 bg-brand-blue/10 rounded-full flex items-center justify-center group-hover/stat:scale-110 transition-transform">
+                  <Calendar strokeWidth={1.5} className="w-6 h-6 text-brand-blue" />
                 </div>
-                <div className="text-3xl font-semibold text-brand-orange mb-1">{user.totalBookings}</div>
-                <div className="text-gray-600 font-medium">Total Bookings</div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">{user.totalBookings}</div>
+                <div className="text-gray-500 font-medium text-sm uppercase tracking-wide">Bookings</div>
               </div>
-              <div className="text-center group">
-                <div className="w-16 h-16 bg-gradient-to-br from-brand-red to-brand-purple rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                  <Heart className="w-8 h-8 text-white" />
+              <div className="text-center group/stat cursor-pointer p-4 rounded-2xl hover:bg-brand-red/5 transition-all duration-300">
+                <div className="w-12 h-12 mx-auto mb-3 bg-brand-red/10 rounded-full flex items-center justify-center group-hover/stat:scale-110 transition-transform">
+                  <Heart strokeWidth={1.5} className="w-6 h-6 text-brand-red" />
                 </div>
-                <div className="text-3xl font-semibold text-brand-red mb-1">{user.favoriteVenues}</div>
-                <div className="text-gray-600 font-medium">Favorite Venues</div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">{user.favoriteVenues}</div>
+                <div className="text-gray-500 font-medium text-sm uppercase tracking-wide">Favorites</div>
               </div>
             </div>
           </CardContent>
@@ -108,19 +122,19 @@ const ProfilePage = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
             <TabsTrigger value="bookings" className="rounded-none border-b-2 border-transparent data-[state=active]:border-gray-900 data-[state=active]:bg-transparent">
-              <Calendar className="w-4 h-4 mr-2" />
+              <Calendar strokeWidth={1.5} className="w-4 h-4 mr-2" />
               My Bookings
             </TabsTrigger>
             <TabsTrigger value="favorites" className="rounded-none border-b-2 border-transparent data-[state=active]:border-gray-900 data-[state=active]:bg-transparent">
-              <Heart className="w-4 h-4 mr-2" />
+              <Heart strokeWidth={1.5} className="w-4 h-4 mr-2" />
               Favorites
             </TabsTrigger>
             <TabsTrigger value="rewards" className="rounded-none border-b-2 border-transparent data-[state=active]:border-gray-900 data-[state=active]:bg-transparent">
-              <Gift className="w-4 h-4 mr-2" />
+              <Gift strokeWidth={1.5} className="w-4 h-4 mr-2" />
               Rewards
             </TabsTrigger>
             <TabsTrigger value="settings" className="rounded-none border-b-2 border-transparent data-[state=active]:border-gray-900 data-[state=active]:bg-transparent">
-              <Settings className="w-4 h-4 mr-2" />
+              <Settings strokeWidth={1.5} className="w-4 h-4 mr-2" />
               Settings
             </TabsTrigger>
           </TabsList>
@@ -143,7 +157,7 @@ const ProfilePage = () => {
                         alt={booking.event}
                         className="w-full md:w-40 h-32 object-cover rounded-xl"
                       />
-                      
+
                       <div className="flex-1">
                         <div className="flex flex-col md:flex-row md:items-start md:justify-between">
                           <div className="flex-1">
@@ -151,23 +165,22 @@ const ProfilePage = () => {
                             <p className="text-gray-600 font-medium mb-3">{booking.venue}</p>
                             <div className="flex items-center gap-6 text-gray-500">
                               <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-brand-red" />
+                                <Calendar strokeWidth={1.5} className="w-4 h-4 text-brand-red" />
                                 <span className="text-sm">{booking.date}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-brand-red" />
+                                <Clock strokeWidth={1.5} className="w-4 h-4 text-brand-red" />
                                 <span className="text-sm">{booking.time}</span>
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="text-right mt-6 md:mt-0">
                             <div className="text-2xl font-semibold text-brand-red mb-2">AED {booking.price}</div>
-                            <Badge className={`${
-                              booking.status === 'Confirmed' 
-                                ? 'bg-green-100 text-green-700 hover:bg-green-100'
-                                : 'bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/10'
-                            }`}>
+                            <Badge className={`${booking.status === 'Confirmed'
+                              ? 'bg-green-100 text-green-700 hover:bg-green-100'
+                              : 'bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/10'
+                              }`}>
                               {booking.status}
                             </Badge>
                             {booking.status === 'Completed' && (
@@ -176,7 +189,7 @@ const ProfilePage = () => {
                                   to={`/review/${booking.id}`}
                                   className="inline-flex items-center gap-2 text-brand-red hover:text-brand-red/80 font-medium transition-colors text-sm"
                                 >
-                                  <Star className="w-4 h-4" />
+                                  <Star strokeWidth={1.5} className="w-4 h-4" />
                                   <span>Leave Review</span>
                                 </Link>
                               </div>
@@ -210,7 +223,7 @@ const ProfilePage = () => {
                           <p className="text-gray-600 text-sm">{favorite.venue}</p>
                           <div className="flex items-center justify-between mt-2">
                             <div className="flex items-center gap-1">
-                              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                              <Star strokeWidth={1.5} className="w-4 h-4 text-yellow-400 fill-current" />
                               <span className="text-sm font-medium">{favorite.rating}</span>
                             </div>
                             <div className="text-brand-red font-semibold">AED {favorite.price}</div>
@@ -237,13 +250,13 @@ const ProfilePage = () => {
                         <div className="text-white/80 text-lg">Available Points</div>
                       </div>
                       <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
-                        <Gift className="w-8 h-8 text-white" />
+                        <Gift strokeWidth={1.5} className="w-8 h-8 text-white" />
                       </div>
                     </div>
                     <div className="bg-white/10 rounded-2xl p-4 mb-4">
                       <div className="text-white/80 text-sm mb-1">Progress to {user.nextRewardTier}</div>
                       <div className="w-full bg-white/20 rounded-full h-2">
-                        <div 
+                        <div
                           className="bg-white rounded-full h-2 transition-all duration-500"
                           style={{ width: `${((user.rewardPoints % 1000) / 1000) * 100}%` }}
                         ></div>
@@ -274,7 +287,7 @@ const ProfilePage = () => {
                         </Button>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="bg-gradient-to-br from-brand-orange/10 to-brand-yellow/10 border-brand-orange/20">
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-4">
@@ -287,7 +300,7 @@ const ProfilePage = () => {
                         </Button>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="bg-gradient-to-br from-rose-50 to-orange-50 border-rose-200">
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-4">
@@ -300,7 +313,7 @@ const ProfilePage = () => {
                         </Button>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="bg-gradient-to-br from-orange-50 to-rose-50 border-orange-200">
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-4">
@@ -341,7 +354,7 @@ const ProfilePage = () => {
             <Card className="border-0 shadow-sm">
               <CardContent className="p-8">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6">Account Settings</h2>
-                
+
                 <div className="space-y-8">
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>

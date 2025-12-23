@@ -22,7 +22,7 @@ export const MerchantProvider = ({ children }) => {
     const savedMerchant = localStorage.getItem('stt_merchant')
     if (savedMerchant) {
       const merchantData = JSON.parse(savedMerchant)
-      
+
       // Ensure role is set for existing merchants (backward compatibility)
       if (!merchantData.role) {
         if (merchantData.email === 'admin@stt.com') {
@@ -32,7 +32,7 @@ export const MerchantProvider = ({ children }) => {
         }
         localStorage.setItem('stt_merchant', JSON.stringify(merchantData))
       }
-      
+
       setMerchant(merchantData)
       loadMerchantData()
     }
@@ -61,7 +61,7 @@ export const MerchantProvider = ({ children }) => {
 
   const registerMerchant = async (merchantData) => {
     const { businessName, email, phone, password, venueData } = merchantData
-    
+
     if (businessName && email && phone && password.length >= 6) {
       const newMerchant = {
         id: Date.now(),
@@ -77,12 +77,12 @@ export const MerchantProvider = ({ children }) => {
         rating: 0,
         venueData
       }
-      
+
       setMerchant(newMerchant)
       localStorage.setItem('stt_merchant', JSON.stringify(newMerchant))
       return { success: true }
     }
-    
+
     return { success: false, error: 'Please fill all required fields' }
   }
 
@@ -105,13 +105,13 @@ export const MerchantProvider = ({ children }) => {
           rating: 5.0,
           role: 'super_admin'
         }
-        
+
         setMerchant(adminData)
         localStorage.setItem('stt_merchant', JSON.stringify(adminData))
         loadMerchantData()
         return { success: true }
       }
-      
+
       // Regular merchant login
       const merchantData = {
         id: Date.now(),
@@ -127,13 +127,13 @@ export const MerchantProvider = ({ children }) => {
         rating: 4.6,
         role: 'merchant'
       }
-      
+
       setMerchant(merchantData)
       localStorage.setItem('stt_merchant', JSON.stringify(merchantData))
       loadMerchantData()
       return { success: true }
     }
-    
+
     return { success: false, error: 'Invalid credentials' }
   }
 
@@ -162,7 +162,7 @@ export const MerchantProvider = ({ children }) => {
       status: 'Pending Approval',
       createdAt: new Date().toISOString()
     }
-    
+
     const updatedVenues = [...venues, newVenue]
     setVenues(updatedVenues)
     localStorage.setItem('stt_merchant_venues', JSON.stringify(updatedVenues))
@@ -179,7 +179,7 @@ export const MerchantProvider = ({ children }) => {
       views: 0,
       bookings: 0
     }
-    
+
     const updatedEvents = [...events, newEvent]
     setEvents(updatedEvents)
     localStorage.setItem('stt_merchant_events', JSON.stringify(updatedEvents))
@@ -187,7 +187,7 @@ export const MerchantProvider = ({ children }) => {
   }
 
   const updateEvent = (eventId, updates) => {
-    const updatedEvents = events.map(event => 
+    const updatedEvents = events.map(event =>
       event.id === eventId ? { ...event, ...updates } : event
     )
     setEvents(updatedEvents)
@@ -206,7 +206,7 @@ export const MerchantProvider = ({ children }) => {
         views: 0,
         bookings: 0
       }
-      
+
       const updatedEvents = [...events, clonedEvent]
       setEvents(updatedEvents)
       localStorage.setItem('stt_merchant_events', JSON.stringify(updatedEvents))
@@ -218,6 +218,43 @@ export const MerchantProvider = ({ children }) => {
     const updatedEvents = events.filter(event => event.id !== eventId)
     setEvents(updatedEvents)
     localStorage.setItem('stt_merchant_events', JSON.stringify(updatedEvents))
+  }
+
+  const addPackage = (eventId, packageData) => {
+    const event = events.find(e => e.id === parseInt(eventId) || e.id === eventId)
+    if (event) {
+      const newPackage = {
+        id: Date.now(),
+        ...packageData,
+        eventId: event.id, // Ensure link
+        status: packageData.status || 'Active',
+        createdAt: new Date().toISOString()
+      }
+      const updatedPackages = [...(event.packages || []), newPackage]
+      updateEvent(event.id, { packages: updatedPackages })
+      return newPackage
+    }
+  }
+
+  const updatePackage = (packageId, updates) => {
+    // Find event containing this package
+    let foundEvent = null
+    let foundPackageIndex = -1
+
+    for (const event of events) {
+      const index = (event.packages || []).findIndex(p => p.id === parseInt(packageId) || p.id === packageId)
+      if (index !== -1) {
+        foundEvent = event
+        foundPackageIndex = index
+        break
+      }
+    }
+
+    if (foundEvent) {
+      const updatedPackages = [...foundEvent.packages]
+      updatedPackages[foundPackageIndex] = { ...updatedPackages[foundPackageIndex], ...updates }
+      updateEvent(foundEvent.id, { packages: updatedPackages })
+    }
   }
 
   const value = {
@@ -235,6 +272,8 @@ export const MerchantProvider = ({ children }) => {
     updateEvent,
     cloneEvent,
     deleteEvent,
+    addPackage,
+    updatePackage,
     isMerchantAuthenticated: !!merchant
   }
 
