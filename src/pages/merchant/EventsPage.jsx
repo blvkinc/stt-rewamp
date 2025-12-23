@@ -104,6 +104,11 @@ const EventsPage = () => {
     return matchesSearch && matchesStatus
   })
 
+  const handleEditEvent = (eventId) => {
+    navigate(`/merchant/events/${eventId}/edit`)
+    setShowDropdown(null)
+  }
+
   const handleCloneEvent = (eventId) => {
     cloneEvent(eventId)
     setShowDropdown(null)
