@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import {
   Button,
   Input,
@@ -37,6 +37,7 @@ const { Title, Text } = Typography
 const { Option } = Select
 
 const EventsPage = () => {
+  const navigate = useNavigate()
   const { merchant, events, cloneEvent, deleteEvent, isMerchantAuthenticated } = useMerchant()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -102,6 +103,11 @@ const EventsPage = () => {
     const matchesStatus = statusFilter === 'all' || event.status.toLowerCase() === statusFilter.toLowerCase()
     return matchesSearch && matchesStatus
   })
+
+  const handleEditEvent = (eventId) => {
+    navigate(`/merchant/events/${eventId}/edit`)
+    setShowDropdown(null)
+  }
 
   const handleCloneEvent = (eventId) => {
     cloneEvent(eventId)
@@ -214,7 +220,8 @@ const EventsPage = () => {
                             {
                               key: 'edit',
                               icon: <EditOutlined />,
-                              label: <Link to={`/merchant/events/${event.id}/edit`}>Edit</Link>
+                              label: 'Edit',
+                              onClick: () => handleEditEvent(event.id)
                             },
                             {
                               key: 'clone',
@@ -225,7 +232,8 @@ const EventsPage = () => {
                             {
                               key: 'view',
                               icon: <EyeOutlined />,
-                              label: <Link to={`/events/${event.id}`}>View Public</Link>
+                              label: 'View Public',
+                              onClick: () => navigate(`/events/${event.id}`)
                             },
                             { type: 'divider' },
                             {
@@ -274,9 +282,6 @@ const EventsPage = () => {
                           <Statistic
                             title="Bookings"
                             value={event.bookings}
-                            valueStyle={{ fontSize: '16px', color: '#1890ff' }} // Deprecated but styles.content not working in v4, checking version first. Assuming v5 based on warning.
-                            // If v5, use <Statistic styles={{ content: { fontSize: '16px', color: '#1890ff' } }} />
-                            // Since I don't know exact version but warning says 'styles.content', I will try to use it.
                             styles={{ content: { fontSize: '16px', color: '#1890ff' } }}
                           />
                         </Col>
