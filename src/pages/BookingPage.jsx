@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
-import { useParams, Link, Navigate, useNavigate } from 'react-router-dom'
-import { ArrowLeft, CreditCard, Shield, Check } from 'lucide-react'
+
+import React, { useState, useEffect } from 'react'
+import { useParams, Link, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import { ArrowLeft, CreditCard, Shield, Check, Lock, Calendar, Users, Package } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useBooking } from '../context/BookingContext'
 
@@ -8,9 +9,22 @@ const BookingPage = () => {
   const { id } = useParams()
   const [step, setStep] = useState(1)
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, isAuthenticated } = useAuth()
   const { addBooking } = useBooking()
-  
+
+  // Use passed state or fallback to mock
+  const bookingData = location.state || {
+    event: "Luxury Brunch at Burj Al Arab",
+    venue: "Al Muntaha Restaurant",
+    date: "2024-12-15",
+    time: "11:00 AM - 3:00 PM",
+    package: "Couple Package",
+    guests: 2,
+    price: 549,
+    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop"
+  }
+
   const [formData, setFormData] = useState({
     firstName: user?.name?.split(' ')[0] || '',
     lastName: user?.name?.split(' ')[1] || '',
@@ -29,9 +43,20 @@ const BookingPage = () => {
   }
 
   const handleInputChange = (e) => {
+    let value = e.target.value
+    if (e.target.name === 'cardNumber') {
+      value = value.replace(/\D/g, '').replace(/(\d{4})/g, '$1 ').trim().slice(0, 19)
+    }
+    if (e.target.name === 'expiryDate') {
+      value = value.replace(/\D/g, '')
+      if (value.length >= 2) {
+        value = value.slice(0, 2) + '/' + value.slice(2, 4)
+      }
+      value = value.slice(0, 5)
+    }
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: value
     })
   }
 
@@ -39,339 +64,334 @@ const BookingPage = () => {
     e.preventDefault()
     if (step < 3) {
       setStep(step + 1)
+      window.scrollTo(0, 0)
     } else {
       // Process booking
-      const newBooking = addBooking({
-        event: booking.event,
-        venue: booking.venue,
-        date: booking.date,
-        time: booking.time,
-        price: booking.price,
-        guests: 2,
-        package: booking.package,
-        image: booking.image
+      addBooking({
+        ...bookingData,
+        ...formData
       })
-      
-      alert('Booking confirmed! You will receive a confirmation email shortly.')
+
+      // Simulate API call
       setTimeout(() => {
         navigate('/profile')
-      }, 2000)
+      }, 3000)
     }
   }
 
-  // Mock booking data
-  const booking = {
-    event: "Luxury Brunch at Burj Al Arab",
-    venue: "Al Muntaha Restaurant",
-    date: "2024-12-15",
-    time: "11:00 AM - 3:00 PM",
-    package: "Couple Package",
-    guests: 2,
-    price: 549,
-    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop"
-  }
-
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <div className="max-w-4xl mx-auto container-padding pt-24 pb-12">
-        {/* Back Button */}
-        <Link to={`/events/${id}`} className="inline-flex items-center space-x-2 text-neutral-600 hover:text-primary-500 mb-8 transition-colors">
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back to Event Details</span>
-        </Link>
-
-        {/* Progress Steps */}
-        <div className="mb-12">
-          <div className="flex items-center justify-center space-x-4">
-            {[1, 2, 3].map((stepNumber) => (
-              <div key={stepNumber} className="flex items-center">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-semibold shadow-soft transition-all duration-300 ${
-                  step >= stepNumber 
-                    ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white scale-110' 
-                    : 'bg-neutral-200 text-neutral-600'
-                }`}>
-                  {step > stepNumber ? <Check className="w-6 h-6" /> : stepNumber}
-                </div>
-                {stepNumber < 3 && (
-                  <div className={`w-20 h-2 mx-3 rounded-full transition-all duration-300 ${
-                    step > stepNumber ? 'bg-gradient-to-r from-primary-500 to-primary-600' : 'bg-neutral-200'
-                  }`}></div>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-center mt-6">
-            <div className="text-center">
-              <div className="text-lg font-semibold text-neutral-700">
-                Step {step} of 3: {
-                  step === 1 ? 'Guest Information' :
-                  step === 2 ? 'Payment Details' :
-                  'Confirmation'
-                }
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 pt-24 pb-12">
+        {/* Header */}
+        <div className="mb-8">
+          <Link to={`/events/${id}`} className="inline-flex items-center space-x-2 text-gray-500 hover:text-gray-900 transition-colors mb-6">
+            <ArrowLeft strokeWidth={1.5} className="w-5 h-5" />
+            <span className="font-medium">Back to Event Details</span>
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900">Secure Checkout</h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Booking Form */}
           <div className="lg:col-span-2">
-            <div className="card">
-              <div className="p-6">
+
+            {/* Progress Steps */}
+            <div className="mb-8 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+              {[
+                { num: 1, label: 'Guest Details' },
+                { num: 2, label: 'Payment' },
+                { num: 3, label: 'Confirmation' }
+              ].map((s) => (
+                <div key={s.num} className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${step >= s.num ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-400'
+                    }`}>
+                    {step > s.num ? <Check strokeWidth={1.5} className="w-4 h-4" /> : s.num}
+                  </div>
+                  <span className={`text-sm font-medium ${step >= s.num ? 'text-gray-900' : 'text-gray-400'} hidden md:block`}>{s.label}</span>
+                  {s.num < 3 && <div className="w-12 h-[1px] bg-gray-200 mx-2 hidden md:block"></div>}
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="p-8">
                 <form onSubmit={handleSubmit}>
                   {step === 1 && (
-                    <div>
-                      <h2 className="text-2xl font-semibold text-slate-900 mb-6">Guest Information</h2>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
-                            First Name *
-                          </label>
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                      <h2 className="text-xl font-bold text-gray-900 mb-6">Guest Information</h2>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-gray-700">First Name</label>
                           <input
                             type="text"
                             name="firstName"
                             value={formData.firstName}
                             onChange={handleInputChange}
                             required
-                            className="input-field"
+                            className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all outline-none"
+                            placeholder="John"
                           />
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Last Name *
-                          </label>
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-gray-700">Last Name</label>
                           <input
                             type="text"
                             name="lastName"
                             value={formData.lastName}
                             onChange={handleInputChange}
                             required
-                            className="input-field"
+                            className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all outline-none"
+                            placeholder="Doe"
                           />
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Email Address *
-                          </label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-gray-700">Email Address</label>
                           <input
                             type="email"
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className="input-field"
+                            className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all outline-none"
+                            placeholder="john@example.com"
                           />
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Phone Number *
-                          </label>
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-gray-700">Phone Number</label>
                           <input
                             type="tel"
                             name="phone"
                             value={formData.phone}
                             onChange={handleInputChange}
                             required
-                            className="input-field"
+                            className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all outline-none"
+                            placeholder="+971 50 000 0000"
                           />
                         </div>
                       </div>
 
-                      <div className="mb-6">
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                          Special Requests (Optional)
-                        </label>
+                      <div className="mb-8">
+                        <label className="text-sm font-semibold text-gray-700 mb-2 block">Special Requests (Optional)</label>
                         <textarea
                           name="specialRequests"
                           value={formData.specialRequests}
                           onChange={handleInputChange}
                           rows={3}
-                          className="input-field"
-                          placeholder="Any dietary restrictions, celebrations, or special requirements..."
+                          className="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all outline-none resize-none"
+                          placeholder="Allergies, dietary restrictions, or special occasions..."
                         />
                       </div>
                     </div>
                   )}
 
                   {step === 2 && (
-                    <div>
-                      <h2 className="text-2xl font-semibold text-slate-900 mb-6">Payment Details</h2>
-                      
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                          Card Number *
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            name="cardNumber"
-                            value={formData.cardNumber}
-                            onChange={handleInputChange}
-                            required
-                            placeholder="1234 5678 9012 3456"
-                            className="input-field pr-12"
-                          />
-                          <CreditCard className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                      <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold text-gray-900">Payment Details</h2>
+                        <div className="flex gap-2">
+                          {/* Payment Icons */}
+                          <div className="h-6 w-10 bg-gray-100 rounded flex items-center justify-center text-[10px] font-bold text-gray-500">VISA</div>
+                          <div className="h-6 w-10 bg-gray-100 rounded flex items-center justify-center text-[10px] font-bold text-gray-500">MC</div>
+                          <div className="h-6 w-10 bg-gray-100 rounded flex items-center justify-center text-[10px] font-bold text-gray-500">AMEX</div>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6 flex items-start gap-3">
+                        <Shield strokeWidth={1.5} className="w-5 h-5 text-green-600 mt-0.5" />
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Expiry Date *
-                          </label>
-                          <input
-                            type="text"
-                            name="expiryDate"
-                            value={formData.expiryDate}
-                            onChange={handleInputChange}
-                            required
-                            placeholder="MM/YY"
-                            className="input-field"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
-                            CVV *
-                          </label>
-                          <input
-                            type="text"
-                            name="cvv"
-                            value={formData.cvv}
-                            onChange={handleInputChange}
-                            required
-                            placeholder="123"
-                            className="input-field"
-                          />
+                          <h4 className="text-sm font-semibold text-gray-900">Secure SSL Connection</h4>
+                          <p className="text-xs text-gray-500 mt-0.5">Your financial data is encrypted and secure.</p>
                         </div>
                       </div>
 
-                      <div className="mb-6">
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                          Cardholder Name *
-                        </label>
-                        <input
-                          type="text"
-                          name="cardName"
-                          value={formData.cardName}
-                          onChange={handleInputChange}
-                          required
-                          className="input-field"
-                        />
-                      </div>
+                      <div className="space-y-6">
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-gray-700">Card Number</label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              name="cardNumber"
+                              value={formData.cardNumber}
+                              onChange={handleInputChange}
+                              required
+                              placeholder="0000 0000 0000 0000"
+                              className="w-full h-11 pl-12 pr-4 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all outline-none font-mono"
+                            />
+                            <CreditCard strokeWidth={1.5} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                          </div>
+                        </div>
 
-                      <div className="bg-slate-50 p-4 rounded-lg mb-6">
-                        <div className="flex items-center space-x-2 text-slate-600">
-                          <Shield className="w-5 h-5" />
-                          <span className="text-sm">Your payment information is secure and encrypted</span>
+                        <div className="grid grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-700">Expiry Date</label>
+                            <input
+                              type="text"
+                              name="expiryDate"
+                              value={formData.expiryDate}
+                              onChange={handleInputChange}
+                              required
+                              placeholder="MM/YY"
+                              className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all outline-none font-mono text-center"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-700">CVV</label>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                name="cvv"
+                                value={formData.cvv}
+                                onChange={handleInputChange}
+                                required
+                                placeholder="123"
+                                maxLength={4}
+                                className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all outline-none font-mono text-center"
+                              />
+                              <Lock strokeWidth={1.5} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-gray-700">Cardholder Name</label>
+                          <input
+                            type="text"
+                            name="cardName"
+                            value={formData.cardName}
+                            onChange={handleInputChange}
+                            required
+                            placeholder="JOHN DOE"
+                            className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all outline-none uppercase"
+                          />
                         </div>
                       </div>
                     </div>
                   )}
 
                   {step === 3 && (
-                    <div>
-                      <h2 className="text-2xl font-semibold text-slate-900 mb-6">Booking Confirmation</h2>
-                      
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
-                        <div className="flex items-center space-x-2 text-green-700 mb-2">
-                          <Check className="w-5 h-5" />
-                          <span className="font-medium">Booking Confirmed!</span>
+                    <div className="text-center py-8 animate-in zoom-in-95 duration-500">
+                      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Check strokeWidth={2} className="w-10 h-10 text-green-600" />
+                      </div>
+                      <h2 className="text-3xl font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
+                      <p className="text-gray-500 mb-8">Thank you, {formData.firstName}. Your reservation is set.</p>
+
+                      <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 text-left space-y-4 max-w-md mx-auto mb-8">
+                        <div className="flex justify-between">
+                          <span className="text-gray-500 text-sm">Booking Ref</span>
+                          <span className="font-mono font-medium text-gray-900">STT-{Math.floor(Math.random() * 100000)}</span>
                         </div>
-                        <p className="text-green-600">
-                          Your booking has been successfully confirmed. You will receive a confirmation email shortly.
-                        </p>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500 text-sm">Date sent to</span>
+                          <span className="font-medium text-gray-900">{formData.email}</span>
+                        </div>
                       </div>
 
-                      <div className="space-y-4">
-                        <div className="flex justify-between">
-                          <span className="text-slate-600">Booking Reference:</span>
-                          <span className="font-medium text-slate-900">STT-{Date.now()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-slate-600">Guest Name:</span>
-                          <span className="font-medium text-slate-900">
-                            {formData.firstName} {formData.lastName}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-slate-600">Email:</span>
-                          <span className="font-medium text-slate-900">{formData.email}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-slate-600">Phone:</span>
-                          <span className="font-medium text-slate-900">{formData.phone}</span>
-                        </div>
-                      </div>
+                      <p className="text-sm text-gray-400">Redirecting to profile...</p>
                     </div>
                   )}
 
-                  <div className="flex justify-between mt-8">
-                    {step > 1 && (
+                  <div className="flex justify-between mt-10 pt-6 border-t border-gray-100">
+                    {step > 1 && step < 3 && (
                       <button
                         type="button"
                         onClick={() => setStep(step - 1)}
-                        className="btn-secondary"
+                        className="px-6 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition-colors"
                       >
-                        Previous
+                        Back
                       </button>
                     )}
-                    <button
-                      type="submit"
-                      className="btn-primary ml-auto"
-                    >
-                      {step === 3 ? 'Done' : step === 2 ? 'Confirm Payment' : 'Continue'}
-                    </button>
+                    {step < 3 && (
+                      <button
+                        type="submit"
+                        className="ml-auto px-8 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
+                      >
+                        {step === 2 ? (
+                          <>
+                            <Lock strokeWidth={1.5} className="w-4 h-4" /> Pay AED {(bookingData.price || 0) * (bookingData.guests || 2) + 45}
+                          </>
+                        ) : (
+                          <>
+                            Continue <ArrowLeft strokeWidth={1.5} className="w-4 h-4 rotate-180" />
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
                 </form>
               </div>
             </div>
           </div>
 
-          {/* Booking Summary */}
+          {/* Booking Summary Sidebar */}
           <div className="lg:col-span-1">
-            <div className="card sticky top-24">
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Booking Summary</h3>
-                
-                <div className="mb-4">
+            <div className="sticky top-24">
+              <div className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden">
+                <div className="aspect-video relative">
                   <img
-                    src={booking.image}
-                    alt={booking.event}
-                    className="w-full h-32 object-cover rounded-lg mb-3"
+                    src={bookingData.image}
+                    alt={bookingData.event}
+                    className="w-full h-full object-cover"
                   />
-                  <h4 className="font-medium text-slate-900">{booking.event}</h4>
-                  <p className="text-slate-600 text-sm">{booking.venue}</p>
-                </div>
-
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Date:</span>
-                    <span className="text-slate-900">{booking.date}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Time:</span>
-                    <span className="text-slate-900">{booking.time}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Package:</span>
-                    <span className="text-slate-900">{booking.package}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Guests:</span>
-                    <span className="text-slate-900">{booking.guests}</span>
+                  <div className="absolute inset-0 bg-black/20"></div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h3 className="text-white font-bold text-lg shadow-black/50 drop-shadow-md">{bookingData.event}</h3>
+                    <p className="text-white/90 text-sm flex items-center gap-1 drop-shadow-md"><Users className="w-3 h-3" /> {bookingData.venue}</p>
                   </div>
                 </div>
 
-                <div className="border-t border-slate-200 pt-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-medium text-slate-900">Total</span>
-                    <span className="text-2xl font-bold text-primary-500">AED {booking.price}</span>
+                <div className="p-6 space-y-4">
+                  <div className="space-y-3 pb-6 border-b border-gray-100">
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                      <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
+                        <Calendar strokeWidth={1.5} className="w-4 h-4 text-gray-900" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-400 font-medium uppercase">Date & Time</p>
+                        <p className="font-semibold text-gray-900">{bookingData.date} • {bookingData.time}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                      <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
+                        <Users strokeWidth={1.5} className="w-4 h-4 text-gray-900" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-400 font-medium uppercase">Guests</p>
+                        <p className="font-semibold text-gray-900">{bookingData.guests || 2} People</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                      <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
+                        <Package strokeWidth={1.5} className="w-4 h-4 text-gray-900" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-400 font-medium uppercase">Package</p>
+                        <p className="font-semibold text-gray-900">{bookingData.package}</p>
+                      </div>
+                    </div>
                   </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Subtotal</span>
+                      <span className="font-medium">AED {(bookingData.price || 0) * (bookingData.guests || 2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Service Fee</span>
+                      <span className="font-medium">AED 45</span>
+                    </div>
+                    <div className="flex justify-between text-lg font-bold text-gray-900 pt-4 border-t border-gray-100">
+                      <span>Total</span>
+                      <span>AED {(bookingData.price || 0) * (bookingData.guests || 2) + 45}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 p-4 text-center">
+                  <p className="text-xs text-gray-500">Free cancellation up to 24h before event</p>
                 </div>
               </div>
             </div>
@@ -383,3 +403,5 @@ const BookingPage = () => {
 }
 
 export default BookingPage
+
+

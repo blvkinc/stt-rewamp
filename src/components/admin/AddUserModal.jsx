@@ -1,35 +1,27 @@
-import React, { useState } from 'react'
-import { X, User, Mail, Phone, MapPin, Shield, Building, AlertCircle, CheckCircle } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { Modal, Form, Input, Select, Checkbox, Button, App, Space, Divider, Typography, Row, Col } from 'antd'
+import { UserOutlined, MailOutlined, PhoneOutlined, LockOutlined, EnvironmentOutlined } from '@ant-design/icons'
 
-const AddUserModal = ({ isOpen, onClose, onSubmit }) => {
+const { Title, Text } = Typography
+const { Option } = Select
+
+const AddUserModal = ({ isOpen, onClose, onSubmit, initialData = null }) => {
+  const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    role: 'Venue Admin',
-    location: '',
-    assignedVenues: [],
-    permissions: [],
-    password: '',
-    confirmPassword: ''
-  })
+  const { message } = App.useApp()
 
   const roles = [
     { value: 'Super Admin', label: 'Super Admin', description: 'Full platform access' },
     { value: 'Venue Admin', label: 'Venue Admin', description: 'Venue management access' }
   ]
 
-  const permissions = [
-    { id: 'venue_management', label: 'Venue Management', description: 'Create and manage venues' },
-    { id: 'event_creation', label: 'Event Creation', description: 'Create and edit events' },
-    { id: 'booking_management', label: 'Booking Management', description: 'Manage bookings and reservations' },
-    { id: 'user_management', label: 'User Management', description: 'Manage other users (Super Admin only)' },
-    { id: 'system_settings', label: 'System Settings', description: 'Access system configuration' },
-    { id: 'analytics_access', label: 'Analytics Access', description: 'View detailed analytics' }
+  const permissionsList = [
+    { label: 'Venue Management', value: 'venue_management' },
+    { label: 'Event Creation', value: 'event_creation' },
+    { label: 'Booking Management', value: 'booking_management' },
+    { label: 'User Management', value: 'user_management' },
+    { label: 'System Settings', value: 'system_settings' },
+    { label: 'Analytics Access', value: 'analytics_access' }
   ]
 
   const venues = [
@@ -40,381 +32,252 @@ const AddUserModal = ({ isOpen, onClose, onSubmit }) => {
     { id: 5, name: 'Marina Sports Bar' }
   ]
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-    if (error) setError('')
-  }
+  useEffect(() => {
+    if (isOpen) {
+      if (initialData) {
+        form.setFieldsValue({
+          name: initialData.name,
+          email: initialData.email,
+          phone: initialData.phone,
+          role: initialData.role || 'Venue Admin',
+          location: initialData.location,
+          assignedVenues: Array.isArray(initialData.assignedVenues) ? initialData.assignedVenues : [],
+          permissions: initialData.permissions || [],
+        })
+      } else {
+        form.resetFields()
+        form.setFieldsValue({
+          role: 'Venue Admin',
+          permissions: [],
+          assignedVenues: []
+        })
+      }
+    }
+  }, [initialData, isOpen, form])
 
   const handleRoleChange = (role) => {
     let defaultPermissions = []
     if (role === 'Super Admin') {
-      defaultPermissions = permissions.map(p => p.id)
+      defaultPermissions = permissionsList.map(p => p.value)
     } else if (role === 'Venue Admin') {
       defaultPermissions = ['venue_management', 'event_creation', 'booking_management']
     }
-    
-    setFormData(prev => ({
-      ...prev,
-      role,
-      permissions: defaultPermissions
-    }))
+    form.setFieldsValue({ permissions: defaultPermissions })
   }
 
-  const handlePermissionChange = (permissionId) => {
-    setFormData(prev => ({
-      ...prev,
-      permissions: prev.permissions.includes(permissionId)
-        ? prev.permissions.filter(p => p !== permissionId)
-        : [...prev.permissions, permissionId]
-    }))
-  }
-
-  const handleVenueChange = (venueId) => {
-    setFormData(prev => ({
-      ...prev,
-      assignedVenues: prev.assignedVenues.includes(venueId)
-        ? prev.assignedVenues.filter(v => v !== venueId)
-        : [...prev.assignedVenues, venueId]
-    }))
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleFinish = async (values) => {
     setLoading(true)
-    setError('')
-
-    // Validation
-    if (!formData.name || !formData.email || !formData.password) {
-      setError('Please fill in all required fields')
-      setLoading(false)
-      return
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
-      setLoading(false)
-      return
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters')
-      setLoading(false)
-      return
-    }
-
     try {
-      await onSubmit(formData)
-      setSuccess('User created successfully!')
-      setTimeout(() => {
-        onClose()
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          role: 'Venue Admin',
-          location: '',
-          assignedVenues: [],
-          permissions: [],
-          password: '',
-          confirmPassword: ''
-        })
-        setSuccess('')
-      }, 1500)
+      await onSubmit(values, !!initialData)
+      message.success(initialData ? 'User updated successfully!' : 'User created successfully!')
+      onClose()
+      form.resetFields()
     } catch (err) {
-      setError('Failed to create user. Please try again.')
+      message.error('Failed to save user. Please try again.')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
-
-  if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-neutral-100">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold text-neutral-800">Add New User</h2>
-              <p className="text-neutral-600">Create a new system administrator or venue manager</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-neutral-500 hover:text-neutral-700 p-2"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
+    <Modal
+      title={
+        <div style={{ paddingBottom: 8, borderBottom: '1px solid #f0f0f0' }}>
+          <Title level={4} style={{ margin: 0 }}>{initialData ? 'Edit User' : 'Add New User'}</Title>
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            {initialData ? 'Update user details and permissions' : 'Create a new system administrator or venue manager'}
+          </Text>
+        </div>
+      }
+      open={isOpen}
+      onCancel={onClose}
+      footer={null}
+      width={720}
+      centered
+      destroyOnClose
+    >
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleFinish}
+        initialValues={{
+          role: 'Venue Admin',
+          permissions: [],
+          assignedVenues: []
+        }}
+        style={{ marginTop: 24 }}
+      >
+        {/* Basic Information */}
+        <div style={{ marginBottom: 24 }}>
+          <Text strong style={{ fontSize: 16, display: 'block', marginBottom: 16 }}>Basic Information</Text>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="name"
+                label="Full Name"
+                rules={[{ required: true, message: 'Please enter full name' }]}
+              >
+                <Input prefix={<UserOutlined />} placeholder="John Doe" size="large" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="email"
+                label="Email Address"
+                rules={[
+                  { required: true, message: 'Please enter email' },
+                  { type: 'email', message: 'Please enter a valid email' }
+                ]}
+              >
+                <Input prefix={<MailOutlined />} placeholder="john@example.com" size="large" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="phone"
+                label="Phone Number"
+              >
+                <Input prefix={<PhoneOutlined />} placeholder="+971 50 123 4567" size="large" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="location"
+                label="Location"
+              >
+                <Input prefix={<EnvironmentOutlined />} placeholder="Dubai, UAE" size="large" />
+              </Form.Item>
+            </Col>
+          </Row>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Error/Success Messages */}
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center space-x-3">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <span className="text-red-700">{error}</span>
-            </div>
-          )}
-          
-          {success && (
-            <div className="p-4 bg-green-50 border border-green-200 rounded-2xl flex items-center space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-              <span className="text-green-700">{success}</span>
-            </div>
-          )}
+        <Divider />
 
-          {/* Basic Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-neutral-800">Basic Information</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Full Name *
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-red-300 focus:border-red-300 outline-none"
-                    placeholder="John Doe"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Email Address *
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-red-300 focus:border-red-300 outline-none"
-                    placeholder="john@example.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Phone Number
-                </label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-red-300 focus:border-red-300 outline-none"
-                    placeholder="+971 50 123 4567"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Location
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-red-300 focus:border-red-300 outline-none"
-                    placeholder="Dubai, UAE"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Role Selection */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-neutral-800">Role & Permissions</h3>
-            
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-3">User Role *</label>
-              <div className="space-y-3">
-                {roles.map((role) => (
-                  <div
-                    key={role.value}
-                    className={`p-4 border-2 rounded-xl cursor-pointer transition-colors ${
-                      formData.role === role.value
-                        ? 'border-red-300 bg-red-50'
-                        : 'border-neutral-200 hover:border-neutral-300'
-                    }`}
-                    onClick={() => handleRoleChange(role.value)}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-4 h-4 rounded-full border-2 ${
-                        formData.role === role.value
-                          ? 'border-red-500 bg-red-500'
-                          : 'border-neutral-300'
-                      }`}>
-                        {formData.role === role.value && (
-                          <div className="w-2 h-2 bg-white rounded-full mx-auto mt-0.5"></div>
-                        )}
-                      </div>
-                      <div>
-                        <div className="font-medium text-neutral-800">{role.label}</div>
-                        <div className="text-sm text-neutral-600">{role.description}</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Permissions */}
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-3">Permissions</label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {permissions.map((permission) => (
-                  <div
-                    key={permission.id}
-                    className={`p-3 border rounded-xl cursor-pointer transition-colors ${
-                      formData.permissions.includes(permission.id)
-                        ? 'border-red-300 bg-red-50'
-                        : 'border-neutral-200 hover:border-neutral-300'
-                    } ${formData.role === 'Super Admin' && permission.id === 'user_management' ? '' : 
-                       formData.role === 'Venue Admin' && permission.id === 'user_management' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    onClick={() => {
-                      if (formData.role === 'Venue Admin' && permission.id === 'user_management') return
-                      handlePermissionChange(permission.id)
-                    }}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <div className={`w-4 h-4 rounded border mt-0.5 ${
-                        formData.permissions.includes(permission.id)
-                          ? 'border-red-500 bg-red-500'
-                          : 'border-neutral-300'
-                      }`}>
-                        {formData.permissions.includes(permission.id) && (
-                          <CheckCircle className="w-3 h-3 text-white" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="font-medium text-neutral-800 text-sm">{permission.label}</div>
-                        <div className="text-xs text-neutral-600">{permission.description}</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Venue Assignment (only for Venue Admins) */}
-          {formData.role === 'Venue Admin' && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-neutral-800">Venue Assignment</h3>
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-3">Assigned Venues</label>
-                <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {venues.map((venue) => (
-                    <div
-                      key={venue.id}
-                      className={`p-3 border rounded-xl cursor-pointer transition-colors ${
-                        formData.assignedVenues.includes(venue.id)
-                          ? 'border-red-300 bg-red-50'
-                          : 'border-neutral-200 hover:border-neutral-300'
-                      }`}
-                      onClick={() => handleVenueChange(venue.id)}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-4 h-4 rounded border ${
-                          formData.assignedVenues.includes(venue.id)
-                            ? 'border-red-500 bg-red-500'
-                            : 'border-neutral-300'
-                        }`}>
-                          {formData.assignedVenues.includes(venue.id) && (
-                            <CheckCircle className="w-3 h-3 text-white" />
-                          )}
-                        </div>
-                        <Building className="w-4 h-4 text-neutral-500" />
-                        <span className="font-medium text-neutral-800">{venue.name}</span>
-                      </div>
-                    </div>
+        {/* Role & Permissions */}
+        <div style={{ marginBottom: 24 }}>
+          <Text strong style={{ fontSize: 16, display: 'block', marginBottom: 16 }}>Role & Permissions</Text>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="role"
+                label="User Role"
+                rules={[{ required: true, message: 'Please select a role' }]}
+              >
+                <Select size="large" onChange={handleRoleChange}>
+                  {roles.map(role => (
+                    <Option key={role.value} value={role.value}>
+                      <Space direction="vertical" size={0}>
+                        <Text strong>{role.label}</Text>
+                        <Text type="secondary" style={{ fontSize: 12 }}>{role.description}</Text>
+                      </Space>
+                    </Option>
                   ))}
-                </div>
-              </div>
-            </div>
-          )}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item
+                name="permissions"
+                label="Permissions"
+              >
+                <Checkbox.Group style={{ width: '100%' }}>
+                  <Row gutter={[16, 16]}>
+                    {permissionsList.map(item => (
+                      <Col span={12} key={item.value}>
+                        <Checkbox value={item.value}>{item.label}</Checkbox>
+                      </Col>
+                    ))}
+                  </Row>
+                </Checkbox.Group>
+              </Form.Item>
+            </Col>
+          </Row>
+        </div>
 
-          {/* Password */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-neutral-800">Security</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Password *
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-red-300 focus:border-red-300 outline-none"
-                  placeholder="Minimum 6 characters"
-                />
+        {/* Venue Assignment - Conditional */}
+        <Form.Item
+          noStyle
+          shouldUpdate={(prevValues, currentValues) => prevValues.role !== currentValues.role}
+        >
+          {({ getFieldValue }) =>
+            getFieldValue('role') === 'Venue Admin' ? (
+              <div style={{ marginBottom: 24 }}>
+                <Text strong style={{ fontSize: 16, display: 'block', marginBottom: 16 }}>Venue Assignment</Text>
+                <Form.Item
+                  name="assignedVenues"
+                  label="Assigned Venues"
+                >
+                  <Select
+                    mode="multiple"
+                    size="large"
+                    placeholder="Select venues"
+                    optionFilterProp="children"
+                  >
+                    {venues.map(venue => (
+                      <Option key={venue.id} value={venue.id}>{venue.name}</Option>
+                    ))}
+                  </Select>
+                </Form.Item>
               </div>
+            ) : null
+          }
+        </Form.Item>
 
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Confirm Password *
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-red-300 focus:border-red-300 outline-none"
-                  placeholder="Confirm password"
-                />
-              </div>
-            </div>
-          </div>
+        <Divider />
 
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-neutral-100">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-secondary"
-              disabled={loading}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn-primary bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loading}
-            >
-              {loading ? 'Creating User...' : 'Create User'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        {/* Security */}
+        <div style={{ marginBottom: 24 }}>
+          <Text strong style={{ fontSize: 16, display: 'block', marginBottom: 16 }}>
+            Security {initialData && <Text type="secondary" style={{ fontSize: 14, fontWeight: 'normal' }}>(Leave blank to keep current)</Text>}
+          </Text>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="password"
+                label="Password"
+                rules={[
+                  { required: !initialData, message: 'Please enter password' },
+                  { min: 6, message: 'Password must be at least 6 characters' }
+                ]}
+              >
+                <Input.Password prefix={<LockOutlined />} placeholder="Min 6 characters" size="large" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="confirmPassword"
+                label="Confirm Password"
+                dependencies={['password']}
+                rules={[
+                  { required: !initialData, message: 'Please confirm password' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) {
+                        return Promise.resolve()
+                      }
+                      return Promise.reject(new Error('Passwords do not match'))
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password prefix={<LockOutlined />} placeholder="Confirm password" size="large" />
+              </Form.Item>
+            </Col>
+          </Row>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+          <Button onClick={onClose} size="large">
+            Cancel
+          </Button>
+          <Button type="primary" htmlType="submit" loading={loading} className="btn-primary" size="large">
+            {initialData ? 'Update User' : 'Create User'}
+          </Button>
+        </div>
+      </Form>
+    </Modal>
   )
 }
 

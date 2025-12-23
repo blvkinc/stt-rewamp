@@ -10,10 +10,10 @@ import VenueCard from '../components/VenueCard'
 // Enhanced smooth scroll utility
 const smoothScrollTo = (element, offset = 80) => {
   if (!element) return
-  
+
   const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
   const offsetPosition = elementPosition - offset
-  
+
   window.scrollTo({
     top: offsetPosition,
     behavior: 'smooth'
@@ -81,7 +81,7 @@ const VenuesPage = () => {
       id: 2,
       name: "Sky Lounge Dubai",
       category: "Rooftop Bar",
-      image: "https://images.unsplash.com/photo-1566737236500-c8ac43014a8e?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&h=300&fit=crop",
       rating: 4.6,
       reviews: 89,
       location: "Downtown Dubai",
@@ -120,7 +120,7 @@ const VenuesPage = () => {
       id: 5,
       name: "Elite Banquet Hall",
       category: "Banquet Hall",
-      image: "https://images.unsplash.com/photo-1519167758481-83f29da8c2b6?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=400&h=300&fit=crop",
       rating: 4.9,
       reviews: 178,
       location: "Business Bay",
@@ -141,6 +141,32 @@ const VenuesPage = () => {
       priceRange: "AED 400-800",
       amenities: ["Michelin Star", "Wine Cellar", "Private Dining", "Valet"],
       upcomingEvents: 4
+    },
+    {
+      id: 7,
+      name: "Harbor View Terrace",
+      category: "Rooftop Bar",
+      image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&h=300&fit=crop",
+      rating: 4.7,
+      reviews: 134,
+      location: "Dubai Marina",
+      capacity: 150,
+      priceRange: "AED 200-450",
+      amenities: ["Harbor Views", "Live DJ", "Cocktails", "Outdoor"],
+      upcomingEvents: 9
+    },
+    {
+      id: 8,
+      name: "Desert Oasis Resort",
+      category: "Garden Venue",
+      image: "https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?w=400&h=300&fit=crop",
+      rating: 4.9,
+      reviews: 312,
+      location: "Desert Conservation Reserve",
+      capacity: 1000,
+      priceRange: "AED 500-1000",
+      amenities: ["Luxury Tents", "Dune Views", "Private Pool", "Spa"],
+      upcomingEvents: 2
     }
   ]
 
@@ -148,7 +174,7 @@ const VenuesPage = () => {
     { name: "Downtown Dubai", venues: 45, image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&h=300&fit=crop" },
     { name: "Palm Jumeirah", venues: 32, image: "https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?w=400&h=300&fit=crop" },
     { name: "Dubai Marina", venues: 38, image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?w=400&h=300&fit=crop" },
-    { name: "DIFC", venues: 28, image: "https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=400&h=300&fit=crop" }
+    { name: "DIFC", venues: 28, image: "https://images.unsplash.com/photo-1582037928769-181f2644ec27?w=400&h=300&fit=crop" }
   ]
 
   const venueFeatures = [
@@ -172,7 +198,7 @@ const VenuesPage = () => {
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <motion.img 
+          <motion.img
             src="https://images.unsplash.com/photo-1540541338287-41700207dee6?w=1920&h=1080&fit=crop"
             alt="Dubai Venues"
             className="w-full h-full object-cover"
@@ -180,17 +206,17 @@ const VenuesPage = () => {
             animate={{ scale: 1 }}
             transition={{ duration: 1.5, ease: "easeOut" }}
           />
-          <motion.div 
+          <motion.div
             className="absolute inset-0 bg-black/40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.5 }}
           />
         </div>
-        
+
         <div className="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           {/* Minimal Typography */}
-          <motion.h1 
+          <motion.h1
             className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -198,8 +224,8 @@ const VenuesPage = () => {
           >
             Find Venues
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             className="text-lg md:text-xl text-white/80 mb-12 max-w-xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -207,9 +233,9 @@ const VenuesPage = () => {
           >
             Discover perfect spaces for your events
           </motion.p>
-          
+
           {/* Ultra Minimal Search Bar */}
-          <motion.div 
+          <motion.div
             className="max-w-lg mx-auto"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -255,9 +281,9 @@ const VenuesPage = () => {
                 </CardContent>
               </Card>
             </motion.div>
-            
+
             {/* Category Filters Under Search Bar */}
-            <motion.div 
+            <motion.div
               className="flex flex-wrap justify-center gap-2 mt-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -267,19 +293,18 @@ const VenuesPage = () => {
                 <motion.button
                   key={category.name}
                   onClick={() => handleCategorySelect(category.name)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                    selectedCategory === category.name
-                      ? 'bg-white text-brand-blue shadow-lg'
-                      : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30'
-                  }`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${selectedCategory === category.name
+                    ? 'bg-white text-brand-blue shadow-lg'
+                    : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30'
+                    }`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ 
-                    duration: 0.5, 
+                  transition={{
+                    duration: 0.5,
                     delay: 0.7 + (index * 0.1),
                     ease: "easeOut"
                   }}
-                  whileHover={{ 
+                  whileHover={{
                     scale: 1.05,
                     y: -2
                   }}
@@ -297,7 +322,7 @@ const VenuesPage = () => {
       {/* Featured Venues */}
       <section ref={resultsRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-white/50 scroll-target">
         <div className="max-w-7xl mx-auto">
-          <motion.div 
+          <motion.div
             className="flex justify-between items-center mb-16"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -305,7 +330,7 @@ const VenuesPage = () => {
             viewport={{ once: true }}
           >
             <div>
-              <motion.h2 
+              <motion.h2
                 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -314,7 +339,7 @@ const VenuesPage = () => {
               >
                 {selectedCategory || searchTerm ? 'Search Results' : 'Featured Venues'}
               </motion.h2>
-              <motion.p 
+              <motion.p
                 className="text-xl text-gray-600"
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -345,9 +370,9 @@ const VenuesPage = () => {
               </Button>
             </motion.div>
           </motion.div>
-          
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -358,13 +383,13 @@ const VenuesPage = () => {
                 key={venue.id}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ 
-                  duration: 0.6, 
+                transition={{
+                  duration: 0.6,
                   delay: index * 0.1,
                   ease: "easeOut"
                 }}
                 viewport={{ once: true }}
-                whileHover={{ 
+                whileHover={{
                   y: -8,
                   transition: { duration: 0.3, ease: "easeOut" }
                 }}
@@ -382,13 +407,13 @@ const VenuesPage = () => {
             >
               <Card className="text-center py-16">
                 <CardContent>
-                  <motion.div 
+                  <motion.div
                     className="text-6xl mb-4"
-                    animate={{ 
+                    animate={{
                       rotate: [0, -10, 10, -10, 0],
                       scale: [1, 1.1, 1]
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 2,
                       repeat: Infinity,
                       repeatDelay: 3
@@ -396,7 +421,7 @@ const VenuesPage = () => {
                   >
                     🏢
                   </motion.div>
-                  <motion.h3 
+                  <motion.h3
                     className="text-2xl font-bold text-gray-900 mb-2"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -404,7 +429,7 @@ const VenuesPage = () => {
                   >
                     No venues found
                   </motion.h3>
-                  <motion.p 
+                  <motion.p
                     className="text-gray-600 mb-6"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -412,7 +437,7 @@ const VenuesPage = () => {
                   >
                     Try adjusting your search criteria or browse all venues
                   </motion.p>
-                  <motion.div 
+                  <motion.div
                     className="flex gap-4 justify-center"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -439,14 +464,14 @@ const VenuesPage = () => {
       {/* Top Locations */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <motion.div 
+          <motion.div
             className="text-center mb-16"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <motion.h2 
+            <motion.h2
               className="text-3xl md:text-4xl font-bold text-gray-900 mb-6"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -455,7 +480,7 @@ const VenuesPage = () => {
             >
               Popular Locations
             </motion.h2>
-            <motion.p 
+            <motion.p
               className="text-xl text-gray-600"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -465,8 +490,8 @@ const VenuesPage = () => {
               Explore venues in Dubai's most sought-after areas
             </motion.p>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -478,13 +503,13 @@ const VenuesPage = () => {
                 key={index}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ 
-                  duration: 0.6, 
+                transition={{
+                  duration: 0.6,
                   delay: index * 0.1,
                   ease: "easeOut"
                 }}
                 viewport={{ once: true }}
-                whileHover={{ 
+                whileHover={{
                   y: -8,
                   transition: { duration: 0.3, ease: "easeOut" }
                 }}
@@ -492,33 +517,33 @@ const VenuesPage = () => {
                 <Link to={`/explore?tab=venues&location=${encodeURIComponent(location.name)}`}>
                   <Card className="group hover:shadow-xl transition-all duration-300 overflow-hidden border-0 bg-white">
                     <div className="relative h-40">
-                      <motion.img 
-                        src={location.image} 
+                      <motion.img
+                        src={location.image}
                         alt={location.name}
                         className="w-full h-full object-cover"
                         whileHover={{ scale: 1.1 }}
                         transition={{ duration: 0.6, ease: "easeOut" }}
                       />
-                      <motion.div 
+                      <motion.div
                         className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"
                         initial={{ opacity: 0.6 }}
                         whileHover={{ opacity: 0.8 }}
                         transition={{ duration: 0.3 }}
                       />
-                      <motion.div 
+                      <motion.div
                         className="absolute bottom-4 left-4 text-white"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 + (index * 0.1), duration: 0.4 }}
                       >
-                        <motion.h3 
+                        <motion.h3
                           className="text-lg font-bold mb-1"
                           whileHover={{ scale: 1.05 }}
                           transition={{ type: "spring", stiffness: 400, damping: 10 }}
                         >
                           {location.name}
                         </motion.h3>
-                        <motion.p 
+                        <motion.p
                           className="text-sm text-white/80"
                           whileHover={{ x: 5 }}
                           transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -538,14 +563,14 @@ const VenuesPage = () => {
       {/* Features Section - Elegant Minimal Style */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <motion.div 
+          <motion.div
             className="text-center mb-16"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <motion.h2 
+            <motion.h2
               className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -554,7 +579,7 @@ const VenuesPage = () => {
             >
               Why choose our venues
             </motion.h2>
-            <motion.p 
+            <motion.p
               className="text-xl text-gray-600"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -564,8 +589,8 @@ const VenuesPage = () => {
               Every venue meets our high standards
             </motion.p>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="grid grid-cols-1 md:grid-cols-3 gap-12"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -575,38 +600,38 @@ const VenuesPage = () => {
             {venueFeatures.map((feature, index) => {
               const IconComponent = feature.icon
               return (
-                <motion.div 
-                  key={index} 
+                <motion.div
+                  key={index}
                   className="text-center group"
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ 
-                    duration: 0.6, 
+                  transition={{
+                    duration: 0.6,
                     delay: 0.4 + (index * 0.2),
                     ease: "easeOut"
                   }}
                   viewport={{ once: true }}
-                  whileHover={{ 
+                  whileHover={{
                     y: -8,
                     transition: { duration: 0.3, ease: "easeOut" }
                   }}
                 >
-                  <motion.div 
+                  <motion.div
                     className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-gray-200 transition-colors duration-300"
-                    whileHover={{ 
+                    whileHover={{
                       scale: 1.1,
                       rotate: 360
                     }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 260, 
+                    transition={{
+                      type: "spring",
+                      stiffness: 260,
                       damping: 20,
                       rotate: { duration: 0.6 }
                     }}
                   >
                     <IconComponent className="w-8 h-8 text-gray-700" />
                   </motion.div>
-                  <motion.h3 
+                  <motion.h3
                     className="text-xl font-semibold text-gray-900 mb-4"
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
@@ -615,7 +640,7 @@ const VenuesPage = () => {
                   >
                     {feature.title}
                   </motion.h3>
-                  <motion.p 
+                  <motion.p
                     className="text-gray-600 leading-relaxed"
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
@@ -634,7 +659,7 @@ const VenuesPage = () => {
       {/* CTA Section - Elegant Minimal Style */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.h2 
+          <motion.h2
             className="text-3xl md:text-4xl font-bold text-gray-900 mb-6"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -643,7 +668,7 @@ const VenuesPage = () => {
           >
             Ready to book your perfect venue?
           </motion.h2>
-          <motion.p 
+          <motion.p
             className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -652,7 +677,7 @@ const VenuesPage = () => {
           >
             Let our venue experts help you find the ideal space for your next event
           </motion.p>
-          <motion.div 
+          <motion.div
             className="flex flex-col sm:flex-row gap-4 justify-center"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -679,11 +704,11 @@ const VenuesPage = () => {
             >
               <Button size="lg" variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-100">
                 <motion.div
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.1, 1],
                     rotate: [0, 5, -5, 0]
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 2,
                     repeat: Infinity,
                     repeatDelay: 3

@@ -1,194 +1,122 @@
 import { Link } from 'react-router-dom'
-import { Star, MapPin, Clock, Heart, ChevronRight } from 'lucide-react'
+import { Star, Heart, MapPin } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Card, CardContent } from './ui/card'
 import { Badge } from './ui/badge'
 
-const EventCard = ({ event }) => {
-  return (
-    <Link to={`/events/${event.id}`} className="group">
-      <motion.div
-        whileHover={{ 
-          y: -8,
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
-        }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-      >
-        <Card className="overflow-hidden border-0 shadow-sm bg-white rounded-3xl">
-          <div className="relative aspect-[4/3]">
-            <motion.img
-              alt={event.title}
-              src={event.image}
-              className="w-full h-full object-cover"
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-            />
-            <motion.div 
-              className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"
-              initial={{ opacity: 0 }}
-              whileHover={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            />
-            
-            {/* Heart Button */}
-            <motion.div 
-              className="absolute top-4 right-4"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2, duration: 0.4 }}
-            >
-              <motion.button 
-                className="p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg"
-                whileHover={{ 
-                  scale: 1.1,
-                  backgroundColor: "rgba(255, 255, 255, 1)"
-                }}
-                whileTap={{ scale: 0.9 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.2 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <Heart className="w-4 h-4 text-gray-600 hover:text-brand-red" />
-                </motion.div>
-              </motion.button>
-            </motion.div>
-            
-            {/* Category Badge */}
-            <motion.div 
-              className="absolute bottom-4 left-4"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3, duration: 0.4 }}
-            >
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <Badge className="bg-white/95 backdrop-blur-sm text-gray-900 hover:bg-white px-3 py-1.5 rounded-full font-medium shadow-lg">
+const EventCard = ({ event, viewMode = 'grid' }) => {
+  if (viewMode === 'list') {
+    return (
+      <Link to={`/events/${event.id}`} className="group block">
+        <motion.div
+          className="rounded-3xl bg-white border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300"
+          whileHover={{ y: -4 }}
+        >
+          <div className="flex flex-col md:flex-row p-1">
+            <div className="md:w-64 relative aspect-[4/3] md:aspect-auto rounded-2xl overflow-hidden shrink-0">
+              <img
+                src={event.image}
+                alt={event.title}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute top-3 left-3">
+                <Badge className="gradient-brand text-white border-0 shadow-sm px-3 py-1 text-xs font-semibold rounded-full">
                   {event.category}
                 </Badge>
-              </motion.div>
-            </motion.div>
-            
-            {/* Price Badge */}
-            <motion.div 
-              className="absolute top-4 left-4"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1, duration: 0.4 }}
-            >
-              <motion.div 
-                className="px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg text-white"
-                style={{
-                  background: 'linear-gradient(to right, #D7415C, #F26D40)'
-                }}
-                whileHover={{ 
-                  scale: 1.05,
-                  boxShadow: "0 10px 25px -5px rgba(212, 65, 92, 0.4)"
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                AED {event.price}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
+
+            <div className="flex-1 p-5 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-bold text-xl text-gray-900 group-hover:text-gray-700 transition-colors">
+                    {event.title}
+                  </h3>
+                  <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-full">
+                    <Star strokeWidth={1.5} className="w-3.5 h-3.5 fill-current text-gray-900" />
+                    <span className="text-sm font-semibold">{event.rating}</span>
+                    <span className="text-xs text-gray-500">({event.reviews})</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
+                  <div className="flex items-center gap-2">
+                    <MapPin strokeWidth={1.5} className="w-4 h-4 text-brand-purple" />
+                    <span>{event.venue}</span>
+                  </div>
+                  {(event.date || event.time) && (
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-gray-300" />
+                      <span>{event.date} • {event.time}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-bold text-gray-900">AED {event.price}</span>
+                  <span className="text-gray-500 text-sm">per person</span>
+                </div>
+                <Badge variant="outline" className="border-gray-200 text-gray-600 group-hover:bg-gray-50">
+                  View Details
+                </Badge>
+              </div>
+            </div>
           </div>
-          
-          <CardContent className="p-6">
-            <motion.div 
-              className="flex items-start justify-between mb-3"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.4 }}
-            >
-              <div className="flex items-center gap-1">
-                <motion.div
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  whileHover={{ scale: 1.2 }}
-                >
-                  <Star className="w-4 h-4 fill-current text-yellow-400" />
-                </motion.div>
-                <span className="text-sm font-semibold">{event.rating}</span>
-                <span className="text-sm text-gray-500">({event.reviews})</span>
-              </div>
-              <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                per person
-              </div>
-            </motion.div>
-            
-            <motion.h3 
-              className="font-bold text-gray-900 mb-2 transition-colors text-lg leading-tight hover:text-red-600"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.4 }}
-            >
+        </motion.div>
+      </Link>
+    )
+  }
+
+  return (
+    <Link to={`/events/${event.id}`} className="group block h-full">
+      <motion.div
+        className="rounded-3xl h-full bg-white border border-gray-100 shadow-md"
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.2 }}
+      >
+        <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-3">
+          <img
+            alt={event.title}
+            src={event.image}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+
+          {/* Heart Button - Clean & Minimal */}
+          <button className="absolute top-3 right-3 p-2 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-colors group/heart">
+            <Heart strokeWidth={1.5} className="w-5 h-5 text-white group-hover/heart:fill-white transition-colors" />
+          </button>
+
+          {/* Category Pill */}
+          <div className="absolute top-3 left-3">
+            <Badge className="gradient-brand text-white border-0 shadow-sm hover:bg-opacity-90 px-3 py-1 text-xs font-semibold rounded-full">
+              {event.category}
+            </Badge>
+          </div>
+        </div>
+
+        <div className="p-5">
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="font-bold text-gray-900 text-lg leading-tight group-hover:text-gray-700 transition-colors line-clamp-1">
               {event.title}
-            </motion.h3>
-            
-            <motion.p 
-              className="text-gray-600 mb-4 font-medium"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.4 }}
-            >
-              {event.venue}
-            </motion.p>
-            
-            <motion.div 
-              className="space-y-2 text-sm text-gray-500"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.4 }}
-            >
-              <motion.div 
-                className="flex items-center gap-2"
-                whileHover={{ x: 5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <MapPin className="w-4 h-4" style={{ color: '#D7415C' }} />
-                <span>{event.location}</span>
-              </motion.div>
-              <motion.div 
-                className="flex items-center gap-2"
-                whileHover={{ x: 5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <Clock className="w-4 h-4" style={{ color: '#D7415C' }} />
-                <span>{event.time}</span>
-              </motion.div>
-            </motion.div>
-            
-            {/* Hover Action */}
-            <motion.div 
-              className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 0, y: 0 }}
-              whileHover={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <motion.div 
-                className="w-full h-px bg-gradient-to-r from-brand-red/20 via-brand-orange/20 to-brand-yellow/20 mb-3"
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                transition={{ duration: 0.6, delay: 0.8 }}
-              />
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Available now</span>
-                <motion.div 
-                  className="flex items-center text-sm font-medium"
-                  style={{ color: '#D7415C' }}
-                  whileHover={{ x: 5 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  Book now
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </motion.div>
-              </div>
-            </motion.div>
-          </CardContent>
-        </Card>
+            </h3>
+            <div className="flex items-center gap-1 shrink-0">
+              <Star strokeWidth={1.5} className="w-3.5 h-3.5 fill-current text-gray-900" />
+              <span className="text-sm font-medium">{event.rating}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+            <MapPin strokeWidth={1.5} className="w-4 h-4 shrink-0" />
+            <span className="truncate">{event.venue}</span>
+          </div>
+
+          <div className="flex items-center gap-1 pt-3 border-t border-gray-100">
+            <span className="font-bold text-gray-900">AED {event.price}</span>
+            <span className="text-gray-500 text-xs"> per person</span>
+          </div>
+        </div>
       </motion.div>
     </Link>
   )
