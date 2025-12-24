@@ -12,7 +12,9 @@ import {
   Row,
   Col,
   Menu,
-  message
+  message,
+  Upload,
+  Avatar
 } from 'antd'
 import {
   UserOutlined,
@@ -26,7 +28,10 @@ import {
   EnvironmentOutlined,
   SaveOutlined,
   EyeOutlined,
-  EyeInvisibleOutlined
+  EyeInvisibleOutlined,
+  UploadOutlined,
+  TeamOutlined,
+  FileTextOutlined
 } from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
@@ -112,7 +117,9 @@ const SettingsPage = () => {
     { key: 'venue', label: 'Venue', icon: <HomeOutlined /> },
     { key: 'banking', label: 'Banking', icon: <CreditCardOutlined /> },
     { key: 'notifications', label: 'Notifications', icon: <BellOutlined /> },
-    { key: 'security', label: 'Security', icon: <SafetyOutlined /> }
+    { key: 'security', label: 'Security', icon: <SafetyOutlined /> },
+    { key: 'team', label: 'Team Management', icon: <TeamOutlined /> },
+    { key: 'documents', label: 'Documents (KYC)', icon: <FileTextOutlined /> }
   ]
 
   return (
@@ -156,6 +163,43 @@ const SettingsPage = () => {
             {activeTab === 'profile' && (
               <div>
                 <Title level={3} style={{ marginBottom: '24px' }}>Profile Information</Title>
+
+                {/* Logo Upload */}
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 32 }}>
+                  <div style={{ position: 'relative', marginRight: 24 }}>
+                    <Avatar
+                      size={100}
+                      src={merchant?.logo}
+                      icon={<UserOutlined />}
+                      style={{ backgroundColor: '#f0f2f5' }}
+                    />
+                    <Upload
+                      showUploadList={false}
+                      customRequest={({ onSuccess }) => setTimeout(() => {
+                        message.success('Logo updated successfully');
+                        onSuccess("ok");
+                      }, 1000)}
+                    >
+                      <Button
+                        shape="circle"
+                        icon={<UploadOutlined />}
+                        size="small"
+                        style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          right: 0,
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                        }}
+                      />
+                    </Upload>
+                  </div>
+                  <div>
+                    <Text strong style={{ fontSize: 16 }}>Business Logo</Text>
+                    <Paragraph type="secondary" style={{ margin: 0, maxWidth: 300 }}>
+                      Upload a high-resolution logo for your business. Recommended size: 500x500px.
+                    </Paragraph>
+                  </div>
+                </div>
 
                 <Form
                   form={profileForm}
@@ -563,6 +607,94 @@ const SettingsPage = () => {
                     </Button>
                   </Form.Item>
                 </Form>
+              </div>
+            )}
+
+            {/* Team Management */}
+            {activeTab === 'team' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                  <div>
+                    <Title level={3} style={{ margin: 0 }}>Team Management</Title>
+                    <Text type="secondary">Manage access and permissions for your staff</Text>
+                  </div>
+                  <Button type="primary" icon={<UserOutlined />} onClick={() => message.info('Add Member feature coming soon')}>
+                    Add Member
+                  </Button>
+                </div>
+
+                <Card size="small" style={{ marginBottom: 16 }}>
+                  <Row align="middle">
+                    <Col span={2}><Avatar icon={<UserOutlined />} /></Col>
+                    <Col span={8}>
+                      <Text strong>John Doe (You)</Text><br />
+                      <Text type="secondary">admin@business.com</Text>
+                    </Col>
+                    <Col span={6}><Text type="secondary">Owner</Text></Col>
+                    <Col span={4}><Text type="success">Active</Text></Col>
+                    <Col span={4} style={{ textAlign: 'right' }}>
+                      <Button type="link" disabled>Edit</Button>
+                    </Col>
+                  </Row>
+                </Card>
+
+                <Card size="small">
+                  <Row align="middle">
+                    <Col span={2}><Avatar icon={<UserOutlined />} style={{ backgroundColor: '#87d068' }} /></Col>
+                    <Col span={8}>
+                      <Text strong>Sarah Smith</Text><br />
+                      <Text type="secondary">sarah@business.com</Text>
+                    </Col>
+                    <Col span={6}><Text type="secondary">Manager</Text></Col>
+                    <Col span={4}><Text type="success">Active</Text></Col>
+                    <Col span={4} style={{ textAlign: 'right' }}>
+                      <Button type="link">Edit</Button>
+                    </Col>
+                  </Row>
+                </Card>
+              </div>
+            )}
+
+            {/* Documents (KYC) */}
+            {activeTab === 'documents' && (
+              <div>
+                <div style={{ marginBottom: 24 }}>
+                  <Title level={3} style={{ margin: 0 }}>Documents & KYC</Title>
+                  <Text type="secondary">Manage your business verification documents</Text>
+                </div>
+
+                <Alert
+                  message="Verification Status: Verified"
+                  description="Your business has been fully verified. You can update your documents below if they expire."
+                  type="success"
+                  showIcon
+                  style={{ marginBottom: 24 }}
+                />
+
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} md={12}>
+                    <Card title="Trade License" extra={<Button type="link">Update</Button>}>
+                      <div style={{ textAlign: 'center', padding: 20, background: '#fafafa', borderRadius: 8, border: '1px dashed #d9d9d9' }}>
+                        <FileTextOutlined style={{ fontSize: 32, color: '#1890ff', marginBottom: 8 }} />
+                        <br />
+                        <Text strong>trade_license_2025.pdf</Text>
+                        <br />
+                        <Text type="secondary">Expires: Dec 31, 2025</Text>
+                      </div>
+                    </Card>
+                  </Col>
+                  <Col xs={24} md={12}>
+                    <Card title="Tax Registration" extra={<Button type="link">Update</Button>}>
+                      <div style={{ textAlign: 'center', padding: 20, background: '#fafafa', borderRadius: 8, border: '1px dashed #d9d9d9' }}>
+                        <FileTextOutlined style={{ fontSize: 32, color: '#1890ff', marginBottom: 8 }} />
+                        <br />
+                        <Text strong>vat_cert.pdf</Text>
+                        <br />
+                        <Text type="secondary">Verified on Oct 15, 2024</Text>
+                      </div>
+                    </Card>
+                  </Col>
+                </Row>
               </div>
             )}
           </Card>

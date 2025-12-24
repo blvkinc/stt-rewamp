@@ -122,7 +122,7 @@ function App() {
 
                   {/* Super Admin Routes */}
                   <Route path="/admin/dashboard" element={<SuperAdminDashboard />} />
-                  <Route path="/admin/venues" element={<VenuesManagement />} />
+                  {/* VenuesManagement merged into MerchantsManagement */}
                   <Route path="/admin/venues/:venueId" element={<VenueDetailPage />} />
                   <Route path="/admin/merchants" element={<MerchantsManagement />} />
                   <Route path="/admin/merchants/invite" element={<InviteMerchant />} />

@@ -29,6 +29,7 @@ const MerchantsManagement = () => {
       id: 1,
       name: 'Ahmed Al-Rashid',
       businessName: 'Jumeirah Hospitality',
+      category: 'Hotel Group',
       plan: 'Enterprise',
       status: 'active',
       lastActive: '2 min ago',
@@ -38,6 +39,7 @@ const MerchantsManagement = () => {
       id: 2,
       name: 'Sarah Johnson',
       businessName: 'Atlantis Group',
+      category: 'Resort',
       plan: 'Enterprise',
       status: 'active',
       lastActive: '1 hr ago',
@@ -47,6 +49,7 @@ const MerchantsManagement = () => {
       id: 3,
       name: 'Michael Chen',
       businessName: 'Sky Lounge LLC',
+      category: 'Night Club',
       plan: 'Premium',
       status: 'review',
       lastActive: 'Just now',
@@ -56,6 +59,7 @@ const MerchantsManagement = () => {
       id: 4,
       name: 'Emma Wilson',
       businessName: 'White Dubai Events',
+      category: 'Event Venue',
       plan: 'Basic',
       status: 'inactive',
       lastActive: '2 days ago',
@@ -65,6 +69,7 @@ const MerchantsManagement = () => {
       id: 5,
       name: 'David Miller',
       businessName: 'Palazzo Hospitality',
+      category: 'Fine Dining',
       plan: 'Premium',
       status: 'active',
       lastActive: '5 hours ago',
@@ -109,6 +114,12 @@ const MerchantsManagement = () => {
         </Space>
       ),
       sorter: (a, b) => a.name.localeCompare(b.name)
+    },
+    {
+      title: 'Category',
+      dataIndex: 'category',
+      key: 'category',
+      render: (text) => <Tag>{text}</Tag>
     },
     {
       title: 'Plan',

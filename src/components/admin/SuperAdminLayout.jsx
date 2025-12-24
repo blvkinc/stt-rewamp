@@ -64,13 +64,8 @@ const SuperAdminLayout = ({ children }) => {
     },
     {
       key: '/admin/merchants',
-      icon: <UserOutlined />,
-      label: <Link to="/admin/merchants">Merchants</Link>,
-    },
-    {
-      key: '/admin/venues',
       icon: <ShopOutlined />,
-      label: <Link to="/admin/venues">Venues</Link>,
+      label: <Link to="/admin/merchants">Merchants & Venues</Link>,
     },
     {
       key: '/admin/events',
