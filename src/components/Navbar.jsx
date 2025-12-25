@@ -188,12 +188,12 @@ const Navbar = () => {
                   size="icon"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className={cn(
-                    "rounded-full bg-gradient-brand p-0.5",
+                    "rounded-full gradient-brand p-0.5",
                     "hover:scale-105 transition-transform"
                   )}
                 >
                   <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
-                    <span className="text-sm font-bold bg-gradient-brand-text bg-clip-text text-transparent">
+                    <span className="text-sm font-bold gradient-brand-text bg-clip-text text-transparent">
                       {user?.name?.charAt(0) || 'U'}
                     </span>
                   </div>
@@ -277,7 +277,7 @@ const Navbar = () => {
             className="absolute right-0 top-0 bottom-0 w-80 bg-white shadow-2xl p-6"
           >
             <div className="flex justify-between items-center mb-8">
-              <span className="font-bold text-xl bg-gradient-brand-text bg-clip-text text-transparent">Menu</span>
+              <span className="font-bold text-xl gradient-brand-text bg-clip-text text-transparent">Menu</span>
               <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
                 <X strokeWidth={1.5} className="w-6 h-6" />
               </Button>
@@ -312,7 +312,7 @@ const Navbar = () => {
               </Button>
               {!isAuthenticated && (
                 <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full rounded-xl h-12 bg-gradient-brand text-white shadow-lg">
+                  <Button className="w-full rounded-xl h-12 gradient-brand text-white shadow-lg">
                     Sign In / Sign Up
                   </Button>
                 </Link>
@@ -327,7 +327,7 @@ const Navbar = () => {
         <div className="fixed inset-0 z-[70] flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setBusinessPopupOpen(false)} />
           <Card className="w-full max-w-lg relative z-10 overflow-hidden rounded-3xl shadow-2xl border-0 animate-in zoom-in-95">
-            <div className="h-40 bg-gradient-brand p-8 flex flex-col justify-end text-white relative">
+            <div className="h-40 gradient-brand p-8 flex flex-col justify-end text-white relative">
               <Button
                 variant="ghost"
                 size="icon"
@@ -365,7 +365,7 @@ const Navbar = () => {
               </div>
 
               <Link to="/merchant/auth" onClick={() => setBusinessPopupOpen(false)}>
-                <Button className="w-full h-14 text-lg rounded-full bg-gradient-brand text-white shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all">
+                <Button className="w-full h-14 text-lg rounded-full gradient-brand text-white shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all">
                   Get Started <ArrowRight strokeWidth={1.5} className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
