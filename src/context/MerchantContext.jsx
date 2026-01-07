@@ -257,6 +257,36 @@ export const MerchantProvider = ({ children }) => {
     }
   }
 
+  const clonePackage = (packageId) => {
+    let foundEvent = null
+    let foundPackage = null
+
+    for (const event of events) {
+      const pkg = (event.packages || []).find(p => p.id === parseInt(packageId) || p.id === packageId)
+      if (pkg) {
+        foundEvent = event
+        foundPackage = pkg
+        break
+      }
+    }
+
+    if (foundEvent && foundPackage) {
+      const clonedPackage = {
+        ...foundPackage,
+        id: Date.now(),
+        name: `${foundPackage.name} (Copy)`,
+        status: 'draft',
+        createdAt: new Date().toISOString(),
+        bookings: 0,
+        revenue: 0
+      }
+
+      const updatedPackages = [...(foundEvent.packages || []), clonedPackage]
+      updateEvent(foundEvent.id, { packages: updatedPackages })
+      return clonedPackage
+    }
+  }
+
   const value = {
     merchant,
     venues,
@@ -274,6 +304,7 @@ export const MerchantProvider = ({ children }) => {
     deleteEvent,
     addPackage,
     updatePackage,
+    clonePackage,
     isMerchantAuthenticated: !!merchant
   }
 

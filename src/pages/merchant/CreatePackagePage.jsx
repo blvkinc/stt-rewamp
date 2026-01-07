@@ -73,10 +73,16 @@ const CreatePackagePage = () => {
       }
 
       if (foundPackage) {
-        setFormData({
+        setFormData(prev => ({
+          ...prev,
           ...foundPackage,
-          eventId: foundEventId // Ensure eventId is set
-        })
+          features: foundPackage.features || [],
+          inclusions: foundPackage.inclusions || [],
+          exclusions: foundPackage.exclusions || [],
+          images: foundPackage.images || [],
+          availableDays: foundPackage.availableDays || prev.availableDays,
+          eventId: foundEventId
+        }))
       }
     }
   }, [isEditMode, id, events])

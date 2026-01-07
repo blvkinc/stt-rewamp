@@ -40,7 +40,7 @@ const { Title, Text } = Typography
 const { Option } = Select
 
 const PackagesPage = () => {
-  const { merchant, isMerchantAuthenticated, events } = useMerchant()
+  const { merchant, isMerchantAuthenticated, events, clonePackage } = useMerchant()
 
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -95,6 +95,11 @@ const PackagesPage = () => {
     }
   }
 
+  const handleDuplicatePackage = (packageId) => {
+    clonePackage(packageId)
+    // Optional: Show success message
+  }
+
   return (
     <div style={{ padding: '24px' }}>
       {/* Header */}
@@ -105,9 +110,7 @@ const PackagesPage = () => {
         </Col>
         <Col>
           <Space>
-            <Button icon={<CopyOutlined />}>
-              Duplicate
-            </Button>
+
             <Link to="/merchant/packages/create">
               <Button
                 type="primary"
@@ -230,7 +233,7 @@ const PackagesPage = () => {
       {/* Packages Grid */}
       <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
         {filteredPackages.map((pkg) => (
-          <Col key={pkg.id} xs={24} md={12} lg={8}>
+          <Col key={`${pkg.eventId}-${pkg.id}`} xs={24} md={12} lg={8}>
             <Card
               hoverable
               style={{ position: 'relative' }}
@@ -239,6 +242,7 @@ const PackagesPage = () => {
                 <Link to={`/merchant/packages/${pkg.id}/edit`}>
                   <Button type="text" icon={<EditOutlined />} key="edit">Edit</Button>
                 </Link>,
+                <Button type="text" icon={<CopyOutlined />} key="copy" onClick={() => handleDuplicatePackage(pkg.id)}>Duplicate</Button>,
                 <Button type="text" icon={<DeleteOutlined />} key="delete" danger>Delete</Button>
               ]}
               extra={
@@ -246,7 +250,7 @@ const PackagesPage = () => {
                   menu={{
                     items: [
                       { key: 'edit', icon: <EditOutlined />, label: <Link to={`/merchant/packages/${pkg.id}/edit`}>Edit</Link> },
-                      { key: 'copy', icon: <CopyOutlined />, label: 'Duplicate' },
+                      { key: 'copy', icon: <CopyOutlined />, label: 'Duplicate', onClick: () => handleDuplicatePackage(pkg.id) },
                       { key: 'delete', icon: <DeleteOutlined />, label: 'Delete', danger: true }
                     ]
                   }}
@@ -330,15 +334,15 @@ const PackagesPage = () => {
               <div>
                 <Text strong style={{ fontSize: '12px' }}>Includes:</Text>
                 <div style={{ marginTop: '8px' }}>
-                  {pkg.features.slice(0, 3).map((feature, index) => (
+                  {(Array.isArray(pkg.features) ? pkg.features : []).slice(0, 3).map((feature, index) => (
                     <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
                       <CheckCircleOutlined style={{ color: '#52c41a', marginRight: '8px', fontSize: '12px' }} />
                       <Text style={{ fontSize: '12px' }}>{feature}</Text>
                     </div>
                   ))}
-                  {pkg.features.length > 3 && (
+                  {(Array.isArray(pkg.features) ? pkg.features : []).length > 3 && (
                     <Text type="secondary" style={{ fontSize: '11px' }}>
-                      +{pkg.features.length - 3} more features
+                      +{(Array.isArray(pkg.features) ? pkg.features : []).length - 3} more features
                     </Text>
                   )}
                 </div>

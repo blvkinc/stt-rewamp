@@ -275,42 +275,28 @@ const EventsPage = () => {
             <motion.div
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="relative z-20"
             >
-              <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-2xl overflow-hidden hover-lift">
-                <CardContent className="p-1">
-                  <div className="flex items-center">
-                    <div className="flex-1 flex items-center px-4 py-3">
-                      <motion.div
-                        whileHover={{ scale: 1.1, rotate: 10 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      >
-                        <Search className="w-5 h-5 text-gray-400 mr-3" />
-                      </motion.div>
-                      <Input
-                        placeholder="Search events..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        onKeyDown={handleKeyPress}
-                        className="flex-1 border-0 bg-transparent focus:ring-0 placeholder:text-gray-400"
-                      />
-                    </div>
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Button
-                        onClick={handleSearch}
-                        className="m-1 px-6 py-3 rounded-xl font-medium hover-scale text-white"
-                        style={{
-                          background: 'linear-gradient(to right, #A76DB7, #6CB5F8)',
-                        }}
-                      >
-                        Search
-                      </Button>
-                    </motion.div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="bg-white p-2 rounded-full shadow-2xl flex items-center pl-4 sm:pl-6 pr-2 py-2">
+                <Search className="w-5 h-5 text-gray-400 mr-2 sm:mr-3 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search events..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  className="flex-1 bg-transparent border-none outline-none text-gray-800 placeholder:text-gray-400 text-base sm:text-lg w-full min-w-0"
+                />
+                <Button
+                  onClick={handleSearch}
+                  className="rounded-full px-4 sm:px-8 h-10 sm:h-12 text-sm sm:text-base font-semibold text-white shadow-lg shrink-0 ml-2 hover:opacity-90 transition-opacity"
+                  style={{
+                    background: 'linear-gradient(to right, #A76DB7, #6CB5F8)',
+                  }}
+                >
+                  Search
+                </Button>
+              </div>
             </motion.div>
 
             {/* Category Filters Under Search Bar */}

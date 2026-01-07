@@ -528,29 +528,26 @@ const ExplorePage = () => {
             Discover events, venues, and experiences
           </p>
 
-          {/* Ultra Minimal Search Bar */}
+
           <div className="max-w-lg mx-auto">
-            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-2xl overflow-hidden">
-              <CardContent className="p-1">
-                <form onSubmit={handleSearch} className="flex items-center">
-                  <div className="flex-1 flex items-center px-4 py-3">
-                    <Search strokeWidth={1.5} className="w-5 h-5 text-gray-400 mr-3" />
-                    <Input
-                      placeholder="Search experiences..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="flex-1 border-0 bg-transparent focus:ring-0 placeholder:text-gray-400"
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    className="m-1 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-xl font-medium"
-                  >
-                    Search
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+            <div className="bg-white p-2 rounded-full shadow-2xl flex items-center pl-4 sm:pl-6 pr-2 py-2">
+              <Search strokeWidth={1.5} className="w-5 h-5 text-gray-400 mr-2 sm:mr-3 shrink-0" />
+              <form onSubmit={handleSearch} className="flex-1 min-w-0">
+                <input
+                  type="text"
+                  placeholder="Search experiences..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-transparent border-none outline-none text-gray-800 placeholder:text-gray-400 text-base sm:text-lg"
+                />
+              </form>
+              <Button
+                onClick={handleSearch}
+                className="rounded-full px-4 sm:px-8 h-10 sm:h-12 text-sm sm:text-base font-semibold bg-emerald-600 text-white shadow-lg shrink-0 ml-2 hover:bg-emerald-700 transition-colors"
+              >
+                Search
+              </Button>
+            </div>
           </div>
         </div>
       </section>

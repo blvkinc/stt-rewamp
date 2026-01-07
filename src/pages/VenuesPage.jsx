@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, ArrowRight, Building, Trophy, HeadphonesIcon } from 'lucide-react'
+import { Search, ArrowRight, Building, Trophy, HeadphonesIcon, Umbrella, Building2, Briefcase, Flower2, Landmark, Utensils } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
@@ -55,12 +55,12 @@ const VenuesPage = () => {
   }
 
   const venueCategories = [
-    { name: "Beach Club", icon: "🏖️" },
-    { name: "Rooftop", icon: "🌃" },
-    { name: "Conference", icon: "💼" },
-    { name: "Garden", icon: "🌿" },
-    { name: "Banquet", icon: "🏛️" },
-    { name: "Fine Dining", icon: "🍽️" }
+    { name: "Beach Club", icon: Umbrella },
+    { name: "Rooftop", icon: Building2 },
+    { name: "Conference", icon: Briefcase },
+    { name: "Garden", icon: Flower2 },
+    { name: "Banquet", icon: Landmark },
+    { name: "Fine Dining", icon: Utensils }
   ]
 
   const featuredVenues = [
@@ -244,42 +244,28 @@ const VenuesPage = () => {
             <motion.div
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="relative z-20"
             >
-              <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-2xl overflow-hidden">
-                <CardContent className="p-1">
-                  <div className="flex items-center">
-                    <div className="flex-1 flex items-center px-4 py-3">
-                      <motion.div
-                        whileHover={{ scale: 1.1, rotate: 10 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      >
-                        <Search className="w-5 h-5 text-gray-400 mr-3" />
-                      </motion.div>
-                      <Input
-                        placeholder="Search venues..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        onKeyDown={handleKeyPress}
-                        className="flex-1 border-0 bg-transparent focus:ring-0 placeholder:text-gray-400"
-                      />
-                    </div>
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Button
-                        onClick={handleSearch}
-                        className="m-1 px-6 py-3 rounded-xl font-medium text-white"
-                        style={{
-                          background: 'linear-gradient(to right, #6CB5F8, #A76DB7)',
-                        }}
-                      >
-                        Search
-                      </Button>
-                    </motion.div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="bg-white p-2 rounded-full shadow-2xl flex items-center pl-4 sm:pl-6 pr-2 py-2">
+                <Search className="w-5 h-5 text-gray-400 mr-2 sm:mr-3 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search venues..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  className="flex-1 bg-transparent border-none outline-none text-gray-800 placeholder:text-gray-400 text-base sm:text-lg w-full min-w-0"
+                />
+                <Button
+                  onClick={handleSearch}
+                  className="rounded-full px-4 sm:px-8 h-10 sm:h-12 text-sm sm:text-base font-semibold text-white shadow-lg shrink-0 ml-2 hover:opacity-90 transition-opacity"
+                  style={{
+                    background: 'linear-gradient(to right, #6CB5F8, #A76DB7)',
+                  }}
+                >
+                  Search
+                </Button>
+              </div>
             </motion.div>
 
             {/* Category Filters Under Search Bar */}
@@ -289,31 +275,34 @@ const VenuesPage = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.6 }}
             >
-              {venueCategories.map((category, index) => (
-                <motion.button
-                  key={category.name}
-                  onClick={() => handleCategorySelect(category.name)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${selectedCategory === category.name
-                    ? 'bg-white text-brand-blue shadow-lg'
-                    : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30'
-                    }`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.5,
-                    delay: 0.7 + (index * 0.1),
-                    ease: "easeOut"
-                  }}
-                  whileHover={{
-                    scale: 1.05,
-                    y: -2
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <span className="mr-2">{category.icon}</span>
-                  {category.name}
-                </motion.button>
-              ))}
+              {venueCategories.map((category, index) => {
+                const Icon = category.icon
+                return (
+                  <motion.button
+                    key={category.name}
+                    onClick={() => handleCategorySelect(category.name)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center ${selectedCategory === category.name
+                      ? 'bg-white text-brand-blue shadow-lg'
+                      : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30'
+                      }`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: 0.7 + (index * 0.1),
+                      ease: "easeOut"
+                    }}
+                    whileHover={{
+                      scale: 1.05,
+                      y: -2
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Icon className="w-4 h-4 mr-2" />
+                    {category.name}
+                  </motion.button>
+                )
+              })}
             </motion.div>
           </motion.div>
         </div>

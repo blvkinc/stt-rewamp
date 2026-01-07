@@ -14,7 +14,8 @@ import {
   Statistic,
   Empty,
   Rate,
-  Avatar
+  Avatar,
+  Tabs
 } from 'antd'
 import {
   PlusOutlined,
@@ -28,7 +29,9 @@ import {
   UserOutlined,
   DollarOutlined,
   MoreOutlined,
-  StarFilled
+
+  StarFilled,
+  RedoOutlined
 } from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
@@ -41,6 +44,7 @@ const EventsPage = () => {
   const { merchant, events, cloneEvent, deleteEvent, isMerchantAuthenticated } = useMerchant()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [activeTab, setActiveTab] = useState('active')
   const [showDropdown, setShowDropdown] = useState(null)
 
   // Redirect to auth if not logged in
@@ -104,6 +108,10 @@ const EventsPage = () => {
     return matchesSearch && matchesStatus
   })
 
+  const now = new Date()
+  const activeEvents = filteredEvents.filter(event => new Date(event.date) >= now)
+  const archivedEvents = filteredEvents.filter(event => new Date(event.date) < now)
+
   const handleEditEvent = (eventId) => {
     navigate(`/merchant/events/${eventId}/edit`)
     setShowDropdown(null)
@@ -118,6 +126,13 @@ const EventsPage = () => {
     if (window.confirm('Are you sure you want to delete this event?')) {
       deleteEvent(eventId)
       setShowDropdown(null)
+    }
+  }
+
+  const handleRecycleEvent = (eventId) => {
+    const newEvent = cloneEvent(eventId)
+    if (newEvent) {
+      navigate(`/merchant/events/${newEvent.id}/edit`)
     }
   }
 
@@ -195,149 +210,208 @@ const EventsPage = () => {
       </Card>
 
       {/* Events Grid */}
-      {filteredEvents.length > 0 ? (
-        <Row gutter={[24, 24]}>
-          {filteredEvents.map((event) => (
-            <Col key={event.id} xs={24} md={12} lg={8}>
-              <Card
-                hoverable
-                cover={
-                  <div style={{ position: 'relative' }}>
-                    <img
-                      src={event.image}
-                      alt={event.title}
-                      style={{ width: '100%', height: '200px', objectFit: 'cover' }}
-                    />
-                    <div style={{ position: 'absolute', top: '12px', left: '12px' }}>
-                      <Tag color={getStatusColor(event.status)}>
-                        {event.status}
-                      </Tag>
-                    </div>
-                    <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
-                      <Dropdown
-                        menu={{
-                          items: [
-                            {
-                              key: 'edit',
-                              icon: <EditOutlined />,
-                              label: 'Edit',
-                              onClick: () => handleEditEvent(event.id)
-                            },
-                            {
-                              key: 'clone',
-                              icon: <CopyOutlined />,
-                              label: 'Clone',
-                              onClick: () => handleCloneEvent(event.id)
-                            },
-                            {
-                              key: 'view',
-                              icon: <EyeOutlined />,
-                              label: 'View Public',
-                              onClick: () => navigate(`/events/${event.id}`)
-                            },
-                            { type: 'divider' },
-                            {
-                              key: 'delete',
-                              icon: <DeleteOutlined />,
-                              label: 'Delete',
-                              danger: true,
-                              onClick: () => handleDeleteEvent(event.id)
-                            }
-                          ]
-                        }}
-                        trigger={['click']}
-                      >
-                        <Button
-                          type="text"
-                          icon={<MoreOutlined />}
-                          style={{
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            backdropFilter: 'blur(8px)'
-                          }}
+      <Tabs activeKey={activeTab} onChange={setActiveTab} type="card">
+        <Tabs.TabPane tab={`Active Events (${activeEvents.length})`} key="active">
+          {activeEvents.length > 0 ? (
+            <Row gutter={[24, 24]}>
+              {activeEvents.map((event) => (
+                <Col key={event.id} xs={24} md={12} lg={8}>
+                  <Card
+                    hoverable
+                    cover={
+                      <div style={{ position: 'relative' }}>
+                        <img
+                          src={event.image}
+                          alt={event.title}
+                          style={{ width: '100%', height: '200px', objectFit: 'cover' }}
                         />
-                      </Dropdown>
-                    </div>
+                        <div style={{ position: 'absolute', top: '12px', left: '12px' }}>
+                          <Tag color={getStatusColor(event.status)}>
+                            {event.status}
+                          </Tag>
+                        </div>
+                        <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
+                          <Dropdown
+                            menu={{
+                              items: [
+                                {
+                                  key: 'edit',
+                                  icon: <EditOutlined />,
+                                  label: 'Edit',
+                                  onClick: () => handleEditEvent(event.id)
+                                },
+                                {
+                                  key: 'clone',
+                                  icon: <CopyOutlined />,
+                                  label: 'Clone',
+                                  onClick: () => handleCloneEvent(event.id)
+                                },
+                                {
+                                  key: 'view',
+                                  icon: <EyeOutlined />,
+                                  label: 'View Public',
+                                  onClick: () => navigate(`/events/${event.id}`)
+                                },
+                                { type: 'divider' },
+                                {
+                                  key: 'delete',
+                                  icon: <DeleteOutlined />,
+                                  label: 'Delete',
+                                  danger: true,
+                                  onClick: () => handleDeleteEvent(event.id)
+                                }
+                              ]
+                            }}
+                            trigger={['click']}
+                          >
+                            <Button
+                              type="text"
+                              icon={<MoreOutlined />}
+                              style={{
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                backdropFilter: 'blur(8px)'
+                              }}
+                            />
+                          </Dropdown>
+                        </div>
+                      </div>
+                    }
+                    actions={[
+                      <Space key="date">
+                        <CalendarOutlined />
+                        <Text type="secondary">{event.date}</Text>
+                      </Space>,
+                      <Space key="price">
+                        <DollarOutlined />
+                        <Text type="secondary">AED {event.price}</Text>
+                      </Space>
+                    ]}
+                  >
+                    <Card.Meta
+                      title={event.title}
+                      description={
+                        <div>
+                          <Text type="secondary" ellipsis>
+                            {event.description}
+                          </Text>
+                          <Row gutter={16} style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f0f0f0' }}>
+                            <Col span={8} style={{ textAlign: 'center' }}>
+                              <Statistic
+                                title="Bookings"
+                                value={event.bookings}
+                                styles={{ content: { fontSize: '16px', color: '#1890ff' } }}
+                              />
+                            </Col>
+                            <Col span={8} style={{ textAlign: 'center' }}>
+                              <Statistic
+                                title="Views"
+                                value={event.views}
+                                styles={{ content: { fontSize: '16px', color: '#1890ff' } }}
+                              />
+                            </Col>
+                            <Col span={8} style={{ textAlign: 'center' }}>
+                              <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '12px', color: '#8c8c8c', marginBottom: '4px' }}>Rating</div>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <StarFilled style={{ color: '#faad14', marginRight: '4px' }} />
+                                  <Text style={{ fontSize: '16px', color: '#1890ff', fontWeight: 'bold' }}>
+                                    {event.rating || 'N/A'}
+                                  </Text>
+                                </div>
+                              </div>
+                            </Col>
+                          </Row>
+                        </div>
+                      }
+                    />
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            <Card>
+              <Empty
+                image={<CalendarOutlined style={{ fontSize: '64px', color: '#d9d9d9' }} />}
+                styles={{ image: { height: 80 } }}
+                description={
+                  <div>
+                    <Title level={4}>No active events found</Title>
+                    <Text type="secondary">
+                      {searchTerm || statusFilter !== 'all'
+                        ? 'Try adjusting your search or filters'
+                        : 'Create your first event to start attracting customers'
+                      }
+                    </Text>
                   </div>
                 }
-                actions={[
-                  <Space key="date">
-                    <CalendarOutlined />
-                    <Text type="secondary">{event.date}</Text>
-                  </Space>,
-                  <Space key="price">
-                    <DollarOutlined />
-                    <Text type="secondary">AED {event.price}</Text>
-                  </Space>
-                ]}
               >
-                <Card.Meta
-                  title={event.title}
-                  description={
-                    <div>
-                      <Text type="secondary" ellipsis>
-                        {event.description}
-                      </Text>
-                      <Row gutter={16} style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f0f0f0' }}>
-                        <Col span={8} style={{ textAlign: 'center' }}>
-                          <Statistic
-                            title="Bookings"
-                            value={event.bookings}
-                            styles={{ content: { fontSize: '16px', color: '#1890ff' } }}
-                          />
-                        </Col>
-                        <Col span={8} style={{ textAlign: 'center' }}>
-                          <Statistic
-                            title="Views"
-                            value={event.views}
-                            styles={{ content: { fontSize: '16px', color: '#1890ff' } }}
-                          />
-                        </Col>
-                        <Col span={8} style={{ textAlign: 'center' }}>
-                          <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '12px', color: '#8c8c8c', marginBottom: '4px' }}>Rating</div>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <StarFilled style={{ color: '#faad14', marginRight: '4px' }} />
-                              <Text style={{ fontSize: '16px', color: '#1890ff', fontWeight: 'bold' }}>
-                                {event.rating || 'N/A'}
-                              </Text>
-                            </div>
+                {!searchTerm && statusFilter === 'all' && (
+                  <Link to="/merchant/events/create">
+                    <Button type="primary" size="large" icon={<PlusOutlined />}>
+                      Create Your First Event
+                    </Button>
+                  </Link>
+                )}
+              </Empty>
+            </Card>
+          )}
+        </Tabs.TabPane>
+        <Tabs.TabPane tab={`Archive (${archivedEvents.length})`} key="archive">
+          {archivedEvents.length > 0 ? (
+            <Row gutter={[24, 24]}>
+              {archivedEvents.map((event) => (
+                <Col key={event.id} xs={24} md={12} lg={8}>
+                  <Card
+                    hoverable
+                    cover={
+                      <div style={{ position: 'relative' }}>
+                        <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.3)', zIndex: 1 }} />
+                        <img
+                          src={event.image}
+                          alt={event.title}
+                          style={{ width: '100%', height: '200px', objectFit: 'cover', filter: 'grayscale(100%)' }}
+                        />
+                        <div style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 2 }}>
+                          <Tag color="default">
+                            Archived
+                          </Tag>
+                        </div>
+                      </div>
+                    }
+                    actions={[
+                      <Button type="primary" icon={<RedoOutlined />} onClick={() => handleRecycleEvent(event.id)}>
+                        Recycle as Template
+                      </Button>
+                    ]}
+                  >
+                    <Card.Meta
+                      title={<Text delete type="secondary">{event.title}</Text>}
+                      description={
+                        <div>
+                          <Text type="secondary" ellipsis>
+                            {event.description}
+                          </Text>
+                          <div style={{ marginTop: '16px' }}>
+                            <Text type="secondary"><CalendarOutlined /> Ended on {event.date}</Text>
                           </div>
-                        </Col>
-                      </Row>
-                    </div>
-                  }
-                />
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      ) : (
-        <Card>
-          <Empty
-            image={<CalendarOutlined style={{ fontSize: '64px', color: '#d9d9d9' }} />}
-            styles={{ image: { height: 80 } }}
-            description={
-              <div>
-                <Title level={4}>No events found</Title>
-                <Text type="secondary">
-                  {searchTerm || statusFilter !== 'all'
-                    ? 'Try adjusting your search or filters'
-                    : 'Create your first event to start attracting customers'
-                  }
-                </Text>
-              </div>
-            }
-          >
-            {!searchTerm && statusFilter === 'all' && (
-              <Link to="/merchant/events/create">
-                <Button type="primary" size="large" icon={<PlusOutlined />}>
-                  Create Your First Event
-                </Button>
-              </Link>
-            )}
-          </Empty>
-        </Card>
-      )}
+                        </div>
+                      }
+                    />
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            <Card>
+              <Empty
+                description={
+                  <Text type="secondary">No past events in archive</Text>
+                }
+              />
+            </Card>
+          )}
+        </Tabs.TabPane>
+      </Tabs>
     </div>
   )
 }
