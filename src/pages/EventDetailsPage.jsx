@@ -1,19 +1,49 @@
-import React, { useState } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
-import { Star, MapPin, Clock, Heart, Share2, Calendar, Phone, Mail, ArrowLeft, ArrowRight, Users, Check, ChevronDown, Sparkles } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
+import React, { useState, useEffect } from 'react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import { MapPin, Star, Clock, Phone, Globe, Calendar, ArrowRight, ArrowLeft, Heart, Share2, Check, Sparkles } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { Badge } from '../components/ui/badge'
 import { motion } from 'framer-motion'
+
+import { useAuth } from '../context/AuthContext'
 
 const EventDetailsPage = () => {
   const { id: _id } = useParams()
   const navigate = useNavigate()
+  const { user, isAuthenticated } = useAuth()
   const [selectedPackage, setSelectedPackage] = useState('')
   const [selectedDate, setSelectedDate] = useState('')
   const [guestCount, setGuestCount] = useState(2)
   const [activeTab, setActiveTab] = useState('overview')
+
+  // Review Form State
+  const [userRating, setUserRating] = useState(0)
+  const [userComment, setUserComment] = useState('')
+  const [reviews, setReviews] = useState([
+    {
+      id: 1,
+      name: "Sarah Ahmed",
+      rating: 5,
+      date: "2 weeks ago",
+      comment: "Absolutely incredible experience! The food was exceptional and the service was impeccable. The views are breathtaking."
+    },
+    {
+      id: 2,
+      name: "Michael Johnson",
+      rating: 4,
+      date: "1 month ago",
+      comment: "Great brunch with amazing variety. A bit pricey but worth it for the experience and location."
+    },
+    {
+      id: 3,
+      name: "Fatima Al-Zahra",
+      rating: 5,
+      date: "1 month ago",
+      comment: "Perfect for special occasions. The staff went above and beyond to make our anniversary memorable."
+    }
+  ])
 
   // Mock event data
   const event = {
@@ -126,29 +156,21 @@ const EventDetailsPage = () => {
     ]
   }
 
-  const reviews = [
-    {
-      id: 1,
-      name: "Sarah Ahmed",
-      rating: 5,
-      date: "2 weeks ago",
-      comment: "Absolutely incredible experience! The food was exceptional and the service was impeccable. The views are breathtaking."
-    },
-    {
-      id: 2,
-      name: "Michael Johnson",
-      rating: 4,
-      date: "1 month ago",
-      comment: "Great brunch with amazing variety. A bit pricey but worth it for the experience and location."
-    },
-    {
-      id: 3,
-      name: "Fatima Al-Zahra",
-      rating: 5,
-      date: "1 month ago",
-      comment: "Perfect for special occasions. The staff went above and beyond to make our anniversary memorable."
+  const handleReviewSubmit = () => {
+    if (userRating === 0 || !userComment.trim()) return
+
+    const newReview = {
+      id: Date.now(),
+      name: user?.name || "Anonymous",
+      rating: userRating,
+      date: "Just now",
+      comment: userComment
     }
-  ]
+
+    setReviews([newReview, ...reviews])
+    setUserRating(0)
+    setUserComment('')
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -305,6 +327,93 @@ const EventDetailsPage = () => {
             )}
 
             {/* ... Other tabs would go here, simplified for brevity but maintaining structure ... */}
+            {/* Reviews Tab */}
+            {activeTab === 'reviews' && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+
+                {/* Write Review Section */}
+                <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
+                  <h3 className="text-xl font-bold text-gray-900 mb-6">Write a Review</h3>
+                  {isAuthenticated ? (
+                    <div className="space-y-4">
+                      <div className="flex gap-2 mb-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            onClick={() => setUserRating(star)}
+                            className="focus:outline-none transition-transform hover:scale-110"
+                          >
+                            <Star
+                              className={`w-8 h-8 ${star <= userRating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 hover:text-yellow-400'}`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                      <textarea
+                        className="w-full p-4 rounded-xl border border-gray-200 focus:border-black focus:ring-0 transition-colors bg-gray-50 resize-none outline-none"
+                        rows="4"
+                        placeholder="Share your experience with us..."
+                        value={userComment}
+                        onChange={(e) => setUserComment(e.target.value)}
+                      />
+                      <div className="flex justify-end">
+                        <Button
+                          onClick={handleReviewSubmit}
+                          disabled={userRating === 0 || !userComment.trim()}
+                          className="rounded-full px-6 bg-gray-900 hover:bg-black text-white"
+                        >
+                          Submit Review
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <p className="text-gray-600 mb-4">Please log in to share your experience</p>
+                      <Link to="/auth">
+                        <Button variant="outline" className="rounded-full px-8">Log In</Button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-4 mb-6 px-2">
+                  <span className="text-2xl font-bold text-gray-900">{reviews.length} Reviews</span>
+                  <div className="h-1 flex-1 bg-gray-100 rounded-full"></div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6">
+                  {reviews.map((review) => (
+                    <div key={review.id} className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-purple to-brand-blue p-[2px]">
+                            <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-brand-purple font-bold text-lg">
+                              {review.name.charAt(0)}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="font-bold text-gray-900 text-lg">{review.name}</div>
+                            <div className="text-sm text-gray-500 font-medium">{review.date}</div>
+                          </div>
+                        </div>
+                        <div className="flex gap-1 bg-gray-50 px-3 py-1.5 rounded-full">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 ${i < review.rating ? 'fill-gray-900 text-gray-900' : 'text-gray-200'}`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-gray-600 leading-relaxed text-lg pl-[64px]">
+                        "{review.comment}"
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {activeTab === 'packages' && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Choose your package</h2>
@@ -328,7 +437,13 @@ const EventDetailsPage = () => {
                             {pkg.originalPrice && <span className="text-sm text-gray-400 line-through">AED {pkg.originalPrice}</span>}
                           </div>
                           <span className="text-xs text-gray-500">per person</span>
-                          <Button className="w-full mt-3 rounded-xl bg-gray-900 text-white hover:bg-gray-800" onClick={() => setSelectedPackage(pkg.id)}>
+                          <Button className="w-full mt-3 rounded-xl bg-gray-900 text-white hover:bg-gray-800" onClick={() => {
+                            if (!selectedDate) {
+                              document.getElementById('date-selection')?.scrollIntoView({ behavior: 'smooth' });
+                              // Optionally show a toast or highlight the date input
+                            }
+                            setSelectedPackage(String(pkg.id));
+                          }}>
                             Select
                           </Button>
                         </div>
@@ -345,103 +460,124 @@ const EventDetailsPage = () => {
             <div className="sticky top-28">
               <Card className="rounded-2xl shadow-xl border-0 overflow-hidden ring-1 ring-black/5">
                 <CardContent className="p-6">
-                  {/* Package Selection */}
-                  <div className="mb-6">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Select Package</label>
-                    <Select value={selectedPackage} onValueChange={setSelectedPackage}>
-                      <SelectTrigger className="w-full rounded-xl border-gray-200 h-12">
-                        <SelectValue placeholder="Choose a package" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {event.packages.map((pkg) => (
-                          <SelectItem key={pkg.id} value={pkg.id}>
-                            <div className="flex justify-between w-full gap-4 items-center">
-                              <span className="font-medium">{pkg.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  {/* Date Selection - Step 1 */}
+                  <div className="mb-6" id="date-selection">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Select Date</label>
+                    <div className="border border-gray-200 rounded-xl p-3 hover:border-black transition-colors cursor-pointer bg-white">
+                      <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        min={new Date().toISOString().split('T')[0]}
+                        className="w-full outline-none text-sm bg-transparent cursor-pointer text-gray-900"
+                      />
+                    </div>
                   </div>
 
-                  {!selectedPackage ? (
-                    <div className="text-center py-4 px-4 bg-orange-50 rounded-xl border border-orange-100 mb-4 animate-in fade-in zoom-in-95 duration-300">
-                      <Sparkles className="w-6 h-6 text-orange-500 mx-auto mb-2" />
-                      <p className="text-sm font-medium text-orange-800">Please select a package above to view pricing and availability.</p>
+                  {/* Package Selection - Step 2 (Conditional) */}
+                  {!selectedDate ? (
+                    <div className="text-center py-6 px-4 bg-gray-50 rounded-xl border border-gray-100 mb-4 animate-in fade-in zoom-in-95 duration-300">
+                      <Calendar className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+                      <p className="text-sm font-medium text-gray-600">Please select a date to view available packages.</p>
                     </div>
                   ) : (
-                    <>
-                      <div className="flex justify-between items-end mb-6 animate-in fade-in slide-in-from-bottom-2">
-                        <div>
-                          <span className="text-2xl font-bold text-gray-900">AED {event.packages.find(p => p.id === selectedPackage)?.price}</span>
-                          <span className="text-gray-500 text-sm"> / person</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-sm">
-                          <Star className="w-4 h-4 fill-current text-gray-900" />
-                          <span className="font-semibold">{event.rating}</span>
-                          <span className="text-gray-500 underline">({event.reviews})</span>
-                        </div>
+                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <div className="mb-6">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Select Package</label>
+                        <Select value={selectedPackage} onValueChange={setSelectedPackage}>
+                          <SelectTrigger className="w-full rounded-xl border-gray-200 h-12">
+                            <SelectValue placeholder="Choose a package" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {event.packages.map((pkg) => (
+                              <SelectItem key={pkg.id} value={String(pkg.id)}>
+                                <div className="flex justify-between w-full gap-4 items-center">
+                                  <span className="font-medium">{pkg.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
 
-                      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 delay-100">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="col-span-2 border border-gray-300 rounded-t-xl p-3 hover:border-black transition-colors cursor-pointer">
-                            <label className="block text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">Date</label>
-                            <input type="date" className="w-full outline-none text-sm bg-transparent cursor-pointer" />
+                      {!selectedPackage ? (
+                        <div className="text-center py-4 px-4 bg-orange-50 rounded-xl border border-orange-100 mb-4 animate-in fade-in zoom-in-95 duration-300">
+                          <Sparkles className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+                          <p className="text-sm font-medium text-orange-800">Please select a package above to view pricing.</p>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex justify-between items-end mb-6 animate-in fade-in slide-in-from-bottom-2">
+                            <div>
+                              <span className="text-2xl font-bold text-gray-900">AED {event.packages.find(p => p.id === parseInt(selectedPackage))?.price}</span>
+                              <span className="text-gray-500 text-sm"> / person</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-sm">
+                              <Star className="w-4 h-4 fill-current text-gray-900" />
+                              <span className="font-semibold">{event.rating}</span>
+                              <span className="text-gray-500 underline">({event.reviews})</span>
+                            </div>
                           </div>
-                          <div className="col-span-2 border-x border-b border-gray-300 rounded-b-xl p-3 hover:border-black transition-colors cursor-pointer">
-                            <label className="block text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">Guests</label>
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm">{guestCount} guests</span>
-                              <div className="flex gap-2">
-                                <button onClick={() => setGuestCount(Math.max(1, guestCount - 1))} className="w-6 h-6 rounded-full border flex items-center justify-center hover:bg-gray-100">-</button>
-                                <button onClick={() => setGuestCount(guestCount + 1)} className="w-6 h-6 rounded-full border flex items-center justify-center hover:bg-gray-100">+</button>
+
+                          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 delay-100">
+                            <div className="grid grid-cols-1 gap-2">
+                              {/* Guest Count */}
+                              <div className="border border-gray-200 rounded-xl p-3 hover:border-black transition-colors cursor-pointer">
+                                <label className="block text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">Guests</label>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm">{guestCount} guests</span>
+                                  <div className="flex gap-2">
+                                    <button onClick={() => setGuestCount(Math.max(1, guestCount - 1))} className="w-6 h-6 rounded-full border flex items-center justify-center hover:bg-gray-100">-</button>
+                                    <button onClick={() => setGuestCount(guestCount + 1)} className="w-6 h-6 rounded-full border flex items-center justify-center hover:bg-gray-100">+</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="pt-4 pb-2">
+                              <Button
+                                size="lg"
+                                className="w-full h-12 text-lg font-semibold rounded-xl bg-gradient-to-r from-brand-purple to-brand-orange hover:opacity-90 shadow-lg"
+                                onClick={() => {
+                                  const pkg = event.packages.find(p => p.id === parseInt(selectedPackage))
+                                  navigate(`/booking/${event.id}`, {
+                                    state: {
+                                      event: event.title,
+                                      venue: event.venue,
+                                      date: selectedDate,
+                                      time: event.time,
+                                      price: pkg?.price,
+                                      guests: guestCount,
+                                      package: pkg?.name,
+                                      image: event.images[0]
+                                    }
+                                  })
+                                }}
+                              >
+                                Reserve
+                              </Button>
+                            </div>
+
+                            <p className="text-center text-xs text-gray-500">You won't be charged yet</p>
+
+                            <div className="space-y-2 pt-4 border-t border-gray-100 text-sm text-gray-600">
+                              <div className="flex justify-between">
+                                <span className="truncate max-w-[150px]">{event.packages.find(p => p.id === parseInt(selectedPackage))?.name} x {guestCount}</span>
+                                <span>AED {(event.packages.find(p => p.id === parseInt(selectedPackage))?.price || 0) * guestCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="underline">Service fee</span>
+                                <span>AED 45</span>
+                              </div>
+                              <div className="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-100 mt-2">
+                                <span>Total</span>
+                                <span>AED {(event.packages.find(p => p.id === parseInt(selectedPackage))?.price || 0) * guestCount + 45}</span>
                               </div>
                             </div>
                           </div>
-                        </div>
-
-                        <div className="pt-4 pb-2">
-                          <Button
-                            size="lg"
-                            className="w-full h-12 text-lg font-semibold rounded-xl bg-gradient-to-r from-brand-purple to-brand-orange hover:opacity-90 shadow-lg"
-                            onClick={() => {
-                              navigate(`/booking/${event.id}`, {
-                                state: {
-                                  event: event.title,
-                                  venue: event.venue,
-                                  date: selectedDate || new Date().toISOString().split('T')[0],
-                                  time: event.time,
-                                  price: event.packages.find(p => p.id === selectedPackage)?.price,
-                                  guests: guestCount,
-                                  package: event.packages.find(p => p.id === selectedPackage)?.name,
-                                  image: event.images[0]
-                                }
-                              })
-                            }}
-                          >
-                            Reserve
-                          </Button>
-                        </div>
-
-                        <p className="text-center text-xs text-gray-500">You won't be charged yet</p>
-
-                        <div className="space-y-2 pt-4 border-t border-gray-100 text-sm text-gray-600">
-                          <div className="flex justify-between">
-                            <span className="truncate max-w-[150px]">{event.packages.find(p => p.id === selectedPackage)?.name} x {guestCount}</span>
-                            <span>AED {(event.packages.find(p => p.id === selectedPackage)?.price || 0) * guestCount}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="underline">Service fee</span>
-                            <span>AED 45</span>
-                          </div>
-                          <div className="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-100 mt-2">
-                            <span>Total</span>
-                            <span>AED {(event.packages.find(p => p.id === selectedPackage)?.price || 0) * guestCount + 45}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </>
+                        </>
+                      )}
+                    </div>
                   )}
                 </CardContent>
               </Card>

@@ -70,6 +70,40 @@ const VenueDetailsPage = () => {
           price: 199,
           image: "https://images.unsplash.com/photo-1566737236500-c8ac43014a8e?w=400&h=300&fit=crop"
         }
+      ],
+      reviews: [
+        {
+          id: 1,
+          name: "John Doe",
+          date: "October 2023",
+          rating: 5,
+          comment: "Beautiful venue with amazing atmosphere. The service was top notch and the food was delicious. Highly recommended for a special occasion.",
+          eventName: "Beach Club Brunch"
+        },
+        {
+          id: 2,
+          name: "Sarah Smith",
+          date: "November 2023",
+          rating: 4,
+          comment: "Great party vibes! The music was fantastic and the crowd was lively. Drinks were a bit pricey but worth it.",
+          eventName: "Sunset Pool Party"
+        },
+        {
+          id: 3,
+          name: "Michael Brown",
+          date: "December 2023",
+          rating: 5,
+          comment: "An unforgettable evening. The staff went above and beyond to make sure we were comfortable.",
+          eventName: "Private Dining Experience"
+        },
+        {
+          id: 4,
+          name: "Emily Davis",
+          date: "January 2024",
+          rating: 5,
+          comment: "Loved the brunch! So many options and everything tasted fresh. Will definitely be back.",
+          eventName: "Beach Club Brunch"
+        }
       ]
     }
     setVenue(mockVenue)
@@ -153,7 +187,7 @@ const VenueDetailsPage = () => {
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 fill-gray-900 text-gray-900" />
                   <span className="font-semibold text-lg">{venue.rating}</span>
-                  <span className="text-gray-500 text-sm underline">({venue.reviews} reviews)</span>
+                  <span className="text-gray-500 text-sm underline">({venue.reviews.length} reviews)</span>
                 </div>
                 <div className="flex items-center gap-1 text-gray-600">
                   <MapPin className="w-4 h-4" />
@@ -249,25 +283,46 @@ const VenueDetailsPage = () => {
             )}
 
             {activeTab === 'reviews' && (
-              <div className="space-y-8">
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="flex items-center gap-4 mb-6">
                   <Star className="w-8 h-8 fill-gray-900 text-gray-900" />
                   <span className="text-3xl font-bold text-gray-900">{venue.rating}</span>
-                  <span className="text-xl text-gray-500">({venue.reviews} reviews)</span>
+                  <span className="text-xl text-gray-500">({venue.reviews.length} reviews)</span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">JD</div>
-                        <div>
-                          <div className="font-semibold text-gray-900">John Doe</div>
-                          <div className="text-sm text-gray-500">October 2023</div>
+                <div className="grid grid-cols-1 gap-6">
+                  {venue.reviews.map((review) => (
+                    <div key={review.id} className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-purple to-brand-blue p-[2px]">
+                            <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-brand-purple font-bold text-lg">
+                              {review.name.charAt(0)}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="font-bold text-gray-900 text-lg">{review.name}</div>
+                            <div className="text-sm text-gray-500 font-medium">{review.date}</div>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <div className="flex gap-1 bg-gray-50 px-3 py-1.5 rounded-full">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${i < review.rating ? 'fill-gray-900 text-gray-900' : 'text-gray-200'}`}
+                              />
+                            ))}
+                          </div>
+                          {/* Event Tag */}
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-purple/5 text-brand-purple text-xs font-semibold">
+                            <Calendar className="w-3 h-3" />
+                            <span>{review.eventName}</span>
+                          </div>
                         </div>
                       </div>
-                      <p className="text-gray-600 leading-relaxed text-sm">
-                        Beautiful venue with amazing atmosphere. The service was top notch and the food was delicious. Highly recommended for a special occasion.
+                      <p className="text-gray-600 leading-relaxed text-lg pl-[64px]">
+                        "{review.comment}"
                       </p>
                     </div>
                   ))}
