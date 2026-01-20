@@ -36,6 +36,9 @@ import AdvertisingPage from './pages/merchant/AdvertisingPage'
 import SettingsPage from './pages/merchant/SettingsPage'
 import EventDetailPage from './pages/merchant/EventDetailPage'
 import CustomersPage from './pages/merchant/CustomersPage'
+import FAQListPage from './pages/merchant/FAQListPage'
+import CreateFAQPage from './pages/merchant/CreateFAQPage'
+import MerchantPlansPage from './pages/merchant/MerchantPlansPage'
 
 // Super Admin Pages
 import SuperAdminDashboard from './pages/admin/SuperAdminDashboard'
@@ -117,7 +120,12 @@ function App() {
                     <Route path="settings" element={<SettingsPage />} />
                     <Route path="events/:id" element={<EventDetailPage />} />
                     <Route path="customers" element={<CustomersPage />} />
+                    <Route path="faqs" element={<FAQListPage />} />
+                    <Route path="faqs/create" element={<CreateFAQPage />} />
+                    <Route path="faqs/:id/edit" element={<CreateFAQPage />} />
+                    <Route path="faqs/:id/edit" element={<CreateFAQPage />} />
                     <Route path="profile" element={<MerchantProfilePage />} />
+                    <Route path="plans" element={<MerchantPlansPage />} />
                   </Route>
 
                   {/* Super Admin Routes */}

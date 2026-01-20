@@ -387,9 +387,9 @@ const ExplorePage = () => {
             if (viewMode === 'list') {
               return (
                 <Link key={`package-${item.id}`} to={`/packages/${item.id}`} className="group block">
-                  <Card className="rounded-3xl border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
+                  <Card className="rounded-xl border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
                     <div className="flex flex-col md:flex-row p-1">
-                      <div className="md:w-64 relative aspect-[4/3] md:aspect-auto rounded-2xl overflow-hidden shrink-0">
+                      <div className="md:w-64 relative aspect-[4/3] md:aspect-auto rounded-xl overflow-hidden shrink-0">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -453,7 +453,7 @@ const ExplorePage = () => {
 
             return (
               <Link key={`package-${item.id}`} to={`/packages/${item.id}`} className="group">
-                <Card className="overflow-hidden border-0 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <Card className="overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-xl">
                   <div className="relative aspect-[4/3]">
                     <img
                       src={item.image}

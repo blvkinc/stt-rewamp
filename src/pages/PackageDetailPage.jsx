@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { Check, Star, Users, Clock, Calendar, ArrowRight, Gift, MapPin, ArrowLeft, Share2, Heart } from 'lucide-react'
+import { Check, Star, Users, Clock, Calendar, ArrowRight, Gift, MapPin, ArrowLeft, Share2, Heart, Phone, Sparkles } from 'lucide-react'
+import { Button } from '../components/ui/button'
+import { Card, CardContent } from '../components/ui/card'
+import { Badge } from '../components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 
 const PackageDetailPage = () => {
   const { packageId } = useParams()
@@ -8,6 +13,7 @@ const PackageDetailPage = () => {
   const [packageData, setPackageData] = useState(null)
   const [selectedDate, setSelectedDate] = useState('')
   const [guestCount, setGuestCount] = useState(2)
+  const [activeTab, setActiveTab] = useState('overview')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -21,9 +27,11 @@ const PackageDetailPage = () => {
       venueId: 1,
       image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
       images: [
-        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
+        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&h=800&fit=crop",
         "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop",
-        "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop"
+        "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop",
+        "https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=800&h=600&fit=crop",
+        "https://images.unsplash.com/photo-1540541338287-41700207dee6?w=800&h=600&fit=crop"
       ],
       price: 449,
       originalPrice: 529,
@@ -85,7 +93,7 @@ const PackageDetailPage = () => {
       ageRestriction: "All ages welcome. Children under 5 dine free.",
       dressCode: "Smart casual to formal attire recommended"
     }
-    
+
     setTimeout(() => {
       setPackageData(mockPackage)
       setLoading(false)
@@ -125,329 +133,301 @@ const PackageDetailPage = () => {
   const savings = (packageData.originalPrice - packageData.price) * guestCount
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      {/* Header */}
-      <div className="bg-white shadow-soft border-b border-neutral-100">
-        <div className="max-w-7xl mx-auto container-padding pt-24 pb-6">
-          <div className="flex items-center justify-between mb-4">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center space-x-2 text-neutral-600 hover:text-primary-600 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Back</span>
-            </button>
-            
-            <div className="flex items-center space-x-3">
-              <button className="p-2 text-neutral-600 hover:text-primary-600 transition-colors">
-                <Heart className="w-6 h-6" />
-              </button>
-              <button className="p-2 text-neutral-600 hover:text-primary-600 transition-colors">
-                <Share2 className="w-6 h-6" />
-              </button>
+    <div className="min-h-screen bg-white">
+      {/* Back Button */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-6">
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="font-medium">Back</span>
+        </button>
+      </div>
+
+      {/* Gallery - Stacked Grid */}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 mb-8 md:mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[300px] md:h-[500px] rounded-3xl overflow-hidden shadow-sm">
+          <div className="md:col-span-2 relative h-full">
+            <img
+              src={packageData.images[0]}
+              alt={packageData.name}
+              className="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer"
+            />
+          </div>
+          <div className="hidden md:flex flex-col gap-2 h-full">
+            <div className="h-1/2 relative">
+              <img src={packageData.images[1]} className="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" alt="Gallery" />
+            </div>
+            <div className="h-1/2 relative">
+              <img src={packageData.images[2]} className="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" alt="Gallery" />
             </div>
           </div>
-          
-          <div className="flex items-center space-x-2 text-sm text-neutral-600 mb-4">
-            <Link to="/" className="hover:text-primary-600">Home</Link>
-            <span>•</span>
-            <Link to="/explore" className="hover:text-primary-600">Explore</Link>
-            <span>•</span>
-            <Link to="/explore?tab=packages" className="hover:text-primary-600">Packages</Link>
-            <span>•</span>
-            <span>{packageData.name}</span>
+          <div className="hidden md:flex flex-col gap-2 h-full">
+            <div className="h-1/2 relative">
+              <img src={packageData.images[3]} className="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" alt="Gallery" />
+            </div>
+            <div className="h-1/2 relative">
+              <img src={packageData.images[4]} className="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" alt="Gallery" />
+              <div className="absolute bottom-4 right-4 bg-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-md">
+                Show all photos
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto container-padding py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Package Header */}
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                {packageData.popular && (
-                  <span className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                    Most Popular
-                  </span>
-                )}
-                <span className="bg-neutral-100 text-neutral-700 px-3 py-1 rounded-full text-sm font-medium">
+          <div className="lg:col-span-2">
+
+            {/* Header */}
+            <div className="mb-8 border-b border-gray-100 pb-8">
+              <div className="flex items-center justify-between mb-4">
+                <Badge variant="secondary" className="px-3 py-1 text-sm bg-gray-100 text-gray-700">
                   {packageData.category}
-                </span>
+                </Badge>
+                <div className="flex items-center space-x-4">
+                  <button className="flex items-center space-x-1 text-gray-600 hover:text-red-500 transition-colors">
+                    <Heart className="w-5 h-5" />
+                    <span className="text-sm font-medium">Save</span>
+                  </button>
+                  <button className="flex items-center space-x-1 text-gray-600 hover:text-gray-900 transition-colors">
+                    <Share2 className="w-5 h-5" />
+                    <span className="text-sm font-medium">Share</span>
+                  </button>
+                </div>
               </div>
-              
-              <h1 className="text-4xl font-bold text-neutral-800 mb-4">{packageData.name}</h1>
-              
-              <div className="flex items-center space-x-6 text-neutral-600 mb-4">
-                <div className="flex items-center space-x-1">
-                  <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="font-medium">{packageData.rating}</span>
-                  <span>({packageData.reviews} reviews)</span>
+
+              <h1 className="text-4xl font-bold text-gray-900 mb-2 tracking-tight">{packageData.name}</h1>
+              <div className="flex items-center space-x-4 text-sm text-gray-600">
+                <span className="font-medium text-gray-900">{packageData.venue}</span>
+                <span>•</span>
+                <span className="underline">{packageData.location}</span>
+              </div>
+
+              <div className="flex items-center space-x-6 mt-4">
+                <div className="flex items-center space-x-1 p-1 bg-gray-50 rounded-lg px-2">
+                  <Star className="w-4 h-4 text-gray-900 fill-current" />
+                  <span className="font-semibold text-gray-900">{packageData.rating}</span>
+                  <span className="text-gray-500 underline ml-1">{packageData.reviews} reviews</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <MapPin className="w-5 h-5" />
-                  <span>{packageData.location}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Clock className="w-5 h-5" />
+                  <Clock className="w-4 h-4" />
                   <span>{packageData.duration}</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Users className="w-5 h-5" />
+                  <Users className="w-4 h-4" />
                   <span>Up to {packageData.maxGuests} guests</span>
                 </div>
               </div>
-              
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="flex items-center space-x-2">
-                  <span className="text-3xl font-bold text-primary-600">AED {packageData.price}</span>
-                  {packageData.originalPrice > packageData.price && (
-                    <span className="text-lg text-neutral-500 line-through">AED {packageData.originalPrice}</span>
-                  )}
-                  <span className="text-neutral-600">per person</span>
-                </div>
-                {savings > 0 && (
-                  <div className="flex items-center space-x-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
-                    <Gift className="w-4 h-4" />
-                    <span>Save AED {packageData.originalPrice - packageData.price}</span>
-                  </div>
-                )}
-              </div>
-              
-              <p className="text-lg text-neutral-700 leading-relaxed">{packageData.description}</p>
             </div>
 
-            {/* Image Gallery */}
-            <div>
-              <h3 className="text-2xl font-bold text-neutral-800 mb-4">Gallery</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {packageData.images.map((image, index) => (
-                  <div key={index} className="relative overflow-hidden rounded-2xl">
-                    <img 
-                      src={image} 
-                      alt={`${packageData.name} ${index + 1}`}
-                      className="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
+            {/* Tabs */}
+            <div className="mb-8">
+              <nav className="flex space-x-8 border-b border-gray-100">
+                {['overview', 'details', 'reviews'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`pb-4 px-1 font-medium text-sm transition-all border-b-2 capitalize ${activeTab === tab
+                      ? 'border-gray-900 text-gray-900'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      }`}
+                  >
+                    {tab}
+                  </button>
                 ))}
-              </div>
+              </nav>
             </div>
 
-            {/* Highlights */}
-            <div>
-              <h3 className="text-2xl font-bold text-neutral-800 mb-4">Experience Highlights</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {packageData.highlights.map((highlight, index) => (
-                  <div key={index} className="flex items-center space-x-3 p-4 bg-white rounded-xl border border-neutral-100">
-                    <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Check className="w-5 h-5 text-primary-600" />
-                    </div>
-                    <span className="text-neutral-700 font-medium">{highlight}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Tab Content */}
+            {activeTab === 'overview' && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">About this package</h2>
+                  <p className="text-gray-600 leading-relaxed text-lg mb-8">{packageData.description}</p>
 
-            {/* What's Included */}
-            <div>
-              <h3 className="text-2xl font-bold text-neutral-800 mb-4">What's Included</h3>
-              <div className="bg-white rounded-2xl p-6 border border-neutral-100">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {packageData.features.map((feature, index) => (
-                    <div key={index} className="flex items-start space-x-3">
-                      <div className="w-5 h-5 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Check className="w-3 h-3 text-primary-600" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Package Highlights</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {packageData.highlights.map((highlight, index) => (
+                      <div key={index} className="flex items-start space-x-3 p-2.5 rounded-xl bg-gray-50">
+                        <Check className="w-5 h-5 text-gray-900 mt-0.5" />
+                        <span className="text-gray-700">{highlight}</span>
                       </div>
-                      <span className="text-neutral-700">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Inclusions & Exclusions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-2xl p-6 border border-neutral-100">
-                <h4 className="text-lg font-bold text-neutral-800 mb-4">Included</h4>
-                <ul className="space-y-2">
-                  {packageData.inclusions.map((item, index) => (
-                    <li key={index} className="flex items-center space-x-2">
-                      <Check className="w-4 h-4 text-green-600" />
-                      <span className="text-neutral-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div className="bg-white rounded-2xl p-6 border border-neutral-100">
-                <h4 className="text-lg font-bold text-neutral-800 mb-4">Not Included</h4>
-                <ul className="space-y-2">
-                  {packageData.exclusions.map((item, index) => (
-                    <li key={index} className="flex items-center space-x-2">
-                      <span className="w-4 h-4 text-red-500">×</span>
-                      <span className="text-neutral-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* Important Information */}
-            <div className="bg-white rounded-2xl p-6 border border-neutral-100">
-              <h3 className="text-xl font-bold text-neutral-800 mb-4">Important Information</h3>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium text-neutral-800 mb-2">Cancellation Policy</h4>
-                  <p className="text-neutral-600">{packageData.cancellationPolicy}</p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-neutral-800 mb-2">Dress Code</h4>
-                  <p className="text-neutral-600">{packageData.dressCode}</p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-neutral-800 mb-2">Age Restriction</h4>
-                  <p className="text-neutral-600">{packageData.ageRestriction}</p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-neutral-800 mb-2">Dietary Options</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {packageData.dietaryOptions.map((option, index) => (
-                      <span key={index} className="bg-neutral-100 text-neutral-700 px-3 py-1 rounded-full text-sm">
-                        {option}
-                      </span>
                     ))}
                   </div>
                 </div>
+
+                <div className="border-t border-gray-100 pt-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Features & Inclusions</h3>
+                  <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {packageData.features.map((feature, index) => (
+                        <div key={index} className="flex items-center space-x-3">
+                          <div className="w-2 h-2 rounded-full bg-green-500" />
+                          <span className="text-gray-700">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-100 pt-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Important Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">Policies</h4>
+                      <p className="text-gray-600 text-sm mb-1">{packageData.cancellationPolicy}</p>
+                      <p className="text-gray-600 text-sm">{packageData.ageRestriction}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">Dress Code</h4>
+                      <p className="text-gray-600 text-sm">{packageData.dressCode}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+
+            {activeTab === 'details' && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="rounded-xl border-gray-100 shadow-sm">
+                    <CardContent className="p-5">
+                      <h3 className="font-bold text-gray-900 mb-4">Inclusions</h3>
+                      <ul className="space-y-1.5">
+                        {packageData.inclusions.map((item, i) => (
+                          <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                            <Check className="w-4 h-4 text-green-600" /> {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                  <Card className="rounded-xl border-gray-100 shadow-sm">
+                    <CardContent className="p-5">
+                      <h3 className="font-bold text-gray-900 mb-4">Exclusions</h3>
+                      <ul className="space-y-1.5">
+                        {packageData.exclusions.map((item, i) => (
+                          <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                            <span className="text-red-500">×</span> {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'reviews' && (
+              <div className="py-12 text-center text-gray-500">
+                <Star className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                <h3 className="text-lg font-medium text-gray-900">Reviews coming soon</h3>
+                <p>Calculated from {packageData.reviews} ratings across all platforms.</p>
+              </div>
+            )}
+
           </div>
 
-          {/* Booking Sidebar */}
+          {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl p-6 shadow-soft border border-neutral-100 sticky top-8">
-              <h3 className="text-xl font-bold text-neutral-800 mb-6">Book This Package</h3>
-              
-              {/* Date Selection */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-neutral-700 mb-2">Select Date</label>
-                <select
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full px-3 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none"
-                >
-                  <option value="">Choose a date</option>
-                  {packageData.availableDates.map((date) => (
-                    <option key={date} value={date}>
-                      {new Date(date).toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="sticky top-24">
+              <Card className="rounded-2xl shadow-xl border-0 overflow-hidden ring-1 ring-black/5">
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-end mb-6">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl font-bold text-gray-900">AED {packageData.price}</span>
+                        {packageData.originalPrice > packageData.price && (
+                          <span className="text-lg text-gray-400 line-through">AED {packageData.originalPrice}</span>
+                        )}
+                      </div>
+                      <span className="text-gray-500 text-sm">per person</span>
+                    </div>
+                    {savings > 0 && (
+                      <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-0">
+                        Save AED {savings / guestCount}
+                      </Badge>
+                    )}
+                  </div>
 
-              {/* Time Slots */}
-              {selectedDate && (
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">Available Times</label>
-                  <div className="space-y-2">
-                    {packageData.timeSlots.map((slot, index) => (
-                      <button
-                        key={index}
-                        disabled={!slot.available}
-                        className={`w-full p-3 text-left rounded-xl border transition-all duration-200 ${
-                          slot.available
-                            ? 'border-neutral-200 hover:border-primary-300 hover:bg-primary-50'
-                            : 'border-neutral-100 bg-neutral-50 text-neutral-400 cursor-not-allowed'
-                        }`}
-                      >
-                        <div className="flex justify-between items-center">
-                          <span>{slot.time}</span>
-                          <span className={`text-sm ${slot.available ? 'text-green-600' : 'text-red-500'}`}>
-                            {slot.available ? 'Available' : 'Sold Out'}
-                          </span>
+                  <div className="space-y-4">
+                    {/* Date Selection */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-gray-900 uppercase tracking-wide">Date</label>
+                      <div className="relative">
+                        <select
+                          value={selectedDate}
+                          onChange={(e) => setSelectedDate(e.target.value)}
+                          className="w-full h-12 pl-4 pr-10 rounded-xl border border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent outline-none appearance-none cursor-pointer"
+                        >
+                          <option value="">Select a date</option>
+                          {packageData.availableDates.map(date => (
+                            <option key={date} value={date}>{date}</option>
+                          ))}
+                        </select>
+                        <Calendar className="absolute right-3 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                      </div>
+                    </div>
+
+                    {/* Guests */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-gray-900 uppercase tracking-wide">Guests</label>
+                      <div className="flex items-center justify-between border border-gray-200 rounded-xl p-3 bg-white">
+                        <button
+                          onClick={() => setGuestCount(Math.max(packageData.minGuests, guestCount - 1))}
+                          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+                        >
+                          -
+                        </button>
+                        <span className="font-medium">{guestCount} guests</span>
+                        <button
+                          onClick={() => setGuestCount(Math.min(packageData.maxGuests, guestCount + 1))}
+                          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Summary */}
+                    {selectedDate && (
+                      <div className="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
+                        <div className="flex justify-between text-gray-600">
+                          <span>AED {packageData.price} x {guestCount}</span>
+                          <span>AED {totalPrice}</span>
                         </div>
-                      </button>
-                    ))}
+                        <div className="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-200">
+                          <span>Total</span>
+                          <span>AED {totalPrice}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <Button
+                      size="lg"
+                      className="w-full h-12 rounded-xl bg-gradient-to-r from-brand-purple to-brand-orange text-white font-semibold text-lg shadow-lg hover:opacity-90"
+                      onClick={handleBooking}
+                      disabled={!selectedDate}
+                    >
+                      Reserve Package
+                    </Button>
+
+                    <p className="text-center text-xs text-gray-500 mt-4">
+                      You won't be charged yet
+                    </p>
                   </div>
-                </div>
-              )}
+                </CardContent>
+              </Card>
 
-              {/* Guest Count */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-neutral-700 mb-2">Number of Guests</label>
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={() => setGuestCount(Math.max(packageData.minGuests, guestCount - 1))}
-                    className="w-10 h-10 border border-neutral-200 rounded-xl flex items-center justify-center hover:bg-neutral-50"
-                  >
-                    -
-                  </button>
-                  <span className="flex-1 text-center font-medium">{guestCount} guests</span>
-                  <button
-                    onClick={() => setGuestCount(Math.min(packageData.maxGuests, guestCount + 1))}
-                    className="w-10 h-10 border border-neutral-200 rounded-xl flex items-center justify-center hover:bg-neutral-50"
-                  >
-                    +
-                  </button>
-                </div>
-                <p className="text-xs text-neutral-500 mt-1">
-                  Min: {packageData.minGuests}, Max: {packageData.maxGuests} guests
-                </p>
-              </div>
-
-              {/* Price Summary */}
-              <div className="space-y-3 mb-6 p-4 bg-neutral-50 rounded-xl">
-                <div className="flex justify-between">
-                  <span className="text-neutral-600">AED {packageData.price} × {guestCount} guests</span>
-                  <span className="font-medium">AED {totalPrice}</span>
-                </div>
-                {savings > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Total Savings</span>
-                    <span className="font-medium">-AED {savings}</span>
-                  </div>
-                )}
-                <hr className="border-neutral-200" />
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-neutral-800">Total</span>
-                  <span className="text-2xl font-bold text-primary-600">AED {totalPrice}</span>
-                </div>
-              </div>
-
-              {/* Book Button */}
-              <button
-                onClick={handleBooking}
-                disabled={!selectedDate}
-                className="w-full btn-primary flex items-center justify-center space-x-2 mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span>Book Now</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-
-              {/* Additional Links */}
-              <div className="space-y-2 text-center">
-                <Link 
-                  to={`/events/${packageData.eventId}`}
-                  className="block text-primary-600 hover:text-primary-700 font-medium"
-                >
-                  View Full Event Details
-                </Link>
-                <Link 
-                  to={`/venues/${packageData.venueId}`}
-                  className="block text-neutral-600 hover:text-neutral-700"
-                >
-                  About {packageData.venue}
+              <div className="mt-4 text-center">
+                <Link to={`/venues/${packageData.venueId}`} className="text-sm font-medium text-gray-600 hover:text-gray-900 underline">
+                  View Venue Details
                 </Link>
               </div>
-
-              <p className="text-xs text-neutral-500 text-center mt-4">
-                Free cancellation up to 24 hours before the event
-              </p>
             </div>
           </div>
         </div>

@@ -26,7 +26,8 @@ import {
   ArrowUpOutlined,
   BellOutlined,
   InboxOutlined,
-  UserOutlined
+  UserOutlined,
+  QuestionCircleOutlined
 } from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 
@@ -63,6 +64,11 @@ const MerchantLayout = () => {
       key: '/merchant/bookings',
       icon: <TeamOutlined />,
       label: <Link to="/merchant/bookings">Bookings</Link>,
+    },
+    {
+      key: '/merchant/faqs',
+      icon: <QuestionCircleOutlined />,
+      label: <Link to="/merchant/faqs">FAQs</Link>,
     },
     {
       key: '/merchant/customers',

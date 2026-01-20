@@ -13,7 +13,10 @@ import {
   Avatar,
   Space,
   Tag,
-  Divider
+  Divider,
+  Tabs,
+  Table,
+  Modal
 } from 'antd'
 import {
   ArrowUpOutlined,
@@ -25,12 +28,14 @@ import {
   DownloadOutlined,
   ArrowDownOutlined,
   BarChartOutlined,
-  PieChartOutlined
+  PieChartOutlined,
+  LockOutlined,
+  FileTextOutlined
 } from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
 
-const { Title, Text } = Typography
+const { Title, Text, Paragraph } = Typography
 const { Option } = Select
 
 const AnalyticsPage = () => {
@@ -137,9 +142,115 @@ const AnalyticsPage = () => {
     </Card>
   )
 
+  const [activeTab, setActiveTab] = useState('dashboard')
+
   const exportReport = () => {
+    // Check subscription
+    if (merchant?.subscriptionType === 'Free') {
+      Modal.warning({
+        title: 'Premium Feature Locked',
+        icon: <LockOutlined style={{ color: '#faad14' }} />,
+        content: (
+          <div>
+            <p>Report generation and advanced analytics export are available on Premium and Enterprise plans.</p>
+            <p>Upgrade your subscription to unlock this feature.</p>
+          </div>
+        ),
+        okText: 'Upgrade Now',
+        onOk: () => window.location.href = '/merchant/settings', // Redirect to settings to upgrade
+        maskClosable: true,
+      })
+      return
+    }
     alert('Analytics report exported successfully!')
   }
+
+  const ReportsTab = () => (
+    <div style={{ position: 'relative', minHeight: '400px' }}>
+      {merchant?.subscriptionType === 'Free' && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(255, 255, 255, 0.6)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius: '8px'
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '40px',
+            borderRadius: '16px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+            textAlign: 'center',
+            maxWidth: '400px'
+          }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              background: '#fff7e6',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 24px auto'
+            }}>
+              <LockOutlined style={{ fontSize: '32px', color: '#faad14' }} />
+            </div>
+            <Title level={3}>Unlock Advanced Reports</Title>
+            <Paragraph type="secondary" style={{ marginBottom: '24px' }}>
+              Get detailed insights, exportable CSVs, and custom date range reports with our Premium plan.
+            </Paragraph>
+            <Space direction="vertical" style={{ width: '100%' }}>
+              <Button
+                type="primary"
+                size="large"
+                block
+                onClick={() => window.location.href = '/merchant/settings'}
+                style={{ background: 'linear-gradient(90deg, #faad14, #ffc53d)', border: 'none' }}
+              >
+                Upgrade to Premium
+              </Button>
+              <Button type="text" size="large">
+                View Plans
+              </Button>
+            </Space>
+          </div>
+        </div>
+      )}
+
+      <Row gutter={[24, 24]}>
+        <Col span={24}>
+          <Card title="Available Reports">
+            <Table
+              dataSource={[
+                { id: 1, name: 'Monthly Revenue Report', type: 'CSV', date: '2023-10-01' },
+                { id: 2, name: 'Customer Demographics', type: 'PDF', date: '2023-09-15' },
+                { id: 3, name: 'Event Performance Q3', type: 'Excel', date: '2023-10-05' },
+              ]}
+              columns={[
+                { title: 'Report Name', dataIndex: 'name', key: 'name' },
+                { title: 'Format', dataIndex: 'type', key: 'type', render: text => <Tag>{text}</Tag> },
+                { title: 'Generated Date', dataIndex: 'date', key: 'date' },
+                {
+                  title: 'Action',
+                  key: 'action',
+                  render: () => <Button icon={<DownloadOutlined />} onClick={exportReport}>Download</Button>
+                }
+              ]}
+              pagination={false}
+            />
+          </Card>
+        </Col>
+      </Row>
+    </div>
+  )
 
   return (
     <div style={{ padding: '24px' }}>
@@ -151,19 +262,22 @@ const AnalyticsPage = () => {
         </Col>
         <Col>
           <Space>
-            <Select
-              value={timeRange}
-              onChange={setTimeRange}
-              style={{ width: 150 }}
-            >
-              <Option value="7days">Last 7 days</Option>
-              <Option value="30days">Last 30 days</Option>
-              <Option value="90days">Last 90 days</Option>
-              <Option value="1year">Last year</Option>
-            </Select>
+            {activeTab === 'dashboard' && (
+              <Select
+                value={timeRange}
+                onChange={setTimeRange}
+                style={{ width: 150 }}
+              >
+                <Option value="7days">Last 7 days</Option>
+                <Option value="30days">Last 30 days</Option>
+                <Option value="90days">Last 90 days</Option>
+                <Option value="1year">Last year</Option>
+              </Select>
+            )}
             <Button
               onClick={exportReport}
               icon={<DownloadOutlined />}
+              type={activeTab === 'reports' ? 'primary' : 'default'}
             >
               Export Report
             </Button>
@@ -171,328 +285,348 @@ const AnalyticsPage = () => {
         </Col>
       </Row>
 
-      {/* Overview Stats */}
-      <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
-        <Col xs={24} sm={12} lg={6}>
-          <StatCard
-            title="Total Revenue"
-            value={analytics.overview.totalRevenue.toLocaleString()}
-            change={analytics.overview.revenueGrowth}
-            icon={DollarOutlined}
-            color="#52c41a"
-            prefix="AED "
-          />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <StatCard
-            title="Total Bookings"
-            value={analytics.overview.totalBookings}
-            change={analytics.overview.bookingsGrowth}
-            icon={CalendarOutlined}
-            color="#722ed1"
-          />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <StatCard
-            title="Profile Views"
-            value={analytics.overview.totalViews.toLocaleString()}
-            change={analytics.overview.viewsGrowth}
-            icon={EyeOutlined}
-            color="#1890ff"
-          />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <StatCard
-            title="Average Rating"
-            value={analytics.overview.avgRating}
-            change={analytics.overview.ratingChange > 0 ? analytics.overview.ratingChange * 10 : undefined}
-            icon={StarFilled}
-            color="#faad14"
-          />
-        </Col>
-      </Row>
-
-      {/* Revenue Chart */}
-      <Row gutter={[32, 32]} style={{ marginBottom: '32px' }}>
-        <Col xs={24} lg={12}>
-          <Card>
-            <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
-              <Col>
-                <Title level={4} style={{ margin: 0 }}>Revenue Trend</Title>
-              </Col>
-              <Col>
-                <BarChartOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
-              </Col>
-            </Row>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {analytics.revenueData.slice(-6).map((data, index) => (
-                <div key={index} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '12px',
-                  borderBottom: index < 5 ? '1px solid #f0f0f0' : 'none'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{
-                      width: '12px',
-                      height: '12px',
-                      backgroundColor: '#1890ff',
-                      borderRadius: '50%'
-                    }} />
-                    <div>
-                      <Text strong style={{ display: 'block' }}>{data.month}</Text>
-                      <Text type="secondary" style={{ fontSize: '13px' }}>{data.bookings} bookings</Text>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <Text strong style={{ fontSize: '16px' }}>
-                      AED {data.revenue.toLocaleString()}
-                    </Text>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </Col>
-
-        {/* Top Events */}
-        <Col xs={24} lg={12}>
-          <Card>
-            <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
-              <Col>
-                <Title level={4} style={{ margin: 0 }}>Top Performing Events</Title>
-              </Col>
-              <Col>
-                <ArrowUpOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
-              </Col>
-            </Row>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {analytics.topEvents.slice(0, 5).map((event, index) => (
-                <div key={index} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '16px',
-                  backgroundColor: '#fafafa',
-                  borderRadius: '8px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <Avatar
-                      style={{ backgroundColor: '#1890ff' }}
-                      size="small"
-                    >
-                      {index + 1}
-                    </Avatar>
-                    <div>
-                      <Text strong style={{ display: 'block' }}>{event.name}</Text>
-                      <Space>
-                        <Text type="secondary" style={{ fontSize: '12px' }}>{event.bookings} bookings</Text>
-                        <Text type="secondary" style={{ fontSize: '12px' }}>•</Text>
-                        <Text type="secondary" style={{ fontSize: '12px' }}>{event.views} views</Text>
-                      </Space>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <Text strong style={{ color: '#1890ff', fontSize: '16px', display: 'block' }}>
-                      AED {event.revenue.toLocaleString()}
-                    </Text>
-                    <div>
-                      <Space>
-                        <StarFilled style={{ color: '#faad14', fontSize: '12px' }} />
-                        <Text type="secondary" style={{ fontSize: '12px' }}>{event.rating}</Text>
-                      </Space>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Customer Demographics */}
-      <Row gutter={[32, 32]} style={{ marginBottom: '32px' }}>
-        <Col xs={24} lg={12}>
-          <Card>
-            <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
-              <Col>
-                <Title level={4} style={{ margin: 0 }}>Customer Age Groups</Title>
-              </Col>
-              <Col>
-                <PieChartOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
-              </Col>
-            </Row>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {analytics.customerDemographics.ageGroups.map((group) => (
-                <Row key={group.range} justify="space-between" align="middle">
-                  <Col>
-                    <Space>
-                      <div style={{
-                        width: '12px',
-                        height: '12px',
-                        backgroundColor: '#1890ff',
-                        borderRadius: '50%'
-                      }} />
-                      <Text strong>{group.range} years</Text>
-                    </Space>
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        type="card"
+        items={[
+          {
+            key: 'dashboard',
+            label: <span><BarChartOutlined /> Dashboard</span>,
+            children: (
+              <>
+                {/* Overview Stats - moved inside tab */}
+                <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
+                  <Col xs={24} sm={12} lg={6}>
+                    <StatCard
+                      title="Total Revenue"
+                      value={analytics.overview.totalRevenue.toLocaleString()}
+                      change={analytics.overview.revenueGrowth}
+                      icon={DollarOutlined}
+                      color="#52c41a"
+                      prefix="AED "
+                    />
                   </Col>
-                  <Col>
-                    <Space>
-                      <Progress
-                        percent={group.percentage}
-                        size="small"
-                        style={{ width: '100px' }}
-                        showInfo={false}
-                      />
-                      <Text strong style={{ width: '40px', textAlign: 'right' }}>
-                        {group.percentage}%
-                      </Text>
-                    </Space>
+                  <Col xs={24} sm={12} lg={6}>
+                    <StatCard
+                      title="Total Bookings"
+                      value={analytics.overview.totalBookings}
+                      change={analytics.overview.bookingsGrowth}
+                      icon={CalendarOutlined}
+                      color="#722ed1"
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <StatCard
+                      title="Profile Views"
+                      value={analytics.overview.totalViews.toLocaleString()}
+                      change={analytics.overview.viewsGrowth}
+                      icon={EyeOutlined}
+                      color="#1890ff"
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <StatCard
+                      title="Average Rating"
+                      value={analytics.overview.avgRating}
+                      change={analytics.overview.ratingChange > 0 ? analytics.overview.ratingChange * 10 : undefined}
+                      icon={StarFilled}
+                      color="#faad14"
+                    />
                   </Col>
                 </Row>
-              ))}
-            </div>
-          </Card>
-        </Col>
 
-        <Col xs={24} lg={12}>
-          <Card>
-            <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
-              <Col>
-                <Title level={4} style={{ margin: 0 }}>Booking Types</Title>
-              </Col>
-              <Col>
-                <UserOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
-              </Col>
-            </Row>
+                {/* Revenue Chart - moved inside tab */}
+                <Row gutter={[32, 32]} style={{ marginBottom: '32px' }}>
+                  <Col xs={24} lg={12}>
+                    <Card>
+                      <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                        <Col>
+                          <Title level={4} style={{ margin: 0 }}>Revenue Trend</Title>
+                        </Col>
+                        <Col>
+                          <BarChartOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
+                        </Col>
+                      </Row>
 
-            <Row gutter={[16, 16]} justify="space-around">
-              {analytics.customerDemographics.bookingTypes.map((type) => (
-                <Col key={type.type} span={8} style={{ textAlign: 'center' }}>
-                  <Avatar
-                    size={64}
-                    style={{
-                      backgroundColor: '#1890ff',
-                      marginBottom: '12px',
-                      fontSize: '18px',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    {type.percentage}%
-                  </Avatar>
-                  <div>
-                    <Text strong style={{ display: 'block' }}>{type.type}</Text>
-                    <Text type="secondary" style={{ fontSize: '12px' }}>
-                      {type.count} bookings
-                    </Text>
-                  </div>
-                </Col>
-              ))}
-            </Row>
-          </Card>
-        </Col>
-      </Row>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {analytics.revenueData.slice(-6).map((data, index) => (
+                          <div key={index} style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '12px',
+                            borderBottom: index < 5 ? '1px solid #f0f0f0' : 'none'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                              <div style={{
+                                width: '12px',
+                                height: '12px',
+                                backgroundColor: '#1890ff',
+                                borderRadius: '50%'
+                              }} />
+                              <div>
+                                <Text strong style={{ display: 'block' }}>{data.month}</Text>
+                                <Text type="secondary" style={{ fontSize: '13px' }}>{data.bookings} bookings</Text>
+                              </div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <Text strong style={{ fontSize: '16px' }}>
+                                AED {data.revenue.toLocaleString()}
+                              </Text>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                  </Col>
 
-      {/* Peak Times */}
-      <Card style={{ marginBottom: '32px' }}>
-        <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
-          <Col>
-            <Title level={4} style={{ margin: 0 }}>Peak Booking Times</Title>
-          </Col>
-          <Col>
-            <BarChartOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
-          </Col>
-        </Row>
+                  {/* Top Events */}
+                  <Col xs={24} lg={12}>
+                    <Card>
+                      <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                        <Col>
+                          <Title level={4} style={{ margin: 0 }}>Top Performing Events</Title>
+                        </Col>
+                        <Col>
+                          <ArrowUpOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
+                        </Col>
+                      </Row>
 
-        <Row gutter={[16, 16]}>
-          {analytics.peakTimes.map((time) => (
-            <Col key={time.time} xs={12} sm={8} md={6} lg={4}>
-              <Card size="small" style={{ textAlign: 'center', backgroundColor: '#fafafa' }}>
-                <Text strong style={{ display: 'block', marginBottom: '4px' }}>
-                  {time.time}
-                </Text>
-                <Text style={{
-                  fontSize: '24px',
-                  fontWeight: 'bold',
-                  color: '#1890ff',
-                  display: 'block',
-                  marginBottom: '4px'
-                }}>
-                  {time.bookings}
-                </Text>
-                <Text type="secondary" style={{ fontSize: '12px' }}>
-                  bookings
-                </Text>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </Card>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {analytics.topEvents.slice(0, 5).map((event, index) => (
+                          <div key={index} style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '16px',
+                            backgroundColor: '#fafafa',
+                            borderRadius: '8px'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <Avatar
+                                style={{ backgroundColor: '#1890ff' }}
+                                size="small"
+                              >
+                                {index + 1}
+                              </Avatar>
+                              <div>
+                                <Text strong style={{ display: 'block' }}>{event.name}</Text>
+                                <Space>
+                                  <Text type="secondary" style={{ fontSize: '12px' }}>{event.bookings} bookings</Text>
+                                  <Text type="secondary" style={{ fontSize: '12px' }}>•</Text>
+                                  <Text type="secondary" style={{ fontSize: '12px' }}>{event.views} views</Text>
+                                </Space>
+                              </div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <Text strong style={{ color: '#1890ff', fontSize: '16px', display: 'block' }}>
+                                AED {event.revenue.toLocaleString()}
+                              </Text>
+                              <div>
+                                <Space>
+                                  <StarFilled style={{ color: '#faad14', fontSize: '12px' }} />
+                                  <Text type="secondary" style={{ fontSize: '12px' }}>{event.rating}</Text>
+                                </Space>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                  </Col>
+                </Row>
 
-      {/* Insights */}
-      <Card>
-        <Title level={4} style={{ marginBottom: '24px' }}>Key Insights</Title>
+                {/* Customer Demographics */}
+                <Row gutter={[32, 32]} style={{ marginBottom: '32px' }}>
+                  <Col xs={24} lg={12}>
+                    <Card>
+                      <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                        <Col>
+                          <Title level={4} style={{ margin: 0 }}>Customer Age Groups</Title>
+                        </Col>
+                        <Col>
+                          <PieChartOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
+                        </Col>
+                      </Row>
 
-        <Row gutter={[24, 24]}>
-          <Col xs={24} md={8}>
-            <Card
-              size="small"
-              style={{
-                backgroundColor: '#f6ffed',
-                border: '1px solid #b7eb8f'
-              }}
-            >
-              <Space style={{ marginBottom: '12px' }}>
-                <ArrowUpOutlined style={{ color: '#52c41a', fontSize: '16px' }} />
-                <Text strong style={{ color: '#389e0d' }}>Revenue Growth</Text>
-              </Space>
-              <Text style={{ color: '#52c41a', fontSize: '14px' }}>
-                Your revenue increased by 12.5% compared to last period. Weekend brunches are your top performer.
-              </Text>
-            </Card>
-          </Col>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {analytics.customerDemographics.ageGroups.map((group) => (
+                          <Row key={group.range} justify="space-between" align="middle">
+                            <Col>
+                              <Space>
+                                <div style={{
+                                  width: '12px',
+                                  height: '12px',
+                                  backgroundColor: '#1890ff',
+                                  borderRadius: '50%'
+                                }} />
+                                <Text strong>{group.range} years</Text>
+                              </Space>
+                            </Col>
+                            <Col>
+                              <Space>
+                                <Progress
+                                  percent={group.percentage}
+                                  size="small"
+                                  style={{ width: '100px' }}
+                                  showInfo={false}
+                                />
+                                <Text strong style={{ width: '40px', textAlign: 'right' }}>
+                                  {group.percentage}%
+                                </Text>
+                              </Space>
+                            </Col>
+                          </Row>
+                        ))}
+                      </div>
+                    </Card>
+                  </Col>
 
-          <Col xs={24} md={8}>
-            <Card
-              size="small"
-              style={{
-                backgroundColor: '#f0f5ff',
-                border: '1px solid #91d5ff'
-              }}
-            >
-              <Space style={{ marginBottom: '12px' }}>
-                <UserOutlined style={{ color: '#1890ff', fontSize: '16px' }} />
-                <Text strong style={{ color: '#096dd9' }}>Customer Preference</Text>
-              </Space>
-              <Text style={{ color: '#1890ff', fontSize: '14px' }}>
-                Couple bookings make up 45% of your reservations. Consider creating more romantic packages.
-              </Text>
-            </Card>
-          </Col>
+                  <Col xs={24} lg={12}>
+                    <Card>
+                      <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                        <Col>
+                          <Title level={4} style={{ margin: 0 }}>Booking Types</Title>
+                        </Col>
+                        <Col>
+                          <UserOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
+                        </Col>
+                      </Row>
 
-          <Col xs={24} md={8}>
-            <Card
-              size="small"
-              style={{
-                backgroundColor: '#fffbe6',
-                border: '1px solid #ffe58f'
-              }}
-            >
-              <Space style={{ marginBottom: '12px' }}>
-                <StarFilled style={{ color: '#faad14', fontSize: '16px' }} />
-                <Text strong style={{ color: '#d48806' }}>Rating Improvement</Text>
-              </Space>
-              <Text style={{ color: '#faad14', fontSize: '14px' }}>
-                Your average rating improved to 4.6. Keep focusing on service quality to reach 4.8+.
-              </Text>
-            </Card>
-          </Col>
-        </Row>
-      </Card>
+                      <Row gutter={[16, 16]} justify="space-around">
+                        {analytics.customerDemographics.bookingTypes.map((type) => (
+                          <Col key={type.type} span={8} style={{ textAlign: 'center' }}>
+                            <Avatar
+                              size={64}
+                              style={{
+                                backgroundColor: '#1890ff',
+                                marginBottom: '12px',
+                                fontSize: '18px',
+                                fontWeight: 'bold'
+                              }}
+                            >
+                              {type.percentage}%
+                            </Avatar>
+                            <div>
+                              <Text strong style={{ display: 'block' }}>{type.type}</Text>
+                              <Text type="secondary" style={{ fontSize: '12px' }}>
+                                {type.count} bookings
+                              </Text>
+                            </div>
+                          </Col>
+                        ))}
+                      </Row>
+                    </Card>
+                  </Col>
+                </Row>
+
+                {/* Peak Times */}
+                <Card style={{ marginBottom: '32px' }}>
+                  <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                    <Col>
+                      <Title level={4} style={{ margin: 0 }}>Peak Booking Times</Title>
+                    </Col>
+                    <Col>
+                      <BarChartOutlined style={{ fontSize: '20px', color: '#8c8c8c' }} />
+                    </Col>
+                  </Row>
+
+                  <Row gutter={[16, 16]}>
+                    {analytics.peakTimes.map((time) => (
+                      <Col key={time.time} xs={12} sm={8} md={6} lg={4}>
+                        <Card size="small" style={{ textAlign: 'center', backgroundColor: '#fafafa' }}>
+                          <Text strong style={{ display: 'block', marginBottom: '4px' }}>
+                            {time.time}
+                          </Text>
+                          <Text style={{
+                            fontSize: '24px',
+                            fontWeight: 'bold',
+                            color: '#1890ff',
+                            display: 'block',
+                            marginBottom: '4px'
+                          }}>
+                            {time.bookings}
+                          </Text>
+                          <Text type="secondary" style={{ fontSize: '12px' }}>
+                            bookings
+                          </Text>
+                        </Card>
+                      </Col>
+                    ))}
+                  </Row>
+                </Card>
+
+                {/* Insights */}
+                <Card>
+                  <Title level={4} style={{ marginBottom: '24px' }}>Key Insights</Title>
+
+                  <Row gutter={[24, 24]}>
+                    <Col xs={24} md={8}>
+                      <Card
+                        size="small"
+                        style={{
+                          backgroundColor: '#f6ffed',
+                          border: '1px solid #b7eb8f'
+                        }}
+                      >
+                        <Space style={{ marginBottom: '12px' }}>
+                          <ArrowUpOutlined style={{ color: '#52c41a', fontSize: '16px' }} />
+                          <Text strong style={{ color: '#389e0d' }}>Revenue Growth</Text>
+                        </Space>
+                        <Text style={{ color: '#52c41a', fontSize: '14px' }}>
+                          Your revenue increased by 12.5% compared to last period. Weekend brunches are your top performer.
+                        </Text>
+                      </Card>
+                    </Col>
+
+                    <Col xs={24} md={8}>
+                      <Card
+                        size="small"
+                        style={{
+                          backgroundColor: '#f0f5ff',
+                          border: '1px solid #91d5ff'
+                        }}
+                      >
+                        <Space style={{ marginBottom: '12px' }}>
+                          <UserOutlined style={{ color: '#1890ff', fontSize: '16px' }} />
+                          <Text strong style={{ color: '#096dd9' }}>Customer Preference</Text>
+                        </Space>
+                        <Text style={{ color: '#1890ff', fontSize: '14px' }}>
+                          Couple bookings make up 45% of your reservations. Consider creating more romantic packages.
+                        </Text>
+                      </Card>
+                    </Col>
+
+                    <Col xs={24} md={8}>
+                      <Card
+                        size="small"
+                        style={{
+                          backgroundColor: '#fffbe6',
+                          border: '1px solid #ffe58f'
+                        }}
+                      >
+                        <Space style={{ marginBottom: '12px' }}>
+                          <StarFilled style={{ color: '#faad14', fontSize: '16px' }} />
+                          <Text strong style={{ color: '#d48806' }}>Rating Improvement</Text>
+                        </Space>
+                        <Text style={{ color: '#faad14', fontSize: '14px' }}>
+                          Your average rating improved to 4.6. Keep focusing on service quality to reach 4.8+.
+                        </Text>
+                      </Card>
+                    </Col>
+                  </Row>
+                </Card>
+              </>
+            )
+          },
+          {
+            key: 'reports',
+            label: <span><FileTextOutlined /> Reports</span>,
+            children: <ReportsTab />
+          }
+        ]}
+      />
     </div>
   )
 }

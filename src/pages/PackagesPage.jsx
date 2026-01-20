@@ -91,21 +91,21 @@ const PackagesPage = () => {
   return (
     <div className="min-h-screen bg-neutral-50">
       {/* Header */}
-      <div className="bg-white shadow-soft border-b border-neutral-100">
+      <div className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto container-padding py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
-              <div className="flex items-center space-x-2 text-sm text-neutral-600 mb-4">
-                <Link to="/" className="hover:text-primary-600">Home</Link>
+              <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+                <Link to="/" className="hover:text-brand-purple">Home</Link>
                 <span>•</span>
-                <Link to="/events" className="hover:text-primary-600">Events</Link>
+                <Link to="/events" className="hover:text-brand-purple">Events</Link>
                 <span>•</span>
-                <Link to={`/events/${event.id}`} className="hover:text-primary-600">{event.title}</Link>
+                <Link to={`/events/${event.id}`} className="hover:text-brand-purple">{event.title}</Link>
                 <span>•</span>
                 <span>Packages</span>
               </div>
-              <h1 className="text-4xl font-bold text-neutral-800 mb-4">{event.title}</h1>
-              <div className="flex items-center space-x-6 text-neutral-600 mb-4">
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">{event.title}</h1>
+              <div className="flex items-center space-x-6 text-gray-600 mb-4">
                 <div className="flex items-center space-x-1">
                   <Calendar className="w-5 h-5" />
                   <span>{event.date}</span>
@@ -119,9 +119,9 @@ const PackagesPage = () => {
                   <span>{event.rating} ({event.reviews} reviews)</span>
                 </div>
               </div>
-              <p className="text-lg text-neutral-600">{event.venue} • {event.location}</p>
+              <p className="text-lg text-gray-600">{event.venue} • {event.location}</p>
             </div>
-            <div className="relative rounded-2xl overflow-hidden">
+            <div className="relative rounded-xl overflow-hidden shadow-md">
               <img src={event.image} alt={event.title} className="w-full h-80 object-cover" />
             </div>
           </div>
@@ -133,16 +133,15 @@ const PackagesPage = () => {
           {/* Packages */}
           <div className="lg:col-span-2">
             <h2 className="text-3xl font-bold text-neutral-800 mb-8">Choose Your Package</h2>
-            
+
             <div className="space-y-6">
               {event.packages.map((pkg) => (
-                <div 
+                <div
                   key={pkg.id}
-                  className={`bg-white rounded-2xl p-8 border-2 transition-all duration-300 cursor-pointer ${
-                    selectedPackage?.id === pkg.id
-                      ? 'border-primary-300 shadow-soft-lg'
-                      : 'border-neutral-100 hover:border-primary-200 shadow-soft'
-                  } ${pkg.popular ? 'relative' : ''}`}
+                  className={`bg-white rounded-xl p-8 border transition-all duration-300 cursor-pointer ${selectedPackage?.id === pkg.id
+                      ? 'border-brand-purple shadow-lg ring-1 ring-brand-purple'
+                      : 'border-gray-100 hover:border-gray-200 hover:shadow-xl shadow-md'
+                    } ${pkg.popular ? 'relative' : ''}`}
                   onClick={() => setSelectedPackage(pkg)}
                 >
                   {pkg.popular && (
@@ -152,14 +151,14 @@ const PackagesPage = () => {
                       </span>
                     </div>
                   )}
-                  
+
                   <div className="flex justify-between items-start mb-6">
                     <div>
-                      <h3 className="text-2xl font-bold text-neutral-800 mb-2">{pkg.name}</h3>
-                      <p className="text-neutral-600 mb-4">{pkg.description}</p>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-2">{pkg.name}</h3>
+                      <p className="text-gray-600 mb-4">{pkg.description}</p>
                       <div className="flex items-center space-x-2">
-                        <Users className="w-5 h-5 text-neutral-500" />
-                        <span className="text-neutral-600">Up to {pkg.maxGuests} guests</span>
+                        <Users className="w-5 h-5 text-gray-400" />
+                        <span className="text-gray-500">Up to {pkg.maxGuests} guests</span>
                       </div>
                     </div>
                     <div className="text-right">
@@ -169,7 +168,7 @@ const PackagesPage = () => {
                           <span className="text-lg text-neutral-500 line-through">AED {pkg.originalPrice}</span>
                         )}
                       </div>
-                      <p className="text-sm text-neutral-500">per person</p>
+                      <p className="text-sm text-gray-500">per person</p>
                       {pkg.originalPrice > pkg.price && (
                         <div className="inline-flex items-center space-x-1 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium mt-2">
                           <Gift className="w-3 h-3" />
@@ -178,14 +177,14 @@ const PackagesPage = () => {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {pkg.features.map((feature, index) => (
                       <div key={index} className="flex items-center space-x-3">
                         <div className="w-5 h-5 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
                           <Check className="w-3 h-3 text-primary-600" />
                         </div>
-                        <span className="text-neutral-700">{feature}</span>
+                        <span className="text-gray-700">{feature}</span>
                       </div>
                     ))}
                   </div>
@@ -196,9 +195,9 @@ const PackagesPage = () => {
 
           {/* Booking Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl p-6 shadow-soft border border-neutral-100 sticky top-8">
-              <h3 className="text-xl font-bold text-neutral-800 mb-6">Booking Summary</h3>
-              
+            <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 sticky top-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Booking Summary</h3>
+
               {selectedPackage && (
                 <>
                   <div className="space-y-4 mb-6">
@@ -215,13 +214,13 @@ const PackagesPage = () => {
                       <span className="font-medium">{event.time}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-neutral-600">Venue</span>
-                      <span className="font-medium">{event.venue}</span>
+                      <span className="text-gray-600">Venue</span>
+                      <span className="font-medium text-gray-900">{event.venue}</span>
                     </div>
                   </div>
-                  
-                  <hr className="border-neutral-200 mb-6" />
-                  
+
+                  <hr className="border-gray-200 mb-6" />
+
                   <div className="space-y-4 mb-6">
                     <div className="flex justify-between">
                       <span className="text-neutral-600">Price per person</span>
@@ -234,22 +233,22 @@ const PackagesPage = () => {
                       </div>
                     )}
                   </div>
-                  
-                  <hr className="border-neutral-200 mb-6" />
-                  
+
+                  <hr className="border-gray-200 mb-6" />
+
                   <div className="flex justify-between items-center mb-6">
-                    <span className="text-lg font-bold text-neutral-800">Total</span>
+                    <span className="text-lg font-bold text-gray-900">Total</span>
                     <span className="text-2xl font-bold text-primary-600">AED {selectedPackage.price}</span>
                   </div>
-                  
-                  <Link 
+
+                  <Link
                     to={`/booking/${event.id}?package=${selectedPackage.id}`}
                     className="w-full btn-primary flex items-center justify-center space-x-2 mb-4"
                   >
                     <span>Continue to Booking</span>
                     <ArrowRight className="w-5 h-5" />
                   </Link>
-                  
+
                   <p className="text-xs text-neutral-500 text-center">
                     Free cancellation up to 24 hours before the event
                   </p>

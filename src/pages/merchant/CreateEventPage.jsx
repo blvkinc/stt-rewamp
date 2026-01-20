@@ -27,7 +27,8 @@ import {
   DollarOutlined,
   PlusOutlined,
   DeleteOutlined,
-  InboxOutlined
+  InboxOutlined,
+  QuestionCircleOutlined
 } from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 
@@ -38,7 +39,7 @@ const { Option } = Select
 const { Dragger } = Upload
 
 const CreateEventPage = () => {
-  const { merchant, addEvent, updateEvent, events, isMerchantAuthenticated, loading: authLoading } = useMerchant()
+  const { merchant, addEvent, updateEvent, events, faqs, isMerchantAuthenticated, loading: authLoading } = useMerchant()
   const { id } = useParams()
   const isEditMode = !!id
   const [loading, setLoading] = useState(false)
@@ -69,6 +70,7 @@ const CreateEventPage = () => {
     tags: [],
     specialRequirements: '',
     cancellationPolicy: '',
+    selectedFaqs: [],
     isDraft: true
   })
 
@@ -588,6 +590,50 @@ const CreateEventPage = () => {
               </Card>
             ))}
           </Space>
+        </Card>
+
+        {/* FAQs */}
+        <Card>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <Title level={4} style={{ margin: 0 }}>Frequently Asked Questions</Title>
+            <Link to="/merchant/faqs/create" target="_blank">
+              <Button type="link" icon={<PlusOutlined />}>Create New FAQ</Button>
+            </Link>
+          </div>
+
+          <Form.Item
+            label="Select FAQ Sections or Templates"
+            help="Choose FAQ sections or individual questions to display on the event page"
+          >
+            <Select
+              mode="multiple"
+              size="large"
+              placeholder="Select FAQs..."
+              value={eventData.selectedFaqs}
+              onChange={(values) => setEventData({ ...eventData, selectedFaqs: values })}
+              style={{ width: '100%' }}
+              optionFilterProp="children"
+            >
+              <Select.OptGroup label="FAQ Sections">
+                {faqs.filter(f => f.type === 'section').map(section => (
+                  <Option key={section.id} value={section.id}>
+                    <Space>
+                      <InboxOutlined /> {section.title}
+                    </Space>
+                  </Option>
+                ))}
+              </Select.OptGroup>
+              <Select.OptGroup label="Individual Questions">
+                {faqs.filter(f => f.type === 'template').map(faq => (
+                  <Option key={faq.id} value={faq.id}>
+                    <Space>
+                      <QuestionCircleOutlined /> {faq.question}
+                    </Space>
+                  </Option>
+                ))}
+              </Select.OptGroup>
+            </Select>
+          </Form.Item>
         </Card>
 
         {/* Additional Information */}

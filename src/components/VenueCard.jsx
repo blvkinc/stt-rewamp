@@ -19,11 +19,11 @@ const VenueCard = ({ venue, viewMode = 'grid' }) => {
     return (
       <Link to={`/venues/${safeVenue.id}`} className="group block">
         <motion.div
-          className="rounded-3xl border border-gray-100 bg-white shadow-md hover:shadow-xl transition-all duration-300"
+          className="rounded-xl border border-gray-100 bg-white shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
           whileHover={{ y: -4 }}
         >
-          <div className="flex flex-col md:flex-row p-1 overflow-hidden">
-            <div className="md:w-64 relative aspect-[4/3] md:aspect-auto rounded-2xl overflow-hidden shrink-0">
+          <div className="flex flex-col md:flex-row overflow-hidden">
+            <div className="md:w-64 relative aspect-[4/3] md:aspect-auto shrink-0 shadow-md z-10">
               <img
                 src={safeVenue.image}
                 alt={safeVenue.name}
@@ -72,6 +72,7 @@ const VenueCard = ({ venue, viewMode = 'grid' }) => {
               </div>
             </div>
           </div>
+          <div className="h-1 w-full gradient-brand" />
         </motion.div>
       </Link>
     )
@@ -81,10 +82,10 @@ const VenueCard = ({ venue, viewMode = 'grid' }) => {
   return (
     <Link to={`/venues/${safeVenue.id}`} className="group block h-full">
       <motion.div
-        className="rounded-3xl h-full border border-gray-100 bg-white shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
+        className="rounded-xl h-full border border-gray-100 bg-white shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
         whileHover={{ y: -4 }}
       >
-        <div className="relative aspect-[4/3] overflow-hidden">
+        <div className="relative aspect-[4/3] shadow-md z-10">
           <img
             src={safeVenue.image}
             alt={safeVenue.name}
@@ -129,6 +130,7 @@ const VenueCard = ({ venue, viewMode = 'grid' }) => {
             )}
           </div>
         </div>
+        <div className="h-1 w-full gradient-brand" />
       </motion.div>
     </Link>
   )

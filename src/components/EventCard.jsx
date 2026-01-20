@@ -9,11 +9,11 @@ const EventCard = ({ event, viewMode = 'grid' }) => {
     return (
       <Link to={`/events/${event.id}`} className="group block">
         <motion.div
-          className="rounded-3xl bg-white border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300"
+          className="rounded-xl bg-white border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
           whileHover={{ y: -4 }}
         >
-          <div className="flex flex-col md:flex-row p-1">
-            <div className="md:w-64 relative aspect-[4/3] md:aspect-auto rounded-2xl overflow-hidden shrink-0">
+          <div className="flex flex-col md:flex-row">
+            <div className="md:w-64 relative aspect-[4/3] md:aspect-auto shrink-0 shadow-md z-10">
               <img
                 src={event.image}
                 alt={event.title}
@@ -72,11 +72,11 @@ const EventCard = ({ event, viewMode = 'grid' }) => {
   return (
     <Link to={`/events/${event.id}`} className="group block h-full">
       <motion.div
-        className="rounded-3xl h-full bg-white border border-gray-100 shadow-md"
+        className="rounded-xl h-full bg-white border border-gray-100 shadow-md overflow-hidden"
         whileHover={{ y: -4 }}
         transition={{ duration: 0.2 }}
       >
-        <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-3">
+        <div className="relative aspect-[4/3] mb-3 shadow-md z-10 rounded-b-xl overflow-hidden">
           <img
             alt={event.title}
             src={event.image}

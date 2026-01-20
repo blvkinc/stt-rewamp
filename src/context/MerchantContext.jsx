@@ -16,6 +16,7 @@ export const MerchantProvider = ({ children }) => {
   const [venues, setVenues] = useState([])
   const [events, setEvents] = useState([])
   const [bookings, setBookings] = useState([])
+  const [faqs, setFaqs] = useState([])
 
   // Check for existing merchant on app load
   useEffect(() => {
@@ -56,6 +57,12 @@ export const MerchantProvider = ({ children }) => {
     const savedBookings = localStorage.getItem('stt_merchant_bookings')
     if (savedBookings) {
       setBookings(JSON.parse(savedBookings))
+    }
+
+    // Load FAQs
+    const savedFaqs = localStorage.getItem('stt_merchant_faqs')
+    if (savedFaqs) {
+      setFaqs(JSON.parse(savedFaqs))
     }
   }
 
@@ -287,6 +294,33 @@ export const MerchantProvider = ({ children }) => {
     }
   }
 
+  const addFaq = (faqData) => {
+    const newFaq = {
+      id: Date.now(),
+      ...faqData,
+      merchantId: merchant.id,
+      createdAt: new Date().toISOString()
+    }
+    const updatedFaqs = [...faqs, newFaq]
+    setFaqs(updatedFaqs)
+    localStorage.setItem('stt_merchant_faqs', JSON.stringify(updatedFaqs))
+    return newFaq
+  }
+
+  const updateFaq = (faqId, updates) => {
+    const updatedFaqs = faqs.map(faq =>
+      faq.id === faqId ? { ...faq, ...updates } : faq
+    )
+    setFaqs(updatedFaqs)
+    localStorage.setItem('stt_merchant_faqs', JSON.stringify(updatedFaqs))
+  }
+
+  const deleteFaq = (faqId) => {
+    const updatedFaqs = faqs.filter(faq => faq.id !== faqId)
+    setFaqs(updatedFaqs)
+    localStorage.setItem('stt_merchant_faqs', JSON.stringify(updatedFaqs))
+  }
+
   const value = {
     merchant,
     venues,
@@ -305,6 +339,10 @@ export const MerchantProvider = ({ children }) => {
     addPackage,
     updatePackage,
     clonePackage,
+    faqs,
+    addFaq,
+    updateFaq,
+    deleteFaq,
     isMerchantAuthenticated: !!merchant
   }
 
