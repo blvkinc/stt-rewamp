@@ -6,16 +6,17 @@ import {
   X,
   Save,
   Eye,
-  Upload,
   DollarSign,
   Users,
   Clock,
   Calendar,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Settings,
+  Tag,
+  Gift
 } from 'lucide-react'
 import { useMerchant } from '../../context/MerchantContext'
-import MerchantLayout from '../../components/merchant/MerchantLayout'
 
 const CreatePackagePage = () => {
   const { merchant, isMerchantAuthenticated, events, addPackage, updatePackage } = useMerchant()
@@ -23,36 +24,42 @@ const CreatePackagePage = () => {
   const { id } = useParams()
   const isEditMode = !!id
 
-  // Redirect to auth if not logged in
-  if (!isMerchantAuthenticated) {
-    return <Navigate to="/merchant/auth" replace />
-  }
+  const [activeTab, setActiveTab] = useState('basics') // basics, rules, availability, combos, discounts
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     eventId: '',
-    price: '',
-    originalPrice: '',
     maxGuests: 2,
     minGuests: 1,
-    status: 'draft',
+    status: 'Draft',
     features: [],
     inclusions: [],
     exclusions: [],
-    images: [],
-    validFrom: '',
-    validUntil: '',
-    availableDays: {
-      monday: true,
-      tuesday: true,
-      wednesday: true,
-      thursday: true,
-      friday: true,
-      saturday: true,
-      sunday: true
+    // newly added fields below matching context shape
+    pricingRules: {
+      type: 'individual',
+      basePrice: '',
+      genderPricing: { enabled: false, ladies: '', gents: '', kids: '' },
+      timePricing: { enabled: false, type: 'early_bird', discountLimit: '', rules: [] },
+      fixedPricing: { enabled: false, amount: '' }
     },
-    timeSlots: [],
+    availability: {
+      type: 'day', // 'day' or 'time'
+      slots: [], 
+      validFrom: '',
+      validUntil: '',
+      inventory: ''
+    },
+    combinations: {
+      enabled: false,
+      linkedPackages: []
+    },
+    discounts: {
+      multiBooking: { enabled: false, count: '', price: '' },
+      gender: { enabled: false, type: 'percentage', value: '' },
+      age: { enabled: false, condition: 'below', age: 12, price: '' }
+    },
     cancellationPolicy: '',
     termsAndConditions: ''
   })
@@ -79,9 +86,11 @@ const CreatePackagePage = () => {
           features: foundPackage.features || [],
           inclusions: foundPackage.inclusions || [],
           exclusions: foundPackage.exclusions || [],
-          images: foundPackage.images || [],
-          availableDays: foundPackage.availableDays || prev.availableDays,
-          eventId: foundEventId
+          eventId: foundEventId,
+          pricingRules: foundPackage.pricingRules || prev.pricingRules,
+          availability: foundPackage.availability || prev.availability,
+          combinations: foundPackage.combinations || prev.combinations,
+          discounts: foundPackage.discounts || prev.discounts
         }))
       }
     }
@@ -92,6 +101,11 @@ const CreatePackagePage = () => {
   const [newExclusion, setNewExclusion] = useState('')
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
+
+  // Redirect to auth if not logged in
+  if (!isMerchantAuthenticated) {
+    return <Navigate to="/merchant/auth" replace />
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -105,12 +119,25 @@ const CreatePackagePage = () => {
     }
   }
 
-  const handleDayToggle = (day) => {
+  const handleNestedInputChange = (section, field, value) => {
     setFormData(prev => ({
       ...prev,
-      availableDays: {
-        ...prev.availableDays,
-        [day]: !prev.availableDays[day]
+      [section]: {
+        ...prev[section],
+        [field]: value
+      }
+    }))
+  }
+
+  const handleDeepNestedChange = (section, subsection, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [subsection]: {
+          ...prev[section][subsection],
+          [field]: value
+        }
       }
     }))
   }
@@ -172,9 +199,8 @@ const CreatePackagePage = () => {
     if (!formData.name.trim()) newErrors.name = 'Package name is required'
     if (!formData.description.trim()) newErrors.description = 'Description is required'
     if (!formData.eventId) newErrors.eventId = 'Please select an event'
-    if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required'
+    if (!formData.pricingRules.basePrice || formData.pricingRules.basePrice <= 0) newErrors.price = 'Valid base price is required'
     if (formData.maxGuests < formData.minGuests) newErrors.maxGuests = 'Max guests must be greater than min guests'
-    if (formData.features.length === 0) newErrors.features = 'Add at least one feature'
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -199,8 +225,10 @@ const CreatePackagePage = () => {
         addPackage(formData.eventId, packageData)
       }
 
-      // Navigate back to packages page
-      navigate('/merchant/packages')
+      // Briefly wait then navigate
+      setTimeout(() => {
+        navigate('/merchant/packages')
+      }, 500)
     } catch (error) {
       console.error('Error saving package:', error)
       setErrors({ submit: 'Failed to save package. Please try again.' })
@@ -267,13 +295,39 @@ const CreatePackagePage = () => {
         </div>
       )}
 
+      {/* Tabs */}
+      <div className="flex border-b border-neutral-200 mb-6 overflow-x-auto scroller">
+        {[
+          { id: 'basics', label: '1. Basics', icon: Settings },
+          { id: 'rules', label: '2. Rule Engine', icon: DollarSign },
+          { id: 'availability', label: '3. Availability', icon: Calendar },
+          { id: 'combos', label: '4. Combinations', icon: Plus },
+          { id: 'discounts', label: '5. Discounts', icon: Gift },
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${activeTab === tab.id
+                ? 'border-primary-600 text-primary-600'
+                : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
+              }`}
+          >
+            <tab.icon className="w-4 h-4" />
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Form */}
+        {/* Main Form Area */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Basic Information */}
-          <div className="card border border-neutral-100">
-            <div className="p-6">
-              <h2 className="text-xl font-bold text-neutral-800 mb-6">Basic Information</h2>
+          
+          {/* TAB: BASICS */}
+          {activeTab === 'basics' && (
+            <>
+              <div className="card border border-neutral-100">
+                <div className="p-6">
+                  <h2 className="text-xl font-bold text-neutral-800 mb-6">Basic Information</h2>
 
               <div className="space-y-4">
                 <div>
@@ -329,65 +383,150 @@ const CreatePackagePage = () => {
               </div>
             </div>
           </div>
+        </>
+      )}
 
-          {/* Pricing */}
+        {/* TAB: RULE ENGINE */}
+        {activeTab === 'rules' && (
           <div className="card border border-neutral-100">
             <div className="p-6">
-              <h2 className="text-xl font-bold text-neutral-800 mb-6">Pricing</h2>
+              <h2 className="text-xl font-bold text-neutral-800 mb-6">Package Pricing Rules</h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Price (AED) *
-                  </label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                    <input
-                      type="number"
-                      name="price"
-                      value={formData.price}
-                      onChange={handleInputChange}
-                      placeholder="299"
-                      min="0"
-                      step="0.01"
-                      className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-300 outline-none ${errors.price ? 'border-red-300' : 'border-neutral-200'
-                        }`}
-                    />
+              <div className="space-y-6">
+                {/* Base Pricing */}
+                <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200">
+                  <h3 className="text-lg font-bold text-neutral-800 mb-4">Base Plan</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">Package Type</label>
+                      <select
+                        value={formData.pricingRules.type}
+                        onChange={(e) => handleNestedInputChange('pricingRules', 'type', e.target.value)}
+                        className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 outline-none"
+                      >
+                        <option value="individual">Individual</option>
+                        <option value="couple">Couple</option>
+                        <option value="group">Group</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">Base Price (AED) *</label>
+                      <div className="relative">
+                        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
+                        <input
+                          type="number"
+                          value={formData.pricingRules.basePrice}
+                          onChange={(e) => handleNestedInputChange('pricingRules', 'basePrice', e.target.value)}
+                          placeholder="299"
+                          className="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 outline-none"
+                        />
+                      </div>
+                      {errors.price && <p className="text-red-600 text-sm mt-1">{errors.price}</p>}
+                    </div>
                   </div>
-                  {errors.price && <p className="text-red-600 text-sm mt-1">{errors.price}</p>}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Original Price (AED)
-                  </label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                    <input
-                      type="number"
-                      name="originalPrice"
-                      value={formData.originalPrice}
-                      onChange={handleInputChange}
-                      placeholder="349"
-                      min="0"
-                      step="0.01"
-                      className="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 outline-none"
-                    />
+                {/* Gender Pricing */}
+                <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-neutral-800">Gender Pricing overrides</h3>
+                    <label className="flex flex-col relative items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.pricingRules.genderPricing.enabled}
+                        onChange={(e) => handleDeepNestedChange('pricingRules', 'genderPricing', 'enabled', e.target.checked)}
+                        className="sr-only peer" 
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                    </label>
                   </div>
-                  <p className="text-xs text-neutral-500 mt-1">Optional: Show discount</p>
+                  
+                  {formData.pricingRules.genderPricing.enabled && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                      <div>
+                        <label className="block text-sm text-neutral-600 mb-1">Ladies Price</label>
+                        <input
+                          type="number"
+                          value={formData.pricingRules.genderPricing.ladies}
+                          onChange={(e) => handleDeepNestedChange('pricingRules', 'genderPricing', 'ladies', e.target.value)}
+                          placeholder="AED"
+                          className="w-full px-3 py-2 border rounded-lg"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-neutral-600 mb-1">Gents Price</label>
+                        <input
+                          type="number"
+                          value={formData.pricingRules.genderPricing.gents}
+                          onChange={(e) => handleDeepNestedChange('pricingRules', 'genderPricing', 'gents', e.target.value)}
+                          placeholder="AED"
+                          className="w-full px-3 py-2 border rounded-lg"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-neutral-600 mb-1">Kids Price</label>
+                        <input
+                          type="number"
+                          value={formData.pricingRules.genderPricing.kids}
+                          onChange={(e) => handleDeepNestedChange('pricingRules', 'genderPricing', 'kids', e.target.value)}
+                          placeholder="AED"
+                          className="w-full px-3 py-2 border rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Time Based Pricing */}
+                <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-bold text-neutral-800">Time-based Pricing</h3>
+                      <p className="text-sm text-neutral-500">Enable early bird or conditional pricing based on time.</p>
+                    </div>
+                    <label className="flex flex-col relative items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.pricingRules.timePricing.enabled}
+                        onChange={(e) => handleDeepNestedChange('pricingRules', 'timePricing', 'enabled', e.target.checked)}
+                        className="sr-only peer" 
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                    </label>
+                  </div>
+                  
+                  {formData.pricingRules.timePricing.enabled && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm text-neutral-600 mb-1">Rule Type</label>
+                          <select
+                            value={formData.pricingRules.timePricing.type}
+                            onChange={(e) => handleDeepNestedChange('pricingRules', 'timePricing', 'type', e.target.value)}
+                            className="w-full px-3 py-2 border rounded-lg"
+                          >
+                            <option value="early_bird">Early Bird</option>
+                            <option value="last_minute">Last Minute</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm text-neutral-600 mb-1">Max Limit (Tickets)</label>
+                          <input
+                            type="number"
+                            value={formData.pricingRules.timePricing.discountLimit}
+                            onChange={(e) => handleDeepNestedChange('pricingRules', 'timePricing', 'discountLimit', e.target.value)}
+                            placeholder="Optional capacity cap"
+                            className="w-full px-3 py-2 border rounded-lg"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {formData.price && formData.originalPrice && formData.originalPrice > formData.price && (
-                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
-                  <p className="text-green-800 font-medium">
-                    Discount: AED {(formData.originalPrice - formData.price).toFixed(2)}
-                    ({(((formData.originalPrice - formData.price) / formData.originalPrice) * 100).toFixed(0)}% off)
-                  </p>
-                </div>
-              )}
             </div>
           </div>
+        )}
 
           {/* Guest Capacity */}
           <div className="card border border-neutral-100">
@@ -564,69 +703,140 @@ const CreatePackagePage = () => {
             </div>
           </div>
 
-          {/* Availability */}
+        {/* TAB: AVAILABILITY */}
+        {activeTab === 'availability' && (
           <div className="card border border-neutral-100">
             <div className="p-6">
-              <h2 className="text-xl font-bold text-neutral-800 mb-6">Availability</h2>
+              <h2 className="text-xl font-bold text-neutral-800 mb-6">Package Availability</h2>
 
               <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Valid From
-                    </label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                      <input
-                        type="date"
-                        name="validFrom"
-                        value={formData.validFrom}
-                        onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Valid Until
-                    </label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                      <input
-                        type="date"
-                        name="validUntil"
-                        value={formData.validUntil}
-                        onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 outline-none"
-                      />
-                    </div>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">Rule Type</label>
+                  <select
+                    value={formData.availability.type}
+                    onChange={(e) => handleNestedInputChange('availability', 'type', e.target.value)}
+                    className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 outline-none"
+                  >
+                    <option value="day">Day Based (e.g. Every Monday)</option>
+                    <option value="time">Date Time Based (e.g. Nov 1st to Dec 1st)</option>
+                  </select>
                 </div>
+
+                {formData.availability.type === 'time' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">Valid From</label>
+                      <input
+                        type="date"
+                        value={formData.availability.validFrom}
+                        onChange={(e) => handleNestedInputChange('availability', 'validFrom', e.target.value)}
+                        className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">Valid Until</label>
+                      <input
+                        type="date"
+                        value={formData.availability.validUntil}
+                        onChange={(e) => handleNestedInputChange('availability', 'validUntil', e.target.value)}
+                        className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-300 outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-3">
-                    Available Days
-                  </label>
-                  <div className="grid grid-cols-7 gap-2">
-                    {Object.keys(formData.availableDays).map(day => (
-                      <button
-                        key={day}
-                        type="button"
-                        onClick={() => handleDayToggle(day)}
-                        className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${formData.availableDays[day]
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                          }`}
-                      >
-                        {day.slice(0, 3)}
-                      </button>
-                    ))}
-                  </div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">Inventory/Slots limit</label>
+                  <input
+                    type="number"
+                    value={formData.availability.inventory}
+                    onChange={(e) => handleNestedInputChange('availability', 'inventory', e.target.value)}
+                    placeholder="E.g. 50 packages available"
+                    className="w-full px-4 py-3 border border-neutral-200 rounded-xl"
+                  />
+                  <p className="text-xs text-neutral-500 mt-1">Leave blank for unlimited quantity within guest capacity</p>
                 </div>
+
               </div>
             </div>
           </div>
+        )}
+
+        {/* TAB: COMBOS */}
+        {activeTab === 'combos' && (
+          <div className="card border border-neutral-100">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-neutral-800">Package Combinations</h2>
+                  <p className="text-sm text-neutral-500">Allow customers to combine this package with others.</p>
+                </div>
+                <label className="flex flex-col relative items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={formData.combinations.enabled}
+                    onChange={(e) => handleNestedInputChange('combinations', 'enabled', e.target.checked)}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-primary-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                </label>
+              </div>
+
+              {formData.combinations.enabled ? (
+                <div className="text-center p-8 bg-neutral-50 rounded-xl border border-neutral-200 border-dashed">
+                  <Plus className="w-8 h-8 text-neutral-400 mx-auto mb-2" />
+                  <p className="text-neutral-600 mb-4">Select existing packages from this event to combine capabilities</p>
+                  <button className="btn-secondary">Add Combination Rule</button>
+                </div>
+              ) : (
+                <div className="p-4 bg-yellow-50 text-yellow-800 rounded-xl text-sm border border-yellow-200">
+                  Package combinations are disabled. This will be sold as an exclusive standalone package.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB: DISCOUNTS */}
+        {activeTab === 'discounts' && (
+          <div className="card border border-neutral-100">
+            <div className="p-6">
+              <h2 className="text-xl font-bold text-neutral-800 mb-6">Discounts & Offers</h2>
+              
+              <div className="space-y-6">
+                <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-bold text-neutral-800">Multi-booking Discount</h3>
+                    <input 
+                      type="checkbox" 
+                      onChange={(e) => handleDeepNestedChange('discounts', 'multiBooking', 'enabled', e.target.checked)}
+                      checked={formData.discounts.multiBooking.enabled}
+                    />
+                  </div>
+                  <p className="text-sm text-neutral-500 mb-4">Discount applies if customer books more than X packages</p>
+                  {formData.discounts.multiBooking.enabled && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <input 
+                        type="number" 
+                        placeholder="Booking count trigger (e.g. 5)"
+                        onChange={(e) => handleDeepNestedChange('discounts', 'multiBooking', 'count', e.target.value)}
+                        className="px-3 py-2 border rounded-lg"
+                      />
+                      <input 
+                        type="number" 
+                        placeholder="New Price per package"
+                        onChange={(e) => handleDeepNestedChange('discounts', 'multiBooking', 'price', e.target.value)}
+                        className="px-3 py-2 border rounded-lg"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Additional Discount Panels could go here */}
+              </div>
+            </div>
+          </div>
+        )}
 
           {/* Policies */}
           <div className="card border border-neutral-100">
@@ -683,15 +893,18 @@ const CreatePackagePage = () => {
                   </div>
                 )}
 
-                {formData.price && (
+                {formData.pricingRules.basePrice && (
                   <div>
-                    <p className="text-sm text-neutral-500 mb-1">Price</p>
+                    <p className="text-sm text-neutral-500 mb-1">Base Price</p>
                     <div className="flex items-center space-x-2">
-                      <p className="text-2xl font-bold text-primary-600">AED {formData.price}</p>
-                      {formData.originalPrice && formData.originalPrice > formData.price && (
-                        <p className="text-lg text-neutral-500 line-through">AED {formData.originalPrice}</p>
-                      )}
+                      <p className="text-2xl font-bold text-primary-600">AED {formData.pricingRules.basePrice}</p>
                     </div>
+                    {formData.pricingRules.genderPricing.enabled && (
+                      <div className="mt-2 text-xs text-neutral-500 space-y-1">
+                        {formData.pricingRules.genderPricing.ladies && <p>Ladies: AED {formData.pricingRules.genderPricing.ladies}</p>}
+                        {formData.pricingRules.genderPricing.gents && <p>Gents: AED {formData.pricingRules.genderPricing.gents}</p>}
+                      </div>
+                    )}
                   </div>
                 )}
 

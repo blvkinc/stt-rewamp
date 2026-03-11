@@ -17,6 +17,11 @@ export const MerchantProvider = ({ children }) => {
   const [events, setEvents] = useState([])
   const [bookings, setBookings] = useState([])
   const [faqs, setFaqs] = useState([])
+  const [promotions, setPromotions] = useState([])
+  const [customers, setCustomers] = useState([])
+  const [adsCampaigns, setAdsCampaigns] = useState([])
+  const [adsInternal, setAdsInternal] = useState([])
+  const [adsExternal, setAdsExternal] = useState([])
 
   // Check for existing merchant on app load
   useEffect(() => {
@@ -63,6 +68,32 @@ export const MerchantProvider = ({ children }) => {
     const savedFaqs = localStorage.getItem('stt_merchant_faqs')
     if (savedFaqs) {
       setFaqs(JSON.parse(savedFaqs))
+    }
+
+    // Load Promotions
+    const savedPromotions = localStorage.getItem('stt_merchant_promotions')
+    if (savedPromotions) {
+      setPromotions(JSON.parse(savedPromotions))
+    }
+
+    // Load Customers
+    const savedCustomers = localStorage.getItem('stt_merchant_customers')
+    if (savedCustomers) {
+      setCustomers(JSON.parse(savedCustomers))
+    }
+
+    // Load Ads State
+    const savedAdsCampaigns = localStorage.getItem('stt_merchant_ads_campaigns')
+    if (savedAdsCampaigns) {
+      setAdsCampaigns(JSON.parse(savedAdsCampaigns))
+    }
+    const savedAdsInternal = localStorage.getItem('stt_merchant_ads_internal')
+    if (savedAdsInternal) {
+      setAdsInternal(JSON.parse(savedAdsInternal))
+    }
+    const savedAdsExternal = localStorage.getItem('stt_merchant_ads_external')
+    if (savedAdsExternal) {
+      setAdsExternal(JSON.parse(savedAdsExternal))
     }
   }
 
@@ -137,6 +168,9 @@ export const MerchantProvider = ({ children }) => {
 
       setMerchant(merchantData)
       localStorage.setItem('stt_merchant', JSON.stringify(merchantData))
+      
+      // Initialize mock data if empty
+      initializeMockData()
       loadMerchantData()
       return { success: true }
     }
@@ -149,10 +183,90 @@ export const MerchantProvider = ({ children }) => {
     setVenues([])
     setEvents([])
     setBookings([])
+    setPromotions([])
+    setCustomers([])
+    setAdsCampaigns([])
+    setAdsInternal([])
+    setAdsExternal([])
     localStorage.removeItem('stt_merchant')
-    localStorage.removeItem('stt_merchant_venues')
-    localStorage.removeItem('stt_merchant_events')
-    localStorage.removeItem('stt_merchant_bookings')
+    // We intentionally don't remove other data so it persists for the prototype
+  }
+
+  const initializeMockData = () => {
+    // Only initialize if data doesn't exist to avoid overwriting user edits
+    if (!localStorage.getItem('stt_merchant_promotions')) {
+      const mockPromotions = [
+        {
+          id: 1, name: 'Weekend Special', type: 'percentage', value: 20, code: 'WEEKEND20',
+          description: '20% off on weekend brunch bookings', startDate: '2024-12-01', endDate: '2024-12-31',
+          usageLimit: 100, usedCount: 23, minAmount: 200, applicableEvents: ['Weekend Brunch Buffet'],
+          isActive: true, createdAt: '2024-11-15'
+        },
+        {
+          id: 2, name: 'Early Bird Discount', type: 'fixed', value: 50, code: 'EARLY50',
+          description: 'AED 50 off for bookings made 7 days in advance', startDate: '2024-11-01', endDate: '2024-12-31',
+          usageLimit: 200, usedCount: 67, minAmount: 300, applicableEvents: ['All Events'],
+          isActive: true, createdAt: '2024-10-28'
+        }
+      ]
+      localStorage.setItem('stt_merchant_promotions', JSON.stringify(mockPromotions))
+    }
+
+    if (!localStorage.getItem('stt_merchant_customers')) {
+      const mockCustomers = [
+        {
+          id: 1, name: "Sarah Ahmed", email: "sarah.ahmed@email.com", phone: "+971 50 123 4567",
+          location: "Dubai Marina", totalBookings: 8, totalSpent: 2394, averageRating: 4.8,
+          lastBooking: "2024-12-15", status: "VIP", joinDate: "2023-06-15",
+          favoriteEvents: ["Weekend Brunch", "Business Lunch"],
+          bookingHistory: [{ date: "2024-12-15", event: "Weekend Brunch", amount: 299, status: "Completed" }]
+        },
+        {
+          id: 2, name: "Michael Johnson", email: "michael.j@email.com", phone: "+971 55 987 6543",
+          location: "Downtown Dubai", totalBookings: 5, totalSpent: 1247, averageRating: 4.6,
+          lastBooking: "2024-12-10", status: "Regular", joinDate: "2023-09-22",
+          favoriteEvents: ["Rooftop Party", "Date Night"],
+          bookingHistory: [{ date: "2024-12-10", event: "Rooftop Party", amount: 199, status: "Completed" }]
+        }
+      ]
+      localStorage.setItem('stt_merchant_customers', JSON.stringify(mockCustomers))
+    }
+
+    if (!localStorage.getItem('stt_merchant_bookings')) {
+      const mockBookings = [
+        {
+          id: 1, bookingRef: 'STT-001234', customerName: 'Sarah Ahmed', customerEmail: 'sarah.ahmed@email.com',
+          customerPhone: '+971 50 123 4567', event: 'Weekend Brunch Buffet', date: '2024-12-15',
+          time: '11:00 AM - 3:00 PM', guests: 2, package: 'Couple Package', amount: 549, commission: 82.35,
+          status: 'Confirmed', bookingDate: '2024-12-01', specialRequests: 'Window table preferred', rating: null
+        }
+      ]
+      localStorage.setItem('stt_merchant_bookings', JSON.stringify(mockBookings))
+    }
+
+    if (!localStorage.getItem('stt_merchant_ads_internal')) {
+      const mockAdsInternal = [
+        { id: 1, name: 'Featured Event', description: 'Highlight your event at the top of search results', price: 299, duration: '7 days', features: ['Top position in search results'], metrics: { impressions: 12500, clicks: 890, bookings: 23 }, isActive: true },
+        { id: 2, name: 'Homepage Banner', description: 'Display your venue on the homepage banner', price: 599, duration: '14 days', features: ['Homepage banner placement'], metrics: { impressions: 45000, clicks: 2100, bookings: 67 }, isActive: false }
+      ]
+      localStorage.setItem('stt_merchant_ads_internal', JSON.stringify(mockAdsInternal))
+    }
+
+    if (!localStorage.getItem('stt_merchant_ads_external')) {
+      const mockAdsExternal = [
+        { id: 1, name: 'Social Media Management', description: 'Complete social media marketing across all platforms', price: 1299, duration: 'Monthly', features: ['Instagram, Facebook, Twitter management'], platforms: ['instagram', 'facebook', 'twitter'], isActive: true },
+        { id: 2, name: 'Influencer Partnerships', description: 'Connect with food bloggers and influencers', price: 2499, duration: 'Campaign', features: ['Influencer matching and outreach'], platforms: ['instagram', 'tiktok'], isActive: false }
+      ]
+      localStorage.setItem('stt_merchant_ads_external', JSON.stringify(mockAdsExternal))
+    }
+
+    if (!localStorage.getItem('stt_merchant_ads_campaigns')) {
+      const mockAdsCampaigns = [
+        { id: 1, name: 'Weekend Brunch Promotion', type: 'Featured Event', startDate: '2024-12-01', endDate: '2024-12-07', budget: 299, spent: 156, impressions: 8900, clicks: 234, bookings: 12, status: 'Active' },
+        { id: 2, name: 'Holiday Special Campaign', type: 'Social Media Management', startDate: '2024-12-01', endDate: '2024-12-31', budget: 1299, spent: 432, impressions: 25600, clicks: 1200, bookings: 45, status: 'Active' }
+      ]
+      localStorage.setItem('stt_merchant_ads_campaigns', JSON.stringify(mockAdsCampaigns))
+    }
   }
 
   const updateMerchant = (updates) => {
@@ -232,6 +346,30 @@ export const MerchantProvider = ({ children }) => {
     if (event) {
       const newPackage = {
         id: Date.now(),
+        approvalStatus: 'Draft',
+        pricingRules: {
+          basePrice: packageData.price || 0,
+          type: 'individual',
+          genderPricing: { enabled: false, ladies: 0, gents: 0, kids: 0 },
+          timePricing: { enabled: false, type: '', discountLimit: 0, rules: [] },
+          fixedPricing: { enabled: false, amount: 0 }
+        },
+        availability: {
+          type: 'day', // 'day' or 'time'
+          slots: [], // For day type
+          validFrom: '',
+          validUntil: '',
+          inventory: 0
+        },
+        combinations: {
+          enabled: false,
+          linkedPackages: []
+        },
+        discounts: {
+          multiBooking: { enabled: false, rules: [] },
+          gender: { enabled: false, rules: [] },
+          age: { enabled: false, rules: [] }
+        },
         ...packageData,
         eventId: event.id, // Ensure link
         status: packageData.status || 'Active',
@@ -244,7 +382,6 @@ export const MerchantProvider = ({ children }) => {
   }
 
   const updatePackage = (packageId, updates) => {
-    // Find event containing this package
     let foundEvent = null
     let foundPackageIndex = -1
 
@@ -259,7 +396,7 @@ export const MerchantProvider = ({ children }) => {
 
     if (foundEvent) {
       const updatedPackages = [...foundEvent.packages]
-      updatedPackages[foundPackageIndex] = { ...updatedPackages[foundPackageIndex], ...updates }
+      updatedPackages[foundPackageIndex] = { ...updatedPackages[foundPackageIndex], ...updates, status: updates.status || updatedPackages[foundPackageIndex].status || 'draft' }
       updateEvent(foundEvent.id, { packages: updatedPackages })
     }
   }
@@ -321,11 +458,112 @@ export const MerchantProvider = ({ children }) => {
     localStorage.setItem('stt_merchant_faqs', JSON.stringify(updatedFaqs))
   }
 
+  const updateBooking = (bookingId, updates) => {
+    const updatedBookings = bookings.map(b =>
+      b.id === bookingId ? { ...b, ...updates } : b
+    )
+    setBookings(updatedBookings)
+    localStorage.setItem('stt_merchant_bookings', JSON.stringify(updatedBookings))
+  }
+
+  const updateCustomer = (customerId, updates) => {
+    const updatedCustomers = customers.map(c =>
+      c.id === customerId ? { ...c, ...updates } : c
+    )
+    setCustomers(updatedCustomers)
+    localStorage.setItem('stt_merchant_customers', JSON.stringify(updatedCustomers))
+  }
+
+  // --- Promotions CRUD ---
+  const addPromotion = (promoData) => {
+    const newPromo = {
+      id: Date.now(),
+      ...promoData,
+      merchantId: merchant.id,
+      createdAt: new Date().toISOString()
+    }
+    const updatedPromotions = [...promotions, newPromo]
+    setPromotions(updatedPromotions)
+    localStorage.setItem('stt_merchant_promotions', JSON.stringify(updatedPromotions))
+    return newPromo
+  }
+
+  const updatePromotion = (promoId, updates) => {
+    const updatedPromotions = promotions.map(p =>
+      p.id === promoId ? { ...p, ...updates } : p
+    )
+    setPromotions(updatedPromotions)
+    localStorage.setItem('stt_merchant_promotions', JSON.stringify(updatedPromotions))
+  }
+
+  const deletePromotion = (promoId) => {
+    const updatedPromotions = promotions.filter(p => p.id !== promoId)
+    setPromotions(updatedPromotions)
+    localStorage.setItem('stt_merchant_promotions', JSON.stringify(updatedPromotions))
+  }
+
+  const duplicatePromotion = (promoId) => {
+    const originalPromo = promotions.find(p => p.id === promoId)
+    if (originalPromo) {
+      const clonedPromo = {
+        ...originalPromo,
+        id: Date.now(),
+        name: `${originalPromo.name} (Copy)`,
+        code: `${originalPromo.code}COPY`,
+        usedCount: 0,
+        isActive: false,
+        createdAt: new Date().toISOString()
+      }
+      const updatedPromotions = [...promotions, clonedPromo]
+      setPromotions(updatedPromotions)
+      localStorage.setItem('stt_merchant_promotions', JSON.stringify(updatedPromotions))
+      return clonedPromo
+    }
+  }
+
+  // --- Advertising CRUD ---
+  const toggleCampaignStatus = (campaignId) => {
+    const updatedCampaigns = adsCampaigns.map(c =>
+      c.id === campaignId ? { ...c, status: c.status === 'Active' ? 'Paused' : 'Active' } : c
+    )
+    setAdsCampaigns(updatedCampaigns)
+    localStorage.setItem('stt_merchant_ads_campaigns', JSON.stringify(updatedCampaigns))
+  }
+
+  const purchaseAdPackage = (packageId, type) => {
+    if (type === 'internal') {
+      const updatedInternal = adsInternal.map(p =>
+        p.id === packageId ? { ...p, isActive: true } : p
+      )
+      setAdsInternal(updatedInternal)
+      localStorage.setItem('stt_merchant_ads_internal', JSON.stringify(updatedInternal))
+    } else if (type === 'external') {
+      const updatedExternal = adsExternal.map(p =>
+        p.id === packageId ? { ...p, isActive: true } : p
+      )
+      setAdsExternal(updatedExternal)
+      localStorage.setItem('stt_merchant_ads_external', JSON.stringify(updatedExternal))
+    }
+  }
+
   const value = {
     merchant,
     venues,
     events,
     bookings,
+    updateBooking,
+    customers,
+    updateCustomer,
+    promotions,
+    addPromotion,
+    updatePromotion,
+    deletePromotion,
+    duplicatePromotion,
+    adsCampaigns,
+    adsInternal,
+    adsExternal,
+    toggleCampaignStatus,
+    purchaseAdPackage,
     loading,
     registerMerchant,
     loginMerchant,

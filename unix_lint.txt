@@ -1,0 +1,13 @@
+﻿C:\Users\Blvk Inc\Desktop\Stt\src\pages\merchant\CreatePackagePage.jsx:11:3: 'Clock' is defined but never used. Allowed unused vars must match /^(React|_)/u. [Warning/no-unused-vars]
+C:\Users\Blvk Inc\Desktop\Stt\src\pages\merchant\CreatePackagePage.jsx:16:3: 'Tag' is defined but never used. Allowed unused vars must match /^(React|_)/u. [Warning/no-unused-vars]
+C:\Users\Blvk Inc\Desktop\Stt\src\pages\merchant\CreatePackagePage.jsx:22:11: 'merchant' is assigned a value but never used. Allowed unused vars must match /^(React|_)/u. [Warning/no-unused-vars]
+C:\Users\Blvk Inc\Desktop\Stt\src\pages\merchant\CreatePackagePage.jsx:32:37: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. [Error/react-hooks/rules-of-hooks]
+C:\Users\Blvk Inc\Desktop\Stt\src\pages\merchant\CreatePackagePage.jsx:34:35: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. [Error/react-hooks/rules-of-hooks]
+C:\Users\Blvk Inc\Desktop\Stt\src\pages\merchant\CreatePackagePage.jsx:72:3: React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render. [Error/react-hooks/rules-of-hooks]
+C:\Users\Blvk Inc\Desktop\Stt\src\pages\merchant\CreatePackagePage.jsx:104:39: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. [Error/react-hooks/rules-of-hooks]
+C:\Users\Blvk Inc\Desktop\Stt\src\pages\merchant\CreatePackagePage.jsx:105:43: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. [Error/react-hooks/rules-of-hooks]
+C:\Users\Blvk Inc\Desktop\Stt\src\pages\merchant\CreatePackagePage.jsx:106:43: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. [Error/react-hooks/rules-of-hooks]
+C:\Users\Blvk Inc\Desktop\Stt\src\pages\merchant\CreatePackagePage.jsx:107:31: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. [Error/react-hooks/rules-of-hooks]
+C:\Users\Blvk Inc\Desktop\Stt\src\pages\merchant\CreatePackagePage.jsx:108:31: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. [Error/react-hooks/rules-of-hooks]
+
+11 problems

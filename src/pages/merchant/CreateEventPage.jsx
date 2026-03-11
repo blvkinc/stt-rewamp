@@ -46,51 +46,41 @@ const CreateEventPage = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const navigate = useNavigate()
+  const [form] = Form.useForm()
 
-  const [eventData, setEventData] = useState({
-    title: '',
-    description: '',
-    eventType: '',
-    date: '',
-    startTime: '',
-    endTime: '',
-    capacity: '',
-    images: [],
-    packages: [
-      {
-        id: 1,
-        name: 'Individual Package',
-        type: 'individual',
-        price: '',
-        guestCount: 1,
-        description: '',
-        includes: ['']
-      }
-    ],
-    tags: [],
-    specialRequirements: '',
-    cancellationPolicy: '',
-    selectedFaqs: [],
-    isDraft: true
-  })
+  const [images, setImages] = useState([])
+  const [packages, setPackages] = useState([
+    {
+      id: 1,
+      name: 'Individual Package',
+      type: 'individual',
+      price: '',
+      guestCount: 1,
+      description: '',
+      includes: ['']
+    }
+  ])
 
   // Load event data if in edit mode
   React.useEffect(() => {
     if (isEditMode && events.length > 0) {
       const eventToEdit = events.find(e => e.id === parseInt(id) || e.id === id)
       if (eventToEdit) {
-        // Format date and times for Ant Design forms if needed, but since we use local state 'eventData',
-        // we just map it directly. Note: DatePicker/TimePicker might need Moment/Dayjs objects depending on Ant version,
-        // but here we are using simple state. If the original state was strings, we might need parsing.
-        // Assuming context stores them as strings/ISO.
-        // For simplicity in this refactor, we populate as is, validation might be needed for Date objects.
-        setEventData({
-          ...eventToEdit,
-          packages: eventToEdit.packages || [] // Ensure packages array exists
+        form.setFieldsValue({
+          title: eventToEdit.title,
+          description: eventToEdit.description,
+          eventType: eventToEdit.eventType,
+          capacity: eventToEdit.capacity,
+          // Since date/time are complex objects in AntD usually, we just leave them blank or handle them if they exist
+          specialRequirements: eventToEdit.specialRequirements,
+          cancellationPolicy: eventToEdit.cancellationPolicy,
+          selectedFaqs: eventToEdit.selectedFaqs
         })
+        setPackages(eventToEdit.packages || [])
+        // Cannot easily pre-fill images due to File object requirements
       }
     }
-  }, [isEditMode, id, events])
+  }, [isEditMode, id, events, form])
 
   if (authLoading) {
     return <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Loading...</div>
@@ -114,27 +104,8 @@ const CreateEventPage = () => {
     'Other'
   ]
 
-  const handleInputChange = (e) => {
-    setEventData({
-      ...eventData,
-      [e.target.name]: e.target.value
-    })
-    if (error) setError('')
-  }
-
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files)
-    setEventData({
-      ...eventData,
-      images: [...eventData.images, ...files.slice(0, 5 - eventData.images.length)]
-    })
-  }
-
   const removeImage = (index) => {
-    setEventData({
-      ...eventData,
-      images: eventData.images.filter((_, i) => i !== index)
-    })
+    setImages(images.filter((_, i) => i !== index))
   }
 
   const addPackage = () => {
@@ -147,83 +118,67 @@ const CreateEventPage = () => {
       description: '',
       includes: ['']
     }
-    setEventData({
-      ...eventData,
-      packages: [...eventData.packages, newPackage]
-    })
+    setPackages([...packages, newPackage])
   }
 
   const updatePackage = (packageId, field, value) => {
-    setEventData({
-      ...eventData,
-      packages: eventData.packages.map(pkg =>
-        pkg.id === packageId ? { ...pkg, [field]: value } : pkg
-      )
-    })
+    setPackages(packages.map(pkg =>
+      pkg.id === packageId ? { ...pkg, [field]: value } : pkg
+    ))
   }
 
   const removePackage = (packageId) => {
-    if (eventData.packages.length > 1) {
-      setEventData({
-        ...eventData,
-        packages: eventData.packages.filter(pkg => pkg.id !== packageId)
-      })
+    if (packages.length > 1) {
+      setPackages(packages.filter(pkg => pkg.id !== packageId))
     }
   }
 
   const addIncludeItem = (packageId) => {
-    setEventData({
-      ...eventData,
-      packages: eventData.packages.map(pkg =>
-        pkg.id === packageId
-          ? { ...pkg, includes: [...pkg.includes, ''] }
-          : pkg
-      )
-    })
+    setPackages(packages.map(pkg =>
+      pkg.id === packageId
+        ? { ...pkg, includes: [...pkg.includes, ''] }
+        : pkg
+    ))
   }
 
   const updateIncludeItem = (packageId, index, value) => {
-    setEventData({
-      ...eventData,
-      packages: eventData.packages.map(pkg =>
-        pkg.id === packageId
-          ? {
-            ...pkg,
-            includes: pkg.includes.map((item, i) => i === index ? value : item)
-          }
-          : pkg
-      )
-    })
+    setPackages(packages.map(pkg =>
+      pkg.id === packageId
+        ? {
+          ...pkg,
+          includes: pkg.includes.map((item, i) => i === index ? value : item)
+        }
+        : pkg
+    ))
   }
 
   const removeIncludeItem = (packageId, index) => {
-    setEventData({
-      ...eventData,
-      packages: eventData.packages.map(pkg =>
-        pkg.id === packageId
-          ? { ...pkg, includes: pkg.includes.filter((_, i) => i !== index) }
-          : pkg
-      )
-    })
+    setPackages(packages.map(pkg =>
+      pkg.id === packageId
+        ? { ...pkg, includes: pkg.includes.filter((_, i) => i !== index) }
+        : pkg
+    ))
   }
 
-  const handleSubmit = async (e, isDraft = true) => {
-    e.preventDefault()
+  const handleSubmit = async (values, isDraft = true) => {
     setLoading(true)
     setError('')
 
     try {
+      const payload = {
+        ...values,
+        date: values.date ? values.date.format('YYYY-MM-DD') : '',
+        startTime: values.startTime ? values.startTime.format('HH:mm') : '',
+        endTime: values.endTime ? values.endTime.format('HH:mm') : '',
+        packages: packages,
+        status: isDraft ? 'Draft' : 'Pending Approval'
+      }
+
       if (isEditMode) {
-        updateEvent(parseInt(id) || id, {
-          ...eventData,
-          status: isDraft ? 'Draft' : 'Pending Approval'
-        })
+        updateEvent(parseInt(id) || id, payload)
         setSuccess(`Event ${isDraft ? 'saved' : 'updated'} successfully!`)
       } else {
-        addEvent({
-          ...eventData,
-          status: isDraft ? 'Draft' : 'Pending Approval'
-        })
+        addEvent(payload)
         setSuccess(`Event ${isDraft ? 'saved as draft' : 'submitted for approval'} successfully!`)
       }
 
@@ -259,8 +214,9 @@ const CreateEventPage = () => {
 
       {/* Form */}
       <Form
+        form={form}
         layout="vertical"
-        onFinish={(values) => handleSubmit({ preventDefault: () => { } }, true)}
+        onFinish={(values) => handleSubmit(values, false)}
         style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}
       >
         {/* Error/Success Messages */}
@@ -298,8 +254,6 @@ const CreateEventPage = () => {
                 <Input
                   size="large"
                   placeholder="e.g., Weekend Brunch Buffet"
-                  value={eventData.title}
-                  onChange={handleInputChange}
                 />
               </Form.Item>
             </Col>
@@ -313,8 +267,6 @@ const CreateEventPage = () => {
                 <TextArea
                   rows={4}
                   placeholder="Describe your event, cuisine, ambiance, and what makes it special..."
-                  value={eventData.description}
-                  onChange={handleInputChange}
                 />
               </Form.Item>
             </Col>
@@ -328,8 +280,6 @@ const CreateEventPage = () => {
                 <Select
                   size="large"
                   placeholder="Select event type"
-                  value={eventData.eventType}
-                  onChange={(value) => setEventData({ ...eventData, eventType: value })}
                 >
                   {eventTypes.map(type => (
                     <Option key={type} value={type}>{type}</Option>
@@ -348,8 +298,6 @@ const CreateEventPage = () => {
                   style={{ width: '100%' }}
                   placeholder="Maximum guests"
                   prefix={<UserOutlined />}
-                  value={eventData.capacity}
-                  onChange={(value) => setEventData({ ...eventData, capacity: value })}
                 />
               </Form.Item>
             </Col>
@@ -410,10 +358,7 @@ const CreateEventPage = () => {
               accept="image/*"
               beforeUpload={() => false}
               onChange={({ fileList }) => {
-                setEventData({
-                  ...eventData,
-                  images: fileList.slice(0, 5).map(file => file.originFileObj)
-                })
+                setImages(fileList.slice(0, 5).map(file => file.originFileObj))
               }}
               style={{ marginBottom: '24px' }}
             >
@@ -429,9 +374,9 @@ const CreateEventPage = () => {
             </Dragger>
           </Form.Item>
 
-          {eventData.images.length > 0 && (
+          {images.length > 0 && (
             <Row gutter={[16, 16]}>
-              {eventData.images.map((image, index) => (
+              {images.map((image, index) => (
                 <Col key={index} xs={12} sm={8} md={6} lg={4}>
                   <div style={{ position: 'relative' }}>
                     <img
@@ -480,7 +425,7 @@ const CreateEventPage = () => {
           </div>
 
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            {eventData.packages.map((pkg, index) => (
+            {packages.map((pkg, index) => (
               <Card
                 key={pkg.id}
                 size="small"
@@ -488,7 +433,7 @@ const CreateEventPage = () => {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <Title level={5} style={{ margin: 0 }}>Package {index + 1}</Title>
-                  {eventData.packages.length > 1 && (
+                  {packages.length > 1 && (
                     <Button
                       type="text"
                       danger
@@ -609,8 +554,6 @@ const CreateEventPage = () => {
               mode="multiple"
               size="large"
               placeholder="Select FAQs..."
-              value={eventData.selectedFaqs}
-              onChange={(values) => setEventData({ ...eventData, selectedFaqs: values })}
               style={{ width: '100%' }}
               optionFilterProp="children"
             >
@@ -649,8 +592,6 @@ const CreateEventPage = () => {
                 <TextArea
                   rows={3}
                   placeholder="Dress code, age restrictions, dietary accommodations, etc."
-                  value={eventData.specialRequirements}
-                  onChange={handleInputChange}
                 />
               </Form.Item>
             </Col>
@@ -663,8 +604,6 @@ const CreateEventPage = () => {
                 <TextArea
                   rows={3}
                   placeholder="Cancellation and refund policy for this event..."
-                  value={eventData.cancellationPolicy}
-                  onChange={handleInputChange}
                 />
               </Form.Item>
             </Col>
@@ -677,15 +616,21 @@ const CreateEventPage = () => {
             <Button
               size="large"
               loading={loading}
-              onClick={(e) => handleSubmit(e, true)}
+              onClick={() => {
+                form.validateFields().then(values => {
+                  handleSubmit(values, true);
+                }).catch(info => {
+                  console.log('Validate Failed:', info);
+                });
+              }}
             >
               {loading ? 'Saving...' : 'Save as Draft'}
             </Button>
             <Button
               type="primary"
+              htmlType="submit"
               size="large"
               loading={loading}
-              onClick={(e) => handleSubmit(e, false)}
               style={{
                 background: 'linear-gradient(90deg, #1890ff, #40a9ff)',
                 border: 'none',

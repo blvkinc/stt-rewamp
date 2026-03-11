@@ -35,7 +35,7 @@ const { Title, Text } = Typography
 const { Option } = Select
 
 const BookingsPage = () => {
-  const { merchant, isMerchantAuthenticated } = useMerchant()
+  const { merchant, isMerchantAuthenticated, bookings, updateBooking } = useMerchant()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [dateFilter, setDateFilter] = useState('all')
@@ -44,82 +44,6 @@ const BookingsPage = () => {
   if (!isMerchantAuthenticated) {
     return <Navigate to="/merchant/auth" replace />
   }
-
-  // Mock bookings data
-  const bookings = [
-    {
-      id: 1,
-      bookingRef: 'STT-001234',
-      customerName: 'Sarah Ahmed',
-      customerEmail: 'sarah.ahmed@email.com',
-      customerPhone: '+971 50 123 4567',
-      event: 'Weekend Brunch Buffet',
-      date: '2024-12-15',
-      time: '11:00 AM - 3:00 PM',
-      guests: 2,
-      package: 'Couple Package',
-      amount: 549,
-      commission: 82.35,
-      status: 'Confirmed',
-      bookingDate: '2024-12-01',
-      specialRequests: 'Window table preferred, celebrating anniversary',
-      rating: null
-    },
-    {
-      id: 2,
-      bookingRef: 'STT-001235',
-      customerName: 'Michael Johnson',
-      customerEmail: 'michael.j@email.com',
-      customerPhone: '+971 55 987 6543',
-      event: 'Business Lunch Special',
-      date: '2024-12-14',
-      time: '12:00 PM - 3:00 PM',
-      guests: 4,
-      package: 'Group Package',
-      amount: 596,
-      commission: 89.40,
-      status: 'Completed',
-      bookingDate: '2024-11-28',
-      specialRequests: 'Quiet area for business discussion',
-      rating: 4.5
-    },
-    {
-      id: 3,
-      bookingRef: 'STT-001236',
-      customerName: 'Fatima Al-Zahra',
-      customerEmail: 'fatima.az@email.com',
-      customerPhone: '+971 52 456 7890',
-      event: 'Romantic Dinner Experience',
-      date: '2024-12-20',
-      time: '7:00 PM - 11:00 PM',
-      guests: 2,
-      package: 'Couple Package',
-      amount: 798,
-      commission: 119.70,
-      status: 'Confirmed',
-      bookingDate: '2024-12-05',
-      specialRequests: 'Surprise birthday setup requested',
-      rating: null
-    },
-    {
-      id: 4,
-      bookingRef: 'STT-001237',
-      customerName: 'Ahmed Hassan',
-      customerEmail: 'ahmed.hassan@email.com',
-      customerPhone: '+971 56 234 5678',
-      event: 'Weekend Brunch Buffet',
-      date: '2024-12-10',
-      time: '11:00 AM - 3:00 PM',
-      guests: 6,
-      package: 'Group Package',
-      amount: 1494,
-      commission: 224.10,
-      status: 'Cancelled',
-      bookingDate: '2024-11-25',
-      specialRequests: 'High chairs needed for children',
-      rating: null
-    }
-  ]
 
   const filteredBookings = bookings.filter(booking => {
     const matchesSearch = booking.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||

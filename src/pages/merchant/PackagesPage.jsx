@@ -64,7 +64,7 @@ const PackagesPage = () => {
     const matchesSearch = pkg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       pkg.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (pkg.eventName || '').toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === 'all' || pkg.status === filterStatus
+    const matchesStatus = filterStatus === 'all' || pkg.status?.toLowerCase() === filterStatus.toLowerCase()
     return matchesSearch && matchesStatus
   })
 
@@ -78,19 +78,25 @@ const PackagesPage = () => {
   }
 
   const getStatusColor = (status) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case 'active': return 'success'
+      case 'approved': return 'success'
       case 'inactive': return 'default'
       case 'draft': return 'warning'
+      case 'pending': return 'processing'
+      case 'rejected': return 'error'
       default: return 'default'
     }
   }
 
   const getStatusIcon = (status) => {
-    switch (status) {
-      case 'active': return <CheckCircleOutlined />
-      case 'inactive': return <CloseCircleOutlined />
-      case 'draft': return <ClockCircleOutlined />
+    switch (status?.toLowerCase()) {
+      case 'active':
+      case 'approved': return <CheckCircleOutlined />
+      case 'inactive':
+      case 'rejected': return <CloseCircleOutlined />
+      case 'draft':
+      case 'pending': return <ClockCircleOutlined />
       default: return null
     }
   }
@@ -184,7 +190,7 @@ const PackagesPage = () => {
           <Card>
             <Statistic
               title="Avg. Package Price"
-              value={`AED ${Math.round(packages.reduce((sum, p) => sum + p.price, 0) / packages.length)}`}
+              value={`AED ${Math.round(packages.reduce((sum, p) => sum + (p.pricingRules?.basePrice || p.price || 0), 0) / (packages.length || 1))}`}
               prefix={<ArrowUpOutlined />}
               suffix={<Text type="secondary" style={{ fontSize: '12px' }}>per person</Text>}
             />
@@ -216,6 +222,9 @@ const PackagesPage = () => {
               <Option value="active">Active</Option>
               <Option value="inactive">Inactive</Option>
               <Option value="draft">Draft</Option>
+              <Option value="pending">Pending</Option>
+              <Option value="approved">Approved</Option>
+              <Option value="rejected">Rejected</Option>
             </Select>
           </Col>
           <Col>
@@ -289,14 +298,16 @@ const PackagesPage = () => {
               <div style={{ marginBottom: '16px' }}>
                 <Space>
                   <Text style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>
-                    AED {pkg.price}
+                    AED {pkg.pricingRules?.basePrice || pkg.price || 0}
                   </Text>
-                  {pkg.originalPrice > pkg.price && (
+                  {pkg.originalPrice > (pkg.pricingRules?.basePrice || pkg.price) && (
                     <Text delete type="secondary">AED {pkg.originalPrice}</Text>
                   )}
                 </Space>
                 <br />
-                <Text type="secondary" style={{ fontSize: '12px' }}>per person</Text>
+                <Text type="secondary" style={{ fontSize: '12px' }}>
+                  {pkg.pricingRules?.type === 'couple' ? 'per couple' : pkg.pricingRules?.type === 'group' ? 'per group' : 'per person'}
+                </Text>
               </div>
 
               {/* Stats */}

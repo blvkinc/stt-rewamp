@@ -37,7 +37,15 @@ const { Title, Text, Paragraph } = Typography
 const { TabPane } = Tabs
 
 const AdvertisingPage = () => {
-  const { merchant, isMerchantAuthenticated } = useMerchant()
+  const {
+    merchant,
+    isMerchantAuthenticated,
+    adsCampaigns: currentCampaigns,
+    adsInternal: internalPackages,
+    adsExternal: externalServices,
+    toggleCampaignStatus,
+    purchaseAdPackage
+  } = useMerchant()
   const [activeTab, setActiveTab] = useState('internal')
 
   // Redirect to auth if not logged in
@@ -45,156 +53,20 @@ const AdvertisingPage = () => {
     return <Navigate to="/merchant/auth" replace />
   }
 
-  // Mock advertising data
-  const internalPackages = [
-    {
-      id: 1,
-      name: 'Featured Event',
-      description: 'Highlight your event at the top of search results',
-      price: 299,
-      duration: '7 days',
-      features: [
-        'Top position in search results',
-        'Featured badge on event card',
-        'Priority in category listings',
-        'Enhanced visibility'
-      ],
-      metrics: {
-        impressions: 12500,
-        clicks: 890,
-        bookings: 23
-      },
-      isActive: true
-    },
-    {
-      id: 2,
-      name: 'Homepage Banner',
-      description: 'Display your venue on the homepage banner',
-      price: 599,
-      duration: '14 days',
-      features: [
-        'Homepage banner placement',
-        'High-resolution image display',
-        'Direct link to your events',
-        'Maximum exposure'
-      ],
-      metrics: {
-        impressions: 45000,
-        clicks: 2100,
-        bookings: 67
-      },
-      isActive: false
-    },
-    {
-      id: 3,
-      name: 'Category Spotlight',
-      description: 'Feature in specific category sections',
-      price: 199,
-      duration: '30 days',
-      features: [
-        'Category page prominence',
-        'Spotlight badge',
-        'Enhanced listing details',
-        'Category-specific targeting'
-      ],
-      metrics: {
-        impressions: 8900,
-        clicks: 445,
-        bookings: 18
-      },
-      isActive: true
-    }
-  ]
-
-  const externalServices = [
-    {
-      id: 1,
-      name: 'Social Media Management',
-      description: 'Complete social media marketing across all platforms',
-      price: 1299,
-      duration: 'Monthly',
-      features: [
-        'Instagram, Facebook, Twitter management',
-        'Content creation and posting',
-        'Engagement management',
-        'Monthly analytics report'
-      ],
-      platforms: ['instagram', 'facebook', 'twitter'],
-      isActive: true
-    },
-    {
-      id: 2,
-      name: 'Influencer Partnerships',
-      description: 'Connect with food bloggers and influencers',
-      price: 2499,
-      duration: 'Campaign',
-      features: [
-        'Influencer matching and outreach',
-        'Campaign coordination',
-        'Content approval process',
-        'Performance tracking'
-      ],
-      platforms: ['instagram', 'tiktok'],
-      isActive: false
-    },
-    {
-      id: 3,
-      name: 'Professional Photography',
-      description: 'High-quality food and venue photography',
-      price: 899,
-      duration: 'One-time',
-      features: [
-        '4-hour photo session',
-        '50+ edited high-res images',
-        'Food styling included',
-        'Commercial usage rights'
-      ],
-      platforms: [],
-      isActive: false
-    }
-  ]
-
-  const currentCampaigns = [
-    {
-      id: 1,
-      name: 'Weekend Brunch Promotion',
-      type: 'Featured Event',
-      startDate: '2024-12-01',
-      endDate: '2024-12-07',
-      budget: 299,
-      spent: 156,
-      impressions: 8900,
-      clicks: 234,
-      bookings: 12,
-      status: 'Active'
-    },
-    {
-      id: 2,
-      name: 'Holiday Special Campaign',
-      type: 'Social Media Management',
-      startDate: '2024-12-01',
-      endDate: '2024-12-31',
-      budget: 1299,
-      spent: 432,
-      impressions: 25600,
-      clicks: 1200,
-      bookings: 45,
-      status: 'Active'
-    }
-  ]
-
-  const toggleCampaign = (id) => {
-    message.success(`Campaign ${id} status toggled!`)
+  const handleToggleCampaign = (id) => {
+    toggleCampaignStatus(id)
+    message.success(`Campaign status toggled!`)
   }
 
-  const purchasePackage = (packageId, type) => {
+  const handlePurchasePackage = (packageId, type) => {
     Modal.confirm({
       title: 'Purchase Package',
       content: `Are you sure you want to purchase this ${type} package?`,
       okText: 'Purchase',
       cancelText: 'Cancel',
       onOk() {
-        message.success(`Purchasing ${type} package ${packageId}. Redirecting to payment...`)
+        purchaseAdPackage(packageId, type)
+        message.success(`Purchased ${type} package!`)
       }
     })
   }
@@ -341,7 +213,7 @@ const AdvertisingPage = () => {
                   <Button
                     type="text"
                     icon={campaign.status === 'Active' ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
-                    onClick={() => toggleCampaign(campaign.id)}
+                    onClick={() => handleToggleCampaign(campaign.id)}
                   />
 
                   <Button
@@ -453,7 +325,7 @@ const AdvertisingPage = () => {
                       size="large"
                       block
                       disabled={pkg.isActive}
-                      onClick={() => purchasePackage(pkg.id, 'internal')}
+                      onClick={() => handlePurchasePackage(pkg.id, 'internal')}
                       style={!pkg.isActive ? {
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         border: 'none'
@@ -543,7 +415,7 @@ const AdvertisingPage = () => {
                       size="large"
                       block
                       disabled={service.isActive}
-                      onClick={() => purchasePackage(service.id, 'external')}
+                      onClick={() => handlePurchasePackage(service.id, 'external')}
                       style={!service.isActive ? {
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         border: 'none'

@@ -41,58 +41,8 @@ const { RangePicker } = DatePicker
 const { TextArea } = Input
 
 const PromotionsPage = () => {
-  const { merchant, isMerchantAuthenticated } = useMerchant()
+  const { merchant, isMerchantAuthenticated, promotions, addPromotion, updatePromotion, deletePromotion, duplicatePromotion } = useMerchant()
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const [promotions, setPromotions] = useState([
-    {
-      id: 1,
-      name: 'Weekend Special',
-      type: 'percentage',
-      value: 20,
-      code: 'WEEKEND20',
-      description: '20% off on weekend brunch bookings',
-      startDate: '2024-12-01',
-      endDate: '2024-12-31',
-      usageLimit: 100,
-      usedCount: 23,
-      minAmount: 200,
-      applicableEvents: ['Weekend Brunch Buffet'],
-      isActive: true,
-      createdAt: '2024-11-15'
-    },
-    {
-      id: 2,
-      name: 'Early Bird Discount',
-      type: 'fixed',
-      value: 50,
-      code: 'EARLY50',
-      description: 'AED 50 off for bookings made 7 days in advance',
-      startDate: '2024-11-01',
-      endDate: '2024-12-31',
-      usageLimit: 200,
-      usedCount: 67,
-      minAmount: 300,
-      applicableEvents: ['All Events'],
-      isActive: true,
-      createdAt: '2024-10-28'
-    },
-    {
-      id: 3,
-      name: 'Group Booking Deal',
-      type: 'percentage',
-      value: 15,
-      code: 'GROUP15',
-      description: '15% off for groups of 6 or more',
-      startDate: '2024-12-01',
-      endDate: '2024-12-31',
-      usageLimit: 50,
-      usedCount: 8,
-      minAmount: 500,
-      applicableEvents: ['Business Lunch Special', 'Family Gathering'],
-      isActive: false,
-      createdAt: '2024-11-20'
-    }
-  ])
 
   // Redirect to auth if not logged in
   if (!isMerchantAuthenticated) {
@@ -114,14 +64,12 @@ const PromotionsPage = () => {
 
   const [form] = Form.useForm()
 
-  const togglePromotion = (id, checked) => {
-    setPromotions(promotions.map(promo =>
-      promo.id === id ? { ...promo, isActive: checked } : promo
-    ))
+  const handleTogglePromotion = (id, checked) => {
+    updatePromotion(id, { isActive: checked })
     message.success(`Promotion ${checked ? 'activated' : 'deactivated'} successfully`)
   }
 
-  const deletePromotion = (id) => {
+  const handleDeletePromotion = (id) => {
     Modal.confirm({
       title: 'Delete Promotion',
       content: 'Are you sure you want to delete this promotion? This action cannot be undone.',
@@ -129,37 +77,27 @@ const PromotionsPage = () => {
       okType: 'danger',
       cancelText: 'Cancel',
       onOk() {
-        setPromotions(promotions.filter(promo => promo.id !== id))
+        deletePromotion(id)
         message.success('Promotion deleted successfully')
       }
     })
   }
 
-  const duplicatePromotion = (promo) => {
-    const newPromo = {
-      ...promo,
-      id: Date.now(),
-      name: `${promo.name} (Copy)`,
-      code: `${promo.code}COPY`,
-      usedCount: 0,
-      isActive: false,
-      createdAt: new Date().toISOString().split('T')[0]
-    }
-    setPromotions([...promotions, newPromo])
+  const handleDuplicatePromotion = (promo) => {
+    duplicatePromotion(promo.id)
     message.success('Promotion duplicated successfully')
   }
 
   const handleCreatePromotion = (values) => {
     const promotion = {
       ...values,
-      id: Date.now(),
       usedCount: 0,
       isActive: true,
-      createdAt: new Date().toISOString().split('T')[0],
       startDate: values.dateRange[0].format('YYYY-MM-DD'),
       endDate: values.dateRange[1].format('YYYY-MM-DD')
     }
-    setPromotions([...promotions, promotion])
+    
+    addPromotion(promotion)
     setShowCreateModal(false)
     form.resetFields()
     message.success('Promotion created successfully')
@@ -182,7 +120,7 @@ const PromotionsPage = () => {
       key: 'duplicate',
       label: 'Duplicate',
       icon: <CopyOutlined />,
-      onClick: () => duplicatePromotion(promo)
+      onClick: () => handleDuplicatePromotion(promo)
     },
     {
       key: 'edit',
@@ -194,7 +132,7 @@ const PromotionsPage = () => {
       label: 'Delete',
       icon: <DeleteOutlined />,
       danger: true,
-      onClick: () => deletePromotion(promo.id)
+      onClick: () => handleDeletePromotion(promo.id)
     }
   ]
 
@@ -336,7 +274,7 @@ const PromotionsPage = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Switch
                     checked={promo.isActive}
-                    onChange={(checked) => togglePromotion(promo.id, checked)}
+                    onChange={(checked) => handleTogglePromotion(promo.id, checked)}
                     style={{
                       background: promo.isActive ? '#667eea' : undefined
                     }}

@@ -39,7 +39,7 @@ const { Title, Text } = Typography
 const { Option } = Select
 
 const CustomersPage = () => {
-  const { merchant, isMerchantAuthenticated } = useMerchant()
+  const { merchant, isMerchantAuthenticated, customers, updateCustomer } = useMerchant()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
   const [selectedCustomer, setSelectedCustomer] = useState(null)
@@ -48,83 +48,6 @@ const CustomersPage = () => {
   if (!isMerchantAuthenticated) {
     return <Navigate to="/merchant/auth" replace />
   }
-
-  // Mock customer data
-  const customers = [
-    {
-      id: 1,
-      name: "Sarah Ahmed",
-      email: "sarah.ahmed@email.com",
-      phone: "+971 50 123 4567",
-      location: "Dubai Marina",
-      totalBookings: 8,
-      totalSpent: 2394,
-      averageRating: 4.8,
-      lastBooking: "2024-12-15",
-      status: "VIP",
-      joinDate: "2023-06-15",
-      favoriteEvents: ["Weekend Brunch", "Business Lunch"],
-      bookingHistory: [
-        { date: "2024-12-15", event: "Weekend Brunch", amount: 299, status: "Completed" },
-        { date: "2024-11-28", event: "Business Lunch", amount: 149, status: "Completed" },
-        { date: "2024-11-10", event: "Anniversary Dinner", amount: 399, status: "Completed" }
-      ]
-    },
-    {
-      id: 2,
-      name: "Michael Johnson",
-      email: "michael.j@email.com",
-      phone: "+971 55 987 6543",
-      location: "Downtown Dubai",
-      totalBookings: 5,
-      totalSpent: 1247,
-      averageRating: 4.6,
-      lastBooking: "2024-12-10",
-      status: "Regular",
-      joinDate: "2023-09-22",
-      favoriteEvents: ["Rooftop Party", "Date Night"],
-      bookingHistory: [
-        { date: "2024-12-10", event: "Rooftop Party", amount: 199, status: "Completed" },
-        { date: "2024-11-25", event: "Date Night", amount: 349, status: "Completed" }
-      ]
-    },
-    {
-      id: 3,
-      name: "Fatima Al-Zahra",
-      email: "fatima.az@email.com",
-      phone: "+971 52 456 7890",
-      location: "Jumeirah",
-      totalBookings: 12,
-      totalSpent: 3567,
-      averageRating: 4.9,
-      lastBooking: "2024-12-18",
-      status: "VIP",
-      joinDate: "2023-03-10",
-      favoriteEvents: ["Luxury Brunch", "Family Gathering"],
-      bookingHistory: [
-        { date: "2024-12-18", event: "Luxury Brunch", amount: 449, status: "Confirmed" },
-        { date: "2024-12-05", event: "Family Gathering", amount: 599, status: "Completed" }
-      ]
-    },
-    {
-      id: 4,
-      name: "Ahmed Hassan",
-      email: "ahmed.hassan@email.com",
-      phone: "+971 56 234 5678",
-      location: "Business Bay",
-      totalBookings: 3,
-      totalSpent: 897,
-      averageRating: 4.3,
-      lastBooking: "2024-12-08",
-      status: "New",
-      joinDate: "2024-10-15",
-      favoriteEvents: ["Business Lunch"],
-      bookingHistory: [
-        { date: "2024-12-08", event: "Business Lunch", amount: 149, status: "Completed" },
-        { date: "2024-11-20", event: "Weekend Brunch", amount: 299, status: "Completed" }
-      ]
-    }
-  ]
 
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
