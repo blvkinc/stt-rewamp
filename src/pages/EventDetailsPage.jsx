@@ -8,6 +8,10 @@ import { Badge } from '../components/ui/badge'
 import { motion } from 'framer-motion'
 
 import { useAuth } from '../context/AuthContext'
+import SaianaImage1 from '../client-demo-pics/BEBEACH1.webp'
+import SaianaImage2 from '../client-demo-pics/BEBEACH2.webp'
+import SaianaImage3 from '../client-demo-pics/BEBEACH3.webp'
+import SaianaImage4 from '../client-demo-pics/BEBEACH4.webp'
 
 const EventDetailsPage = () => {
   const { id: _id } = useParams()
@@ -46,7 +50,7 @@ const EventDetailsPage = () => {
   ])
 
   // Mock event data
-  const event = {
+  let event = {
     id: 1,
     title: "Luxury Brunch at Burj Al Arab",
     venue: "Al Muntaha Restaurant",
@@ -156,6 +160,115 @@ const EventDetailsPage = () => {
     ]
   }
 
+  if (String(_id) === '99') {
+    event = {
+      id: 99,
+      title: "Saiana Brunch",
+      venue: "BeBeach Dubai",
+      venueId: 99,
+      images: [
+        SaianaImage1,
+        SaianaImage2,
+        SaianaImage3,
+        SaianaImage4,
+        SaianaImage2
+      ],
+      rating: 4.9,
+      reviews: 842,
+      location: "Dubai Harbour",
+      time: "2:00 PM - 6:00 PM",
+      category: "Day Brunch",
+      description: "From 2 PM to 6 PM, indulge in the ultimate Sunday brunch experience at Be Beach Dubai with SAIANA. Enjoy a curated menu featuring delights like Rock Shrimp Tempura and Slow-Cooked Short Rib, alongside live cooking stations and decadent desserts. The boho-chic atmosphere comes alive with high-energy live entertainment, including drummers and dancers, all set against the stunning Dubai skyline.",
+      highlights: [
+        "Afterparty: 6PM - 2AM",
+        "Mediterranean Cuisine & Live Cooking Stations",
+        "4 Hours Unlimited Beverages",
+        "Pool Access",
+        "Live Entertainment: DJ, Drummers, Dancers",
+        "Amazing Views of Dubai Skyline"
+      ],
+      venueDetails: {
+        id: 99,
+        name: "BeBeach Dubai",
+        description: "BeBeach is a luxury day club and restaurant bringing chic Mediterranean vibes to Dubai Harbour.",
+        address: "Dubai Harbour, UAE",
+        phone: "+971 4 000 0000",
+        email: "reservations@bebeach.com",
+        website: "www.bebeach.com",
+        capacity: 500,
+        rating: 4.9,
+        reviews: 1205,
+        priceRange: "AED 320-600",
+        amenities: [
+          "Pool",
+          "Open Format Music",
+          "Valet Parking",
+          "Wheelchair Accessible",
+          "Outdoor Seating",
+          "Entertainment"
+        ],
+        images: [
+          SaianaImage1,
+          SaianaImage2,
+          SaianaImage3
+        ],
+        openingHours: {
+          monday: "10:00 AM - 2:00 AM",
+          tuesday: "10:00 AM - 2:00 AM",
+          wednesday: "10:00 AM - 2:00 AM",
+          thursday: "10:00 AM - 2:00 AM",
+          friday: "10:00 AM - 3:00 AM",
+          saturday: "10:00 AM - 3:00 AM",
+          sunday: "10:00 AM - 2:00 AM"
+        },
+        dressCode: "Beach Chic",
+        parkingInfo: "Valet Parking available",
+        upcomingEvents: 4
+      },
+      packages: [
+        {
+          id: 97,
+          name: 'SOFT ESCAPE',
+          price: 320,
+          originalPrice: 350,
+          description: 'Dining with Selection of Mocktails & Soft Drinks',
+          maxGuests: 4,
+          popular: false,
+          features: ['Mocktails', 'Soft Drinks', 'Dining', 'Pool Access']
+        },
+        {
+          id: 98,
+          name: 'SAIANA BAR',
+          price: 420,
+          originalPrice: 480,
+          description: 'Dining with Selection of House Spirits, House Wine & Beer',
+          maxGuests: 4,
+          popular: true,
+          features: ['House Spirits', 'House Wine', 'Beer', 'Dining', 'Pool Access']
+        },
+        {
+          id: 99,
+          name: 'GOLDEN SAIANA',
+          price: 520,
+          originalPrice: 600,
+          description: 'Dining with Selection of House Spirits, House Wine, Prosecco, Cocktails & Beer',
+          maxGuests: 8,
+          popular: false,
+          features: ['House Spirits', 'House Wine', 'Prosecco', 'Cocktails', 'Beer', 'Dining', 'Pool Access']
+        }
+      ],
+      contact: {
+        phone: '+971 4 000 0000',
+        email: 'reservations@bebeach.com'
+      },
+      policies: [
+        'Beach Chic dress code required',
+        '21+ age policy applies',
+        'Valet Parking provided'
+      ]
+    }
+  }
+
   const handleReviewSubmit = () => {
     if (userRating === 0 || !userComment.trim()) return
 
@@ -244,7 +357,9 @@ const EventDetailsPage = () => {
 
               <h1 className="text-4xl font-bold text-gray-900 mb-2 tracking-tight">{event.title}</h1>
               <div className="flex items-center space-x-4 text-sm text-gray-600">
-                <span className="font-medium text-gray-900">{event.venue}</span>
+                <Link to={`/venues/${event.venueId || event.id}`} className="font-medium text-gray-900 hover:text-brand-purple hover:underline">
+                  {event.venue}
+                </Link>
                 <span>•</span>
                 <span className="underline">{event.location}</span>
               </div>
@@ -326,7 +441,52 @@ const EventDetailsPage = () => {
               </div>
             )}
 
-            {/* ... Other tabs would go here, simplified for brevity but maintaining structure ... */}
+            {/* Venue Tab */}
+            {activeTab === 'venue' && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">{event.venueDetails?.name || event.venue}</h2>
+                  <p className="text-gray-600 leading-relaxed text-lg mb-8">{event.venueDetails?.description}</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3 text-gray-700">
+                        <MapPin className="w-5 h-5 text-gray-400" />
+                        <span>{event.venueDetails?.address || event.location}</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-gray-700">
+                        <Phone className="w-5 h-5 text-gray-400" />
+                        <span>{event.venueDetails?.phone || event.contact?.phone}</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-gray-700">
+                        <Globe className="w-5 h-5 text-gray-400" />
+                        <a href={`http://${event.venueDetails?.website}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{event.venueDetails?.website}</a>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-gray-900">Amenities</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {event.venueDetails?.amenities?.map((amenity, index) => (
+                          <Badge key={index} variant="secondary" className="bg-gray-100 text-gray-700 font-normal">
+                            {amenity}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-8 pt-8 border-t border-gray-100">
+                    <Link to={`/venues/${event.venueId || event.id}`}>
+                      <Button className="rounded-full px-8 bg-gray-900 text-white hover:bg-black">
+                        View Full Venue Details
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Reviews Tab */}
             {activeTab === 'reviews' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">

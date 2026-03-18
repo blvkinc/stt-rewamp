@@ -34,7 +34,7 @@ export const BookingProvider = ({ children }) => {
       price: 199,
       guests: 4,
       package: "Group Package",
-      image: "https://images.unsplash.com/photo-1566737236500-c8ac43014a8e?w=200&h=150&fit=crop"
+      image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=200&h=150&fit=crop"
     }
   ])
 

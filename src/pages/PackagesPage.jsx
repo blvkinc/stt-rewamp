@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Check, Star, Users, Clock, Calendar, ArrowRight, Gift } from 'lucide-react'
+import SaianaImage1 from '../client-demo-pics/BEBEACH1.webp'
 
 const PackagesPage = () => {
   const { eventId } = useParams()
@@ -9,7 +10,7 @@ const PackagesPage = () => {
 
   useEffect(() => {
     // Mock event data with packages - replace with actual API call
-    const mockEvent = {
+    let mockEvent = {
       id: parseInt(eventId),
       title: "Luxury Brunch at Burj Al Arab",
       venue: "Al Muntaha Restaurant",
@@ -76,6 +77,53 @@ const PackagesPage = () => {
         }
       ]
     }
+
+    if (String(eventId) === '99') {
+      mockEvent = {
+        id: 99,
+        title: "Saiana Brunch",
+        venue: "BeBeach Dubai",
+        image: SaianaImage1,
+        date: "2024-12-22",
+        time: "2:00 PM - 6:00 PM",
+        location: "Dubai Harbour",
+        rating: 4.9,
+        reviews: 842,
+        packages: [
+          {
+            id: 97,
+            name: "SOFT ESCAPE",
+            price: 320,
+            originalPrice: 350,
+            description: "Dining with Selection of Mocktails & Soft Drinks",
+            features: ["Mocktails", "Soft Drinks", "Dining", "Pool Access"],
+            popular: false,
+            maxGuests: 4
+          },
+          {
+            id: 98,
+            name: "SAIANA BAR",
+            price: 420,
+            originalPrice: 480,
+            description: "Dining with Selection of House Spirits, House Wine & Beer",
+            features: ["House Spirits", "House Wine", "Beer", "Dining", "Pool Access"],
+            popular: true,
+            maxGuests: 4
+          },
+          {
+            id: 99,
+            name: "GOLDEN SAIANA",
+            price: 520,
+            originalPrice: 600,
+            description: "Dining with Selection of House Spirits, House Wine, Prosecco, Cocktails & Beer",
+            features: ["House Spirits", "House Wine", "Prosecco", "Cocktails", "Beer", "Dining", "Pool Access"],
+            popular: false,
+            maxGuests: 8
+          }
+        ]
+      }
+    }
+
     setEvent(mockEvent)
     setSelectedPackage(mockEvent.packages[1]) // Default to popular package
   }, [eventId])

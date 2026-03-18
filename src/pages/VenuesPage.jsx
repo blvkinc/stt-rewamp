@@ -6,6 +6,7 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Card, CardContent } from '../components/ui/card'
 import VenueCard from '../components/VenueCard'
+import SaianaImage1 from '../client-demo-pics/BEBEACH1.webp'
 
 // Enhanced smooth scroll utility
 const smoothScrollTo = (element, offset = 80) => {
@@ -64,6 +65,19 @@ const VenuesPage = () => {
   ]
 
   const featuredVenues = [
+    {
+      id: 99,
+      name: "BeBeach Dubai",
+      category: "Beach Club",
+      image: SaianaImage1,
+      rating: 4.9,
+      reviews: 1205,
+      location: "Dubai Harbour",
+      capacity: 500,
+      priceRange: "AED 320-600",
+      amenities: ["Beach Access", "Pool", "Valet Parking", "Entertainment"],
+      upcomingEvents: 4
+    },
     {
       id: 1,
       name: "Azure Beach Club",

@@ -71,53 +71,53 @@ const SuperAdminDashboard = () => {
 
   // Mock platform-wide data
   const platformStats = {
-    totalVenues: 156,
-    totalMerchants: 89,
-    totalCustomers: 12847,
-    totalEvents: 342,
-    totalBookings: 5678,
-    totalRevenue: 2847392,
-    totalUsers: 45, // Super Admin specific
-    pendingApprovals: 5, // Super Admin specific
-    systemHealth: 98.5, // Super Admin specific
-    activeAlerts: 3, // Super Admin specific
+    totalVenues: 254,
+    totalMerchants: 142,
+    totalCustomers: 15847,
+    totalEvents: 642,
+    totalBookings: 8678,
+    totalRevenue: 5847392,
+    totalUsers: 95, // Super Admin specific
+    pendingApprovals: 8, // Super Admin specific
+    systemHealth: 99.9, // Super Admin specific
+    activeAlerts: 2, // Super Admin specific
     monthlyGrowth: {
-      venues: 12.5,
-      merchants: 8.3,
-      customers: 23.7,
-      revenue: 18.9,
-      users: 15.2,
-      approvals: -8.7
+      venues: 18.5,
+      merchants: 15.3,
+      customers: 34.7,
+      revenue: 42.9,
+      users: 12.2,
+      approvals: -12.7
     },
-    conversionRate: 14.2,
-    averageOrderValue: 287
+    conversionRate: 18.2,
+    averageOrderValue: 673
   }
 
   // Super Admin specific data
   const systemAlerts = [
     {
       id: 1,
-      type: 'security',
-      title: 'Multiple Failed Login Attempts',
-      description: 'Unusual login activity detected from IP 192.168.1.100',
-      severity: 'high',
+      type: 'performance',
+      title: 'High Booking Velocity Detected',
+      description: 'Saiana Brunch events are experiencing a 300% spike in traffic.',
+      severity: 'medium',
       timestamp: '5 minutes ago',
       status: 'active'
     },
     {
       id: 2,
-      type: 'performance',
-      title: 'High Server Load',
-      description: 'CPU usage exceeded 85% on Instance A',
-      severity: 'medium',
+      type: 'business',
+      title: 'Premium Tier Milestone',
+      description: 'Platform crossed 5 million AED in processed revenue.',
+      severity: 'info',
       timestamp: '15 minutes ago',
-      status: 'investigating'
+      status: 'resolved'
     },
     {
       id: 3,
       type: 'system',
-      title: 'DB Backup Success',
-      description: 'Nightly backup completed successfully',
+      title: 'Database Auto-Scaled',
+      description: 'Read replicas increased due to holiday traffic.',
       severity: 'info',
       timestamp: '6 hours ago',
       status: 'resolved'
@@ -128,27 +128,27 @@ const SuperAdminDashboard = () => {
     {
       id: 1,
       type: 'venue',
-      title: 'Atlantis The Palm - Nobu',
-      submittedBy: 'Nobu Hospitality',
-      submittedAt: '2024-12-18',
+      title: 'BeBeach Dubai Registration',
+      submittedBy: 'Saiana Group',
+      submittedAt: 'Today',
       priority: 'high',
       status: 'pending'
     },
     {
       id: 2,
       type: 'event',
-      title: 'New Year Gala Dinner',
-      submittedBy: 'Burj Al Arab',
-      submittedAt: '2024-12-17',
+      title: 'Saiana Brunch Launch',
+      submittedBy: 'Saiana Group',
+      submittedAt: 'Today',
       priority: 'critical',
       status: 'pending'
     },
     {
       id: 3,
       type: 'package',
-      title: 'Premium Brunch Package',
-      submittedBy: 'Four Seasons Resort',
-      submittedAt: '2024-12-16',
+      title: 'Golden Saiana Package',
+      submittedBy: 'Saiana Group',
+      submittedAt: 'Yesterday',
       priority: 'medium',
       status: 'under_review'
     }

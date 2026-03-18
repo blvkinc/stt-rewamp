@@ -6,6 +6,10 @@ import { Card, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
+import SaianaImage1 from '../client-demo-pics/BEBEACH1.webp'
+import SaianaImage2 from '../client-demo-pics/BEBEACH2.webp'
+import SaianaImage3 from '../client-demo-pics/BEBEACH3.webp'
+import SaianaImage4 from '../client-demo-pics/BEBEACH4.webp'
 
 const PackageDetailPage = () => {
   const { packageId } = useParams()
@@ -18,7 +22,7 @@ const PackageDetailPage = () => {
 
   useEffect(() => {
     // Mock package data - replace with actual API call
-    const mockPackage = {
+    let mockPackage = {
       id: parseInt(packageId),
       name: "Premium Brunch Package",
       event: "Luxury Brunch at Burj Al Arab",
@@ -92,6 +96,110 @@ const PackageDetailPage = () => {
       dietaryOptions: ["Vegetarian", "Vegan", "Gluten-free", "Halal"],
       ageRestriction: "All ages welcome. Children under 5 dine free.",
       dressCode: "Smart casual to formal attire recommended"
+    }
+
+    if (String(packageId) === '97') {
+      mockPackage = {
+        id: 97,
+        name: "SOFT ESCAPE",
+        event: "Saiana Brunch",
+        eventId: 99,
+        venue: "BeBeach Dubai",
+        venueId: 99,
+        image: SaianaImage1,
+        images: [SaianaImage1, SaianaImage2, SaianaImage3, SaianaImage4, SaianaImage1],
+        price: 320,
+        originalPrice: 350,
+        rating: 4.9,
+        reviews: 142,
+        location: "Dubai Harbour",
+        category: "Beach Brunch",
+        duration: "4 hours",
+        maxGuests: 4,
+        minGuests: 1,
+        popular: false,
+        description: "Experience the Saiana Brunch with our Soft Escape package. Enjoy a curated Mediterranean menu with unlimited mocktails and soft beverages at BeBeach.",
+        highlights: [
+           "Mediterranean Cuisine", "Included Pool Access", "Stunning Dubai Skyline Views", "Live Entertainment"
+        ],
+        features: ["Mocktails", "Soft Drinks", "Dining", "Pool Access"],
+        inclusions: ["Mocktails & Soft Drinks", "Mediterranean Menu", "Pool Access", "Live Entertainment"],
+        exclusions: ["Alcoholic Beverages", "Afterparty Drinks", "Transportation"],
+        availableDates: ["2024-12-22", "2024-12-29"],
+        timeSlots: [{ time: "2:00 PM - 6:00 PM", available: true }],
+        cancellationPolicy: "Free cancellation up to 48 hours before the event.",
+        dietaryOptions: ["Vegetarian", "Vegan Options available"],
+        ageRestriction: "21+",
+        dressCode: "Beach Chic"
+      }
+    } else if (String(packageId) === '98') {
+      mockPackage = {
+        id: 98,
+        name: "SAIANA BAR",
+        event: "Saiana Brunch",
+        eventId: 99,
+        venue: "BeBeach Dubai",
+        venueId: 99,
+        image: SaianaImage1,
+        images: [SaianaImage1, SaianaImage2, SaianaImage3, SaianaImage4, SaianaImage1],
+        price: 420,
+        originalPrice: 480,
+        rating: 4.9,
+        reviews: 320,
+        location: "Dubai Harbour",
+        category: "Beach Brunch",
+        duration: "4 hours",
+        maxGuests: 4,
+        minGuests: 1,
+        popular: true,
+        description: "Experience the Saiana Brunch with our Saiana Bar package. Enjoy a curated Mediterranean menu with unlimited house spirits, wine, and beer at BeBeach.",
+        highlights: [
+           "Mediterranean Cuisine", "Included Pool Access", "Stunning Dubai Skyline Views", "Live Entertainment"
+        ],
+        features: ["House Spirits", "House Wine", "Beer", "Dining", "Pool Access"],
+        inclusions: ["House Spirits, Wine & Beer", "Mediterranean Menu", "Pool Access", "Live Entertainment"],
+        exclusions: ["Premium Spirits", "Champagne", "Afterparty Drinks", "Transportation"],
+        availableDates: ["2024-12-22", "2024-12-29"],
+        timeSlots: [{ time: "2:00 PM - 6:00 PM", available: true }],
+        cancellationPolicy: "Free cancellation up to 48 hours before the event.",
+        dietaryOptions: ["Vegetarian", "Vegan Options available"],
+        ageRestriction: "21+",
+        dressCode: "Beach Chic"
+      }
+    } else if (String(packageId) === '99') {
+      mockPackage = {
+        id: 99,
+        name: "GOLDEN SAIANA",
+        event: "Saiana Brunch",
+        eventId: 99,
+        venue: "BeBeach Dubai",
+        venueId: 99,
+        image: SaianaImage1,
+        images: [SaianaImage1, SaianaImage2, SaianaImage3, SaianaImage4, SaianaImage1],
+        price: 520,
+        originalPrice: 600,
+        rating: 5.0,
+        reviews: 180,
+        location: "Dubai Harbour",
+        category: "Beach Brunch",
+        duration: "4 hours",
+        maxGuests: 8,
+        minGuests: 1,
+        popular: false,
+        description: "Experience the Saiana Brunch with our Golden Saiana package. Enjoy a curated Mediterranean menu with unlimited house spirits, wine, prosecco, cocktails, and beer at BeBeach.",
+        highlights: [
+           "Mediterranean Cuisine", "Included Pool Access", "Stunning Dubai Skyline Views", "Live Entertainment"
+        ],
+        features: ["House Spirits", "House Wine", "Prosecco", "Cocktails", "Beer", "Dining", "Pool Access"],
+        inclusions: ["House Spirits, Wine, Prosecco, Cocktails & Beer", "Mediterranean Menu", "Pool Access", "Live Entertainment"],
+        exclusions: ["Premium Champagne", "Afterparty Drinks", "Transportation"],
+        availableDates: ["2024-12-22", "2024-12-29"],
+        timeSlots: [{ time: "2:00 PM - 6:00 PM", available: true }],
+        cancellationPolicy: "Free cancellation up to 48 hours before the event.",
+        dietaryOptions: ["Vegetarian", "Vegan Options available"],
+        ageRestriction: "21+",
+        dressCode: "Beach Chic"
+      }
     }
 
     setTimeout(() => {

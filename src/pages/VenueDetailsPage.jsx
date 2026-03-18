@@ -4,6 +4,10 @@ import { MapPin, Star, Clock, Phone, Globe, Calendar, ArrowRight, ArrowLeft, Hea
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
+import SaianaImage1 from '../client-demo-pics/BEBEACH1.webp'
+import SaianaImage2 from '../client-demo-pics/BEBEACH2.webp'
+import SaianaImage3 from '../client-demo-pics/BEBEACH3.webp'
+import SaianaImage4 from '../client-demo-pics/BEBEACH4.webp'
 
 const VenueDetailsPage = () => {
   const { id } = useParams()
@@ -12,7 +16,7 @@ const VenueDetailsPage = () => {
 
   useEffect(() => {
     // Mock venue data - replace with actual API call
-    const mockVenue = {
+    let mockVenue = {
       id: parseInt(id),
       name: "Azure Beach Club",
       description: "Experience luxury dining with breathtaking ocean views at Dubai's premier beachfront destination. Our award-winning chefs create culinary masterpieces while you enjoy the pristine beach setting. Whether you are looking for a relaxing day by the pool or a vibrant nightlife experience, Azure Beach Club offers it all.",
@@ -25,7 +29,7 @@ const VenueDetailsPage = () => {
       images: [
         "https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=1600&h=900&fit=crop",
         "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
-        "https://images.unsplash.com/photo-1566737236500-c8ac43014a8e?w=800&h=600&fit=crop",
+        "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&h=600&fit=crop",
         "https://images.unsplash.com/photo-1540541338287-41700207dee6?w=800&h=600&fit=crop",
         "https://images.unsplash.com/photo-1571896349842-68c47e0f5550?w=800&h=600&fit=crop"
       ],
@@ -68,7 +72,7 @@ const VenueDetailsPage = () => {
           date: "2024-01-20",
           time: "6:00 PM - 11:00 PM",
           price: 199,
-          image: "https://images.unsplash.com/photo-1566737236500-c8ac43014a8e?w=400&h=300&fit=crop"
+          image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&h=300&fit=crop"
         }
       ],
       reviews: [
@@ -106,6 +110,72 @@ const VenueDetailsPage = () => {
         }
       ]
     }
+
+    if (String(id) === '99') {
+      mockVenue = {
+        id: 99,
+        name: "BeBeach Dubai",
+        description: "BeBeach is a luxury day club and restaurant bringing chic Mediterranean vibes to Dubai Harbour.",
+        address: "Dubai Harbour, UAE",
+        phone: "+971 54 300 0000",
+        website: "www.bebeach.com",
+        rating: 4.9,
+        reviews: 1205,
+        priceRange: "AED 320-600",
+        images: [
+          SaianaImage1,
+          SaianaImage2,
+          SaianaImage3,
+          SaianaImage4,
+          SaianaImage1
+        ],
+        amenities: [
+          "Pool",
+          "Open Format Music",
+          "Valet Parking",
+          "Wheelchair Accessible",
+          "Outdoor Seating",
+          "Entertainment"
+        ],
+        dressCode: "Beach Chic",
+        highlights: [
+          "Mediterranean cuisine",
+          "Sunset views",
+          "Poolside cabanas",
+          "Live DJs"
+        ],
+        openingHours: {
+          monday: "10:00 AM - 2:00 AM",
+          tuesday: "10:00 AM - 2:00 AM",
+          wednesday: "10:00 AM - 2:00 AM",
+          thursday: "10:00 AM - 2:00 AM",
+          friday: "10:00 AM - 3:00 AM",
+          saturday: "10:00 AM - 3:00 AM",
+          sunday: "10:00 AM - 2:00 AM"
+        },
+        upcomingEvents: [
+          {
+            id: 99,
+            title: "Saiana Brunch",
+            date: "2024-12-22",
+            time: "2:00 PM - 6:00 PM",
+            price: 320,
+            image: SaianaImage1
+          }
+        ],
+        reviews: [
+          {
+            id: 1,
+            name: "John D.",
+            date: "October 2024",
+            rating: 5,
+            comment: "Incredible vibe and views! The food and service were perfect.",
+            eventName: "Saiana Brunch"
+          }
+        ]
+      }
+    }
+
     setVenue(mockVenue)
   }, [id])
 

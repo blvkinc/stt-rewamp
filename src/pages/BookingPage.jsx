@@ -62,10 +62,13 @@ const BookingPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (step < 3) {
-      setStep(step + 1)
+    if (step === 1) {
+      setStep(2)
       window.scrollTo(0, 0)
-    } else {
+    } else if (step === 2) {
+      setStep(3)
+      window.scrollTo(0, 0)
+      
       // Process booking
       addBooking({
         ...bookingData,

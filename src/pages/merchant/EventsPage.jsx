@@ -35,6 +35,7 @@ import {
 } from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
 import MerchantLayout from '../../components/merchant/MerchantLayout'
+import SaianaImage from '../../client-demo-pics/BEBEACH1.webp'
 
 const { Title, Text } = Typography
 const { Option } = Select
@@ -54,6 +55,21 @@ const EventsPage = () => {
 
   // Mock events data if none exist
   const mockEvents = events.length > 0 ? events : [
+    {
+      id: 99,
+      title: "Saiana Brunch",
+      description: "From 2 PM to 6 PM, indulge in the ultimate Sunday brunch experience at Be Beach Dubai with SAIANA. Enjoy a curated menu featuring delights like Rock Shrimp Tempura and Slow-Cooked Short Rib, alongside live cooking stations and decadent desserts. The boho-chic atmosphere comes alive with high-energy live entertainment, including drummers and dancers, all set against the stunning Dubai skyline.",
+      status: "Published",
+      date: "2024-12-22",
+      time: "2:00 PM - 6:00 PM",
+      price: 320,
+      capacity: 300,
+      bookings: 142,
+      views: 1205,
+      rating: 4.9,
+      image: SaianaImage,
+      createdAt: "2024-11-20"
+    },
     {
       id: 1,
       title: "Weekend Brunch Buffet",

@@ -12,6 +12,7 @@ import {
 import EditEventModal from '../../components/admin/EditEventModal'
 import FilterDropdown from '../../components/admin/FilterDropdown'
 import SuperAdminLayout from '../../components/admin/SuperAdminLayout'
+import SaianaImage from '../../client-demo-pics/BEBEACH1.webp'
 
 const { Title, Text } = Typography
 
@@ -23,6 +24,17 @@ const EventsManagement = () => {
 
   // Mock Events Data
   const [events, setEvents] = useState([
+    {
+      id: 99,
+      title: 'Saiana Brunch',
+      date: '2024-12-22T14:00:00',
+      location: 'BeBeach Dubai - Dubai Harbour',
+      status: 'upcoming',
+      ticketsSold: 142,
+      totalTickets: 300,
+      image: SaianaImage,
+      category: 'Day Brunch'
+    },
     {
       id: 1,
       title: 'Neon Nights',

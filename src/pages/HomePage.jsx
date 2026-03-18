@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
 import EventCard from '../components/EventCard'
+import SaianaImage from '../client-demo-pics/BEBEACH1.webp'
 
 const smoothScrollTo = (element, offset = 80) => {
   if (!element) return
@@ -48,6 +49,18 @@ const HomePage = () => {
   }
 
   const featuredEvents = [
+    {
+      id: 99,
+      title: "Saiana Brunch",
+      venue: "BeBeach Dubai",
+      image: SaianaImage,
+      rating: 4.9,
+      reviews: 842,
+      price: 320,
+      location: "Dubai Harbour",
+      category: "Brunch",
+      time: "2:00 PM - 6:00 PM"
+    },
     {
       id: 1,
       title: "Luxury Brunch at Burj Al Arab",
@@ -108,6 +121,14 @@ const HomePage = () => {
   ]
 
   const topVenues = [
+    {
+      id: 99,
+      name: "BeBeach Dubai",
+      image: SaianaImage,
+      rating: 4.9,
+      reviews: 1205,
+      location: "Dubai Harbour"
+    },
     {
       id: 1,
       name: "Azure Beach Club",

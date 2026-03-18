@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import EventCard from '../components/EventCard'
 import VenueCard from '../components/VenueCard'
+import SaianaImage from '../client-demo-pics/BEBEACH1.webp'
 
 const ExplorePage = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -46,6 +47,20 @@ const ExplorePage = () => {
     // Simulate API call
     setTimeout(() => {
       const mockEvents = [
+        {
+          id: 99,
+          title: "Saiana Brunch",
+          venue: "BeBeach Dubai",
+          image: SaianaImage,
+          rating: 4.9,
+          reviews: 842,
+          price: 320,
+          location: "Dubai Harbour",
+          time: "2:00 PM - 6:00 PM",
+          category: "Beach Brunch",
+          date: "2024-12-22",
+          availability: "limited"
+        },
         {
           id: 1,
           title: "Luxury Brunch at Burj Al Arab",
@@ -106,6 +121,20 @@ const ExplorePage = () => {
 
       const mockVenues = [
         {
+          id: 99,
+          name: "BeBeach Dubai",
+          category: "Beach Club",
+          image: SaianaImage,
+          rating: 4.9,
+          reviews: 1205,
+          location: "Dubai Harbour",
+          address: "Dubai Harbour, UAE",
+          description: "Luxury beachfront club with stunning skyline views and world-class dining.",
+          upcomingEvents: 4,
+          priceRange: "AED 320-520",
+          amenities: ["Pool", "Open Format Music", "Valet Parking", "Entertainment", "Outdoor"]
+        },
+        {
           id: 1,
           name: "Azure Beach Club",
           category: "Beach Club",
@@ -164,6 +193,54 @@ const ExplorePage = () => {
       ]
 
       const mockPackages = [
+        {
+          id: 97,
+          name: "SOFT ESCAPE",
+          event: "Saiana Brunch",
+          venue: "BeBeach Dubai",
+          image: SaianaImage,
+          price: 320,
+          originalPrice: 350,
+          rating: 4.9,
+          reviews: 142,
+          features: ["Selection of Mocktails", "Soft Drinks", "Dining"],
+          category: "Beach Brunch",
+          location: "Dubai Harbour",
+          maxGuests: 4,
+          popular: true
+        },
+        {
+          id: 98,
+          name: "SAIANA BAR",
+          event: "Saiana Brunch",
+          venue: "BeBeach Dubai",
+          image: SaianaImage,
+          price: 420,
+          originalPrice: 480,
+          rating: 4.9,
+          reviews: 320,
+          features: ["House Spirits", "House Wine", "Beer", "Dining"],
+          category: "Beach Brunch",
+          location: "Dubai Harbour",
+          maxGuests: 4,
+          popular: true
+        },
+        {
+          id: 99,
+          name: "GOLDEN SAIANA",
+          event: "Saiana Brunch",
+          venue: "BeBeach Dubai",
+          image: SaianaImage,
+          price: 520,
+          originalPrice: 600,
+          rating: 5.0,
+          reviews: 180,
+          features: ["House Spirits", "House Wine", "Prosecco", "Cocktails & Beer", "Dining"],
+          category: "Beach Brunch",
+          location: "Dubai Harbour",
+          maxGuests: 8,
+          popular: true
+        },
         {
           id: 1,
           name: "Classic Brunch Package",
@@ -324,7 +401,7 @@ const ExplorePage = () => {
   ]
 
   const locations = [
-    'Downtown Dubai', 'Palm Jumeirah', 'Burj Al Arab', 'DIFC', 'Bur Dubai', 'Dubai Marina'
+    'Downtown Dubai', 'Palm Jumeirah', 'Burj Al Arab', 'DIFC', 'Bur Dubai', 'Dubai Marina', 'Dubai Harbour'
   ]
 
   const priceRanges = [

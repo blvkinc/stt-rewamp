@@ -56,45 +56,45 @@ const MerchantDashboard = () => {
 
   // Mock analytics data
   const analytics = {
-    totalRevenue: merchant?.totalRevenue || 15420,
-    totalBookings: merchant?.totalBookings || 89,
-    totalEvents: events.length || 12,
-    avgRating: merchant?.rating || 4.8,
-    monthlyGrowth: 12.5,
+    totalRevenue: merchant?.totalRevenue || 124500,
+    totalBookings: merchant?.totalBookings || 342,
+    totalEvents: events.length || 18,
+    avgRating: merchant?.rating || 4.9,
+    monthlyGrowth: 22.5,
     recentBookings: [
       {
         id: 1,
         customerName: "Sarah Ahmed",
-        event: "Weekend Brunch",
+        event: "Saiana Brunch @ BeBeach",
         date: "Today, 12:30 PM",
-        amount: 299,
+        amount: 840,
         status: "Confirmed",
         avatar: "https://i.pravatar.cc/150?u=1"
       },
       {
         id: 2,
         customerName: "Michael Johnson",
-        event: "Business Lunch",
+        event: "Luxury Brunch @ Burj Al Arab",
         date: "Yesterday, 1:00 PM",
-        amount: 149,
+        amount: 1098,
         status: "Completed",
         avatar: "https://i.pravatar.cc/150?u=2"
       },
       {
         id: 3,
         customerName: "Fatima Al-Zahra",
-        event: "Anniversary Dinner",
+        event: "Rooftop Party Experience",
         date: "Oct 24, 8:00 PM",
-        amount: 399,
+        amount: 796,
         status: "Pending",
         avatar: "https://i.pravatar.cc/150?u=3"
       },
       {
         id: 4,
         customerName: "John Smith",
-        event: "Rooftop Party",
+        event: "Beach Club Brunch",
         date: "Oct 23, 9:00 PM",
-        amount: 550,
+        amount: 498,
         status: "Cancelled",
         avatar: "https://i.pravatar.cc/150?u=4"
       }
@@ -102,27 +102,27 @@ const MerchantDashboard = () => {
     topEvents: [
       {
         id: 1,
-        name: "Weekend Brunch Buffet",
-        bookings: 24,
-        revenue: 7176,
+        name: "Saiana Brunch @ BeBeach",
+        bookings: 64,
+        revenue: 26880,
+        rating: 4.9,
+        growth: 25
+      },
+      {
+        id: 2,
+        name: "Luxury Brunch @ Burj",
+        bookings: 42,
+        revenue: 23058,
         rating: 4.8,
         growth: 15
       },
       {
-        id: 2,
-        name: "Business Lunch Special",
-        bookings: 18,
-        revenue: 2682,
-        rating: 4.5,
-        growth: 8
-      },
-      {
         id: 3,
-        name: "Romantic Dinner",
-        bookings: 15,
-        revenue: 5985,
-        rating: 4.9,
-        growth: 22
+        name: "Rooftop Party Experience",
+        bookings: 35,
+        revenue: 6965,
+        rating: 4.7,
+        growth: 12
       }
     ]
   }

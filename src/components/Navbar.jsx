@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { User, Heart, Menu, LogOut, Crown, X, Sparkles, Building, Mail, Phone, ArrowRight, Check } from 'lucide-react'
+import { User, Heart, Menu, LogOut, Crown, X, Sparkles, Building, Mail, Phone, ArrowRight, Check, Calendar } from 'lucide-react'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { useAuth } from '../context/AuthContext'
@@ -199,33 +199,43 @@ const Navbar = () => {
                   </div>
                 </Button>
 
-                {/* User Dropdown */}
                 {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-64 animate-in fade-in slide-in-from-top-2">
-                    <Card className="border border-gray-100 shadow-xl rounded-2xl overflow-hidden bg-white/95 backdrop-blur-md">
-                      <div className="p-4 border-b border-gray-100">
-                        <p className="font-semibold text-gray-900 truncate">{user?.name}</p>
-                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                  <div className="absolute right-0 top-full mt-2 w-72 animate-in fade-in slide-in-from-top-2">
+                    <Card className="border border-gray-100 shadow-2xl rounded-3xl overflow-hidden bg-white/95 backdrop-blur-xl">
+                      <div className="p-5 bg-gradient-to-br from-brand-purple/5 via-white to-brand-blue/5 border-b border-gray-100/50">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-full bg-gradient-brand flex items-center justify-center p-[2px] shadow-sm">
+                            <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
+                              <span className="text-lg font-bold gradient-brand-text bg-clip-text text-transparent">
+                                {user?.name?.charAt(0) || 'U'}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex-1 overflow-hidden">
+                            <p className="font-bold text-gray-900 truncate tracking-tight">{user?.name}</p>
+                            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="p-2 space-y-1">
+                      <div className="p-2 space-y-0.5">
                         <Link to="/profile" onClick={() => setUserMenuOpen(false)}>
-                          <Button variant="ghost" className="w-full justify-start rounded-xl font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-                            <User strokeWidth={1.5} className="w-4 h-4 mr-3 text-gray-500" /> My Profile
+                          <Button variant="ghost" className="w-full justify-start rounded-xl h-11 font-medium text-gray-700 hover:text-brand-purple hover:bg-brand-purple/5 transition-all">
+                            <User strokeWidth={1.75} className="w-4 h-4 mr-3" /> My Profile
                           </Button>
                         </Link>
                         <Link to="/profile?tab=bookings" onClick={() => setUserMenuOpen(false)}>
-                          <Button variant="ghost" className="w-full justify-start rounded-xl font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-                            <span className="w-4 h-4 mr-3 flex items-center justify-center text-gray-500">📅</span> My Bookings
+                          <Button variant="ghost" className="w-full justify-start rounded-xl h-11 font-medium text-gray-700 hover:text-brand-blue hover:bg-brand-blue/5 transition-all">
+                            <Calendar strokeWidth={1.75} className="w-4 h-4 mr-3" /> My Bookings
                           </Button>
                         </Link>
                         <Link to="/profile?tab=favorites" onClick={() => setUserMenuOpen(false)}>
-                          <Button variant="ghost" className="w-full justify-start rounded-xl font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-                            <Heart strokeWidth={1.5} className="w-4 h-4 mr-3 text-gray-500" /> Favorites
+                          <Button variant="ghost" className="w-full justify-start rounded-xl h-11 font-medium text-gray-700 hover:text-brand-red hover:bg-brand-red/5 transition-all">
+                            <Heart strokeWidth={1.75} className="w-4 h-4 mr-3" /> Favorites
                           </Button>
                         </Link>
-                        <div className="h-px bg-gray-100 my-1" />
-                        <Button variant="ghost" className="w-full justify-start rounded-xl font-medium text-red-600 hover:text-red-700 hover:bg-red-50" onClick={handleLogout}>
-                          <LogOut strokeWidth={1.5} className="w-4 h-4 mr-3" /> Sign Out
+                        <div className="h-px bg-gray-100/80 my-2 mx-2" />
+                        <Button variant="ghost" className="w-full justify-start rounded-xl h-11 font-medium text-gray-500 hover:text-rose-600 hover:bg-rose-50 transition-all" onClick={handleLogout}>
+                          <LogOut strokeWidth={1.75} className="w-4 h-4 mr-3" /> Sign Out
                         </Button>
                       </div>
                     </Card>
