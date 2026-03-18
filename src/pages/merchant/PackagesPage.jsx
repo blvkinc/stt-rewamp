@@ -61,20 +61,25 @@ const PackagesPage = () => {
   }, [events])
 
   const filteredPackages = packages.filter(pkg => {
-    const matchesSearch = pkg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pkg.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = (pkg.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (pkg.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (pkg.eventName || '').toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = filterStatus === 'all' || pkg.status?.toLowerCase() === filterStatus.toLowerCase()
     return matchesSearch && matchesStatus
   })
 
+  const ratedPackages = packages.filter(p => Number(p.rating) > 0)
+  const averageRating = ratedPackages.length > 0
+    ? (ratedPackages.reduce((sum, p) => sum + Number(p.rating || 0), 0) / ratedPackages.length).toFixed(1)
+    : 'N/A'
+
   // Calculate stats
   const stats = {
     total: packages.length,
-    active: packages.filter(p => p.status === 'active').length,
-    totalBookings: packages.reduce((sum, p) => sum + p.bookings, 0),
-    totalRevenue: packages.reduce((sum, p) => sum + p.revenue, 0),
-    avgRating: (packages.reduce((sum, p) => sum + p.rating, 0) / packages.filter(p => p.rating > 0).length).toFixed(1)
+    active: packages.filter(p => (p.status || '').toLowerCase() === 'active').length,
+    totalBookings: packages.reduce((sum, p) => sum + Number(p.bookings || 0), 0),
+    totalRevenue: packages.reduce((sum, p) => sum + Number(p.revenue || 0), 0),
+    avgRating: averageRating
   }
 
   const getStatusColor = (status) => {

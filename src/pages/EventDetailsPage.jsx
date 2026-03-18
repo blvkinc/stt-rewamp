@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { Badge } from '../components/ui/badge'
+import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert'
 import { motion } from 'framer-motion'
 
 import { useAuth } from '../context/AuthContext'
@@ -21,6 +22,7 @@ const EventDetailsPage = () => {
   const [selectedDate, setSelectedDate] = useState('')
   const [guestCount, setGuestCount] = useState(2)
   const [activeTab, setActiveTab] = useState('overview')
+  const [showDatePrompt, setShowDatePrompt] = useState(false)
 
   // Review Form State
   const [userRating, setUserRating] = useState(0)
@@ -284,6 +286,12 @@ const EventDetailsPage = () => {
     setUserRating(0)
     setUserComment('')
   }
+
+  useEffect(() => {
+    if (selectedDate && showDatePrompt) {
+      setShowDatePrompt(false)
+    }
+  }, [selectedDate, showDatePrompt])
 
   return (
     <div className="min-h-screen bg-white">
@@ -577,6 +585,14 @@ const EventDetailsPage = () => {
             {activeTab === 'packages' && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Choose your package</h2>
+                {showDatePrompt && (
+                  <Alert variant="warning" className="mb-4">
+                    <AlertTitle>Select a date first</AlertTitle>
+                    <AlertDescription>
+                      Choose a date to see availability before selecting a package.
+                    </AlertDescription>
+                  </Alert>
+                )}
                 <div className="grid grid-cols-1 gap-6">
                   {event.packages.map((pkg) => (
                     <Card key={pkg.id} className={`rounded-2xl overflow-hidden transition-all ${pkg.popular ? 'border-brand-purple shadow-md' : 'border-gray-200'}`}>
@@ -597,13 +613,17 @@ const EventDetailsPage = () => {
                             {pkg.originalPrice && <span className="text-sm text-gray-400 line-through">AED {pkg.originalPrice}</span>}
                           </div>
                           <span className="text-xs text-gray-500">per person</span>
-                          <Button className="w-full mt-3 rounded-xl bg-gray-900 text-white hover:bg-gray-800" onClick={() => {
-                            if (!selectedDate) {
-                              document.getElementById('date-selection')?.scrollIntoView({ behavior: 'smooth' });
-                              // Optionally show a toast or highlight the date input
-                            }
-                            setSelectedPackage(String(pkg.id));
-                          }}>
+                          <Button
+                            className="w-full mt-3 rounded-xl bg-gray-900 text-white hover:bg-gray-800"
+                            onClick={() => {
+                              if (!selectedDate) {
+                                setShowDatePrompt(true)
+                                document.getElementById('date-selection')?.scrollIntoView({ behavior: 'smooth' })
+                                return
+                              }
+                              setSelectedPackage(String(pkg.id))
+                            }}
+                          >
                             Select
                           </Button>
                         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom'
 import {
   Layout,
@@ -102,6 +102,33 @@ const MerchantLayout = () => {
     navigate('/merchant/auth')
   }
 
+  const selectedMenuKey = useMemo(() => {
+    const match = menuItems.find((item) => location.pathname.startsWith(item.key))
+    return match ? [match.key] : [location.pathname]
+  }, [location.pathname, menuItems])
+
+  const pageTitle = useMemo(() => {
+    const path = location.pathname
+    if (path.startsWith('/merchant/events/create')) return 'Create Event'
+    if (path.startsWith('/merchant/events/') && path.endsWith('/edit')) return 'Edit Event'
+    if (path.startsWith('/merchant/events/')) return 'Event Details'
+    if (path.startsWith('/merchant/events')) return 'Events'
+    if (path.startsWith('/merchant/packages/create')) return 'Create Package'
+    if (path.startsWith('/merchant/packages/')) return 'Edit Package'
+    if (path.startsWith('/merchant/packages')) return 'Packages'
+    if (path.startsWith('/merchant/bookings')) return 'Bookings'
+    if (path.startsWith('/merchant/customers')) return 'Customers'
+    if (path.startsWith('/merchant/analytics')) return 'Analytics'
+    if (path.startsWith('/merchant/promotions')) return 'Promotions'
+    if (path.startsWith('/merchant/advertising')) return 'Advertising'
+    if (path.startsWith('/merchant/settings')) return 'Settings'
+    if (path.startsWith('/merchant/faqs')) return 'FAQs'
+    if (path.startsWith('/merchant/profile')) return 'Profile'
+    if (path.startsWith('/merchant/plans')) return 'Plans'
+    if (path.startsWith('/merchant/dashboard')) return 'Dashboard'
+    return 'Dashboard'
+  }, [location.pathname])
+
   const userMenuItems = [
     {
       key: 'profile',
@@ -184,7 +211,7 @@ const MerchantLayout = () => {
             <Menu
               theme="dark"
               mode="inline"
-              selectedKeys={[location.pathname]}
+              selectedKeys={selectedMenuKey}
               items={menuItems}
               style={{
                 background: 'transparent',
@@ -241,7 +268,7 @@ const MerchantLayout = () => {
               }}
             />
             <Title level={4} style={{ margin: 0, fontSize: 18, color: '#001529' }}>
-              Dashboard
+              {pageTitle}
             </Title>
           </Space>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   Layout,
@@ -106,6 +106,11 @@ const SuperAdminLayout = ({ children }) => {
 
 
 
+  const selectedMenuKey = useMemo(() => {
+    const match = menuItems.find((item) => location.pathname.startsWith(item.key))
+    return match ? [match.key] : [location.pathname]
+  }, [location.pathname, menuItems])
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider
@@ -183,7 +188,7 @@ const SuperAdminLayout = ({ children }) => {
             <Menu
               theme="dark"
               mode="inline"
-              selectedKeys={[location.pathname]}
+              selectedKeys={selectedMenuKey}
               items={menuItems}
               style={{
                 background: 'transparent',

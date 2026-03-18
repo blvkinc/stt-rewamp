@@ -123,7 +123,6 @@ function App() {
                     <Route path="faqs" element={<FAQListPage />} />
                     <Route path="faqs/create" element={<CreateFAQPage />} />
                     <Route path="faqs/:id/edit" element={<CreateFAQPage />} />
-                    <Route path="faqs/:id/edit" element={<CreateFAQPage />} />
                     <Route path="profile" element={<MerchantProfilePage />} />
                     <Route path="plans" element={<MerchantPlansPage />} />
                   </Route>
