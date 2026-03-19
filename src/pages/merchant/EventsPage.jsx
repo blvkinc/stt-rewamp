@@ -42,7 +42,7 @@ const { Option } = Select
 
 const EventsPage = () => {
   const navigate = useNavigate()
-  const { merchant, events, cloneEvent, deleteEvent, isMerchantAuthenticated } = useMerchant()
+  const { merchant, events, cloneEvent, deleteEvent, seedDemoData, isMerchantAuthenticated } = useMerchant()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [activeTab, setActiveTab] = useState('active')
@@ -125,8 +125,20 @@ const EventsPage = () => {
   })
 
   const now = new Date()
-  const activeEvents = filteredEvents.filter(event => new Date(event.date) >= now)
-  const archivedEvents = filteredEvents.filter(event => new Date(event.date) < now)
+  const parseEventDate = (value) => {
+    if (!value) return null
+    const parsed = new Date(value)
+    return Number.isNaN(parsed.getTime()) ? null : parsed
+  }
+
+  const activeEvents = filteredEvents.filter(event => {
+    const eventDate = parseEventDate(event.date)
+    return !eventDate || eventDate >= now
+  })
+  const archivedEvents = filteredEvents.filter(event => {
+    const eventDate = parseEventDate(event.date)
+    return eventDate && eventDate < now
+  })
 
   const handleEditEvent = (eventId) => {
     navigate(`/merchant/events/${eventId}/edit`)
@@ -165,6 +177,12 @@ const EventsPage = () => {
       default:
         return 'default'
     }
+  }
+
+  const getEventImage = (event) => {
+    if (event.image) return event.image
+    if (Array.isArray(event.images) && event.images.length > 0) return event.images[0]
+    return SaianaImage
   }
 
   return (
@@ -237,9 +255,12 @@ const EventsPage = () => {
                     cover={
                       <div style={{ position: 'relative' }}>
                         <img
-                          src={event.image}
+                          src={getEventImage(event)}
                           alt={event.title}
                           style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                          onError={(e) => {
+                            e.currentTarget.src = SaianaImage
+                          }}
                         />
                         <div style={{ position: 'absolute', top: '12px', left: '12px' }}>
                           <Tag color={getStatusColor(event.status)}>
@@ -300,7 +321,10 @@ const EventsPage = () => {
                       <Space key="price">
                         <DollarOutlined />
                         <Text type="secondary">AED {event.price}</Text>
-                      </Space>
+                      </Space>,
+                      <Button type="link" icon={<EditOutlined />} onClick={() => handleEditEvent(event.id)} key="edit">
+                        Edit
+                      </Button>
                     ]}
                   >
                     <Card.Meta
@@ -362,11 +386,16 @@ const EventsPage = () => {
                 }
               >
                 {!searchTerm && statusFilter === 'all' && (
-                  <Link to="/merchant/events/create">
-                    <Button type="primary" size="large" icon={<PlusOutlined />}>
-                      Create Your First Event
+                  <Space>
+                    <Link to="/merchant/events/create">
+                      <Button type="primary" size="large" icon={<PlusOutlined />}>
+                        Create Your First Event
+                      </Button>
+                    </Link>
+                    <Button onClick={seedDemoData}>
+                      Load Demo Events
                     </Button>
-                  </Link>
+                  </Space>
                 )}
               </Empty>
             </Card>

@@ -25,6 +25,7 @@ import {
   ClockCircleOutlined,
   DollarOutlined,
   EditOutlined,
+  EnvironmentOutlined,
   EyeOutlined,
   MessageOutlined,
   SettingOutlined,
@@ -198,12 +199,22 @@ const EventDetailPage = () => {
               <Descriptions.Item label="Event Type">
                 {event.eventType || 'Not set'}
               </Descriptions.Item>
+              <Descriptions.Item label="Schedule">
+                {event.scheduleType === 'recurring'
+                  ? `Recurring (${(event.recurrence?.days || []).join(', ') || 'days not set'})`
+                  : 'One-time'}
+              </Descriptions.Item>
               <Descriptions.Item label="Date">
                 {eventDate}
               </Descriptions.Item>
               <Descriptions.Item label="Time">
                 {eventTime}
               </Descriptions.Item>
+              {event.scheduleType === 'recurring' && event.recurrence?.endDate && (
+                <Descriptions.Item label="Recurrence End">
+                  {event.recurrence.endDate}
+                </Descriptions.Item>
+              )}
               <Descriptions.Item label="Capacity">
                 {event.capacity ? `${event.capacity} guests` : 'Not set'}
               </Descriptions.Item>
@@ -248,7 +259,21 @@ const EventDetailPage = () => {
                       <Space size={8} wrap>
                         <Tag>{pkg.type || 'individual'}</Tag>
                         <Tag>{pkg.guestCount || 1} guests</Tag>
+                        {pkg.templateName && <Tag color="blue">Template: {pkg.templateName}</Tag>}
                       </Space>
+                      {pkg.rules && (
+                        <Space size={8} wrap>
+                          <Tag color="purple">
+                            Inventory: {pkg.rules.inventoryConsumption === 'per_package' ? 'per package' : 'per guest'}
+                          </Tag>
+                          {pkg.rules.maxBookingsPerDate && (
+                            <Tag color="gold">Max {pkg.rules.maxBookingsPerDate} / date</Tag>
+                          )}
+                          {(pkg.rules.cutoffHours !== null && pkg.rules.cutoffHours !== undefined) && (
+                            <Tag color="orange">Cutoff {pkg.rules.cutoffHours}h</Tag>
+                          )}
+                        </Space>
+                      )}
                     </Space>
                   </List.Item>
                 )}

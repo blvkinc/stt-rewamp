@@ -40,7 +40,7 @@ const { Title, Text } = Typography
 const { Option } = Select
 
 const PackagesPage = () => {
-  const { merchant, isMerchantAuthenticated, events, clonePackage } = useMerchant()
+  const { merchant, isMerchantAuthenticated, events, clonePackage, seedDemoData } = useMerchant()
 
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -104,6 +104,12 @@ const PackagesPage = () => {
       case 'pending': return <ClockCircleOutlined />
       default: return null
     }
+  }
+
+  const getPackageFeatures = (pkg) => {
+    if (Array.isArray(pkg.features) && pkg.features.length > 0) return pkg.features
+    if (Array.isArray(pkg.includes) && pkg.includes.length > 0) return pkg.includes
+    return []
   }
 
   const handleDuplicatePackage = (packageId) => {
@@ -293,6 +299,26 @@ const PackagesPage = () => {
                     <Text type="secondary" style={{ fontSize: '13px' }}>{pkg.description}</Text>
                     <br />
                     <Text type="secondary" style={{ fontSize: '11px' }}>{pkg.eventName}</Text>
+                    {pkg.templateName && (
+                      <div style={{ marginTop: 8 }}>
+                        <Tag color="blue" style={{ marginInlineEnd: 0 }}>
+                          Template: {pkg.templateName}
+                        </Tag>
+                      </div>
+                    )}
+                    {pkg.rules && (
+                      <div style={{ marginTop: 8, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <Tag color="purple">
+                          Inventory: {pkg.rules.inventoryConsumption === 'per_package' ? 'per package' : 'per guest'}
+                        </Tag>
+                        {pkg.rules.maxBookingsPerDate ? (
+                          <Tag color="gold">Max {pkg.rules.maxBookingsPerDate} / date</Tag>
+                        ) : null}
+                        {(pkg.rules.cutoffHours !== null && pkg.rules.cutoffHours !== undefined) ? (
+                          <Tag color="orange">Cutoff {pkg.rules.cutoffHours}h</Tag>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
                 }
               />
@@ -350,15 +376,20 @@ const PackagesPage = () => {
               <div>
                 <Text strong style={{ fontSize: '12px' }}>Includes:</Text>
                 <div style={{ marginTop: '8px' }}>
-                  {(Array.isArray(pkg.features) ? pkg.features : []).slice(0, 3).map((feature, index) => (
+                  {getPackageFeatures(pkg).slice(0, 3).map((feature, index) => (
                     <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
                       <CheckCircleOutlined style={{ color: '#52c41a', marginRight: '8px', fontSize: '12px' }} />
                       <Text style={{ fontSize: '12px' }}>{feature}</Text>
                     </div>
                   ))}
-                  {(Array.isArray(pkg.features) ? pkg.features : []).length > 3 && (
+                  {getPackageFeatures(pkg).length > 3 && (
                     <Text type="secondary" style={{ fontSize: '11px' }}>
-                      +{(Array.isArray(pkg.features) ? pkg.features : []).length - 3} more features
+                      +{getPackageFeatures(pkg).length - 3} more features
+                    </Text>
+                  )}
+                  {getPackageFeatures(pkg).length === 0 && (
+                    <Text type="secondary" style={{ fontSize: '11px' }}>
+                      No inclusions listed yet.
                     </Text>
                   )}
                 </div>
@@ -381,14 +412,19 @@ const PackagesPage = () => {
               </div>
             }
           >
-            <Button
-              onClick={() => {
-                setSearchTerm('')
-                setFilterStatus('all')
-              }}
-            >
-              Clear Filters
-            </Button>
+            <Space>
+              <Button
+                onClick={() => {
+                  setSearchTerm('')
+                  setFilterStatus('all')
+                }}
+              >
+                Clear Filters
+              </Button>
+              <Button onClick={seedDemoData}>
+                Load Demo Data
+              </Button>
+            </Space>
           </Empty>
         </Card>
       )}

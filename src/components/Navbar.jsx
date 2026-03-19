@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { User, Heart, Menu, LogOut, Crown, X, Sparkles, Building, Mail, Phone, ArrowRight, Check, Calendar } from 'lucide-react'
+import { User, Heart, Menu, LogOut, Crown, X, Sparkles, Building, Mail, Phone, ArrowRight, Check, Calendar, ShoppingBag } from 'lucide-react'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
 import { cn } from '../lib/utils'
 import sttLogo from '../assets/sttmainlogo.svg' // Ensure you have this or use text if missing
 import { motion } from 'framer-motion'
@@ -16,6 +17,7 @@ const Navbar = () => {
   const [isOnWhiteBackground, setIsOnWhiteBackground] = useState(false)
   const location = useLocation()
   const { user, logout, isAuthenticated } = useAuth()
+  const { itemCount } = useCart()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,7 +28,7 @@ const Navbar = () => {
   }, [])
 
   useEffect(() => {
-    const whiteBackgroundPages = ['/auth', '/profile', '/premium', '/review']
+    const whiteBackgroundPages = ['/auth', '/profile', '/premium', '/review', '/cart']
     const isWhitePage = whiteBackgroundPages.some(page => location.pathname.startsWith(page)) ||
       location.pathname.includes('/events/') ||
       location.pathname.includes('/venues/') ||
@@ -168,17 +170,36 @@ const Navbar = () => {
               <span className="text-sm font-medium">For Business</span>
             </Button>
 
-            {/* Favorites - Mobile & Desktop */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn(
+          {/* Favorites - Mobile & Desktop */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
                 "rounded-full transition-all hover:scale-105",
                 scrolled || isOnWhiteBackground ? "hover:bg-gray-100 text-gray-700" : "hover:bg-white/20 text-white"
               )}
             >
               <Heart strokeWidth={1.5} className={cn("w-5 h-5", scrolled || isOnWhiteBackground ? "" : "text-white")} />
             </Button>
+
+            {/* Cart */}
+            <Link to="/cart" className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "rounded-full transition-all hover:scale-105",
+                  scrolled || isOnWhiteBackground ? "hover:bg-gray-100 text-gray-700" : "hover:bg-white/20 text-white"
+                )}
+              >
+                <ShoppingBag strokeWidth={1.5} className={cn("w-5 h-5", scrolled || isOnWhiteBackground ? "" : "text-white")} />
+              </Button>
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-brand-purple text-white text-[10px] font-bold rounded-full px-1.5 py-0.5">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
 
             {/* User Profile */}
             {isAuthenticated ? (

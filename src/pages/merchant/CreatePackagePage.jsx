@@ -19,7 +19,7 @@ import {
 import { useMerchant } from '../../context/MerchantContext'
 
 const CreatePackagePage = () => {
-  const { merchant, isMerchantAuthenticated, events, addPackage, updatePackage } = useMerchant()
+  const { isMerchantAuthenticated, packageTemplates, addPackageTemplate, updatePackageTemplate } = useMerchant()
   const navigate = useNavigate()
   const { id } = useParams()
   const isEditMode = !!id
@@ -29,7 +29,6 @@ const CreatePackagePage = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    eventId: '',
     maxGuests: 2,
     minGuests: 1,
     status: 'Draft',
@@ -66,35 +65,23 @@ const CreatePackagePage = () => {
 
   useEffect(() => {
     if (isEditMode && events.length > 0) {
-      // Find package across all events
-      let foundPackage = null
-      let foundEventId = null
+      const foundTemplate = (packageTemplates || []).find(p => p.id === parseInt(id) || p.id === id)
 
-      for (const event of events) {
-        const pkg = (event.packages || []).find(p => p.id === parseInt(id) || p.id === id)
-        if (pkg) {
-          foundPackage = pkg
-          foundEventId = event.id
-          break
-        }
-      }
-
-      if (foundPackage) {
+      if (foundTemplate) {
         setFormData(prev => ({
           ...prev,
-          ...foundPackage,
-          features: foundPackage.features || [],
-          inclusions: foundPackage.inclusions || [],
-          exclusions: foundPackage.exclusions || [],
-          eventId: foundEventId,
-          pricingRules: foundPackage.pricingRules || prev.pricingRules,
-          availability: foundPackage.availability || prev.availability,
-          combinations: foundPackage.combinations || prev.combinations,
-          discounts: foundPackage.discounts || prev.discounts
+          ...foundTemplate,
+          features: foundTemplate.features || [],
+          inclusions: foundTemplate.inclusions || [],
+          exclusions: foundTemplate.exclusions || [],
+          pricingRules: foundTemplate.pricingRules || prev.pricingRules,
+          availability: foundTemplate.availability || prev.availability,
+          combinations: foundTemplate.combinations || prev.combinations,
+          discounts: foundTemplate.discounts || prev.discounts
         }))
       }
     }
-  }, [isEditMode, id, events])
+  }, [isEditMode, id, packageTemplates])
 
   const [newFeature, setNewFeature] = useState('')
   const [newInclusion, setNewInclusion] = useState('')
@@ -198,7 +185,6 @@ const CreatePackagePage = () => {
 
     if (!formData.name.trim()) newErrors.name = 'Package name is required'
     if (!formData.description.trim()) newErrors.description = 'Description is required'
-    if (!formData.eventId) newErrors.eventId = 'Please select an event'
     if (!formData.pricingRules.basePrice || formData.pricingRules.basePrice <= 0) newErrors.price = 'Valid base price is required'
     if (formData.maxGuests < formData.minGuests) newErrors.maxGuests = 'Max guests must be greater than min guests'
 
@@ -220,9 +206,9 @@ const CreatePackagePage = () => {
       }
 
       if (isEditMode) {
-        updatePackage(parseInt(id) || id, packageData)
+        updatePackageTemplate(parseInt(id) || id, packageData)
       } else {
-        addPackage(formData.eventId, packageData)
+        addPackageTemplate(packageData)
       }
 
       // Briefly wait then navigate
@@ -238,13 +224,6 @@ const CreatePackagePage = () => {
   }
 
   // Mock events data
-  const mockEvents = events.length > 0 ? events : [
-    { id: 1, name: 'Weekend Brunch' },
-    { id: 2, name: 'Business Lunch' },
-    { id: 3, name: 'Romantic Dinner' },
-    { id: 4, name: 'Family Celebration' }
-  ]
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -257,8 +236,8 @@ const CreatePackagePage = () => {
             <ArrowLeft className="w-5 h-5 text-neutral-600" />
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-neutral-800">{isEditMode ? 'Edit Package' : 'Create Package'}</h1>
-            <p className="text-neutral-600">{isEditMode ? 'Update package details' : 'Design a custom package for your event'}</p>
+            <h1 className="text-3xl font-bold text-neutral-800">{isEditMode ? 'Edit Package Template' : 'Create Package Template'}</h1>
+            <p className="text-neutral-600">{isEditMode ? 'Update template details' : 'Design a reusable package template for events'}</p>
           </div>
         </div>
 
@@ -282,7 +261,7 @@ const CreatePackagePage = () => {
             }}
           >
             <CheckCircle className="w-5 h-5" />
-            <span>{saving ? 'Saving...' : (isEditMode ? 'Update Package' : 'Publish Package')}</span>
+            <span>{saving ? 'Saving...' : (isEditMode ? 'Update Template' : 'Publish Template')}</span>
           </button>
         </div>
       </div>
@@ -363,22 +342,9 @@ const CreatePackagePage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Select Event *
-                  </label>
-                  <select
-                    name="eventId"
-                    value={formData.eventId}
-                    onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-300 outline-none ${errors.eventId ? 'border-red-300' : 'border-neutral-200'
-                      }`}
-                  >
-                    <option value="">Choose an event</option>
-                    {mockEvents.map(event => (
-                      <option key={event.id} value={event.id}>{event.name}</option>
-                    ))}
-                  </select>
-                  {errors.eventId && <p className="text-red-600 text-sm mt-1">{errors.eventId}</p>}
+                  <p className="text-sm text-neutral-500">
+                    Templates can be reused across events. Event-specific rules are configured when attaching the template to an event.
+                  </p>
                 </div>
               </div>
             </div>
@@ -391,6 +357,9 @@ const CreatePackagePage = () => {
           <div className="card border border-neutral-100">
             <div className="p-6">
               <h2 className="text-xl font-bold text-neutral-800 mb-6">Package Pricing Rules</h2>
+              <p className="text-sm text-neutral-500 mb-6">
+                These act as defaults. Event-specific rules can override them when the template is attached to an event.
+              </p>
 
               <div className="space-y-6">
                 {/* Base Pricing */}

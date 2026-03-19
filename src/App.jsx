@@ -4,6 +4,7 @@ import { ConfigProvider, App as AntApp } from 'antd'
 import { AuthProvider } from './context/AuthContext'
 import { BookingProvider } from './context/BookingContext'
 import { MerchantProvider } from './context/MerchantContext'
+import { CartProvider } from './context/CartContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
@@ -19,6 +20,8 @@ import ProfilePage from './pages/ProfilePage'
 import AuthPage from './pages/AuthPage'
 import PremiumUpgradePage from './pages/PremiumUpgradePage'
 import ReviewPage from './pages/ReviewPage'
+import CartPage from './pages/CartPage'
+import CartCheckoutPage from './pages/CartCheckoutPage'
 
 // Merchant Pages
 import MerchantLayout from './components/merchant/MerchantLayout'
@@ -29,6 +32,7 @@ import MerchantEventsPage from './pages/merchant/EventsPage'
 import CreateEventPage from './pages/merchant/CreateEventPage'
 import MerchantPackagesPage from './pages/merchant/PackagesPage'
 import CreatePackagePage from './pages/merchant/CreatePackagePage'
+import PackageEditRedirect from './pages/merchant/PackageEditRedirect'
 import BookingsPage from './pages/merchant/BookingsPage'
 import AnalyticsPage from './pages/merchant/AnalyticsPage'
 import PromotionsPage from './pages/merchant/PromotionsPage'
@@ -73,9 +77,10 @@ function App() {
       <AntApp>
         <AuthProvider>
           <BookingProvider>
-            <MerchantProvider>
-              <Router>
-                <Routes>
+            <CartProvider>
+              <MerchantProvider>
+                <Router>
+                  <Routes>
                   {/* Customer Routes */}
                   <Route path="/*" element={
                     <div className="min-h-screen flex flex-col">
@@ -95,6 +100,8 @@ function App() {
                           <Route path="/auth" element={<AuthPage />} />
                           <Route path="/premium" element={<PremiumUpgradePage />} />
                           <Route path="/review/:bookingId" element={<ReviewPage />} />
+                          <Route path="/cart" element={<CartPage />} />
+                          <Route path="/cart/checkout" element={<CartCheckoutPage />} />
                         </Routes>
                       </main>
                       <Footer />
@@ -112,7 +119,7 @@ function App() {
                     <Route path="events/:id/edit" element={<CreateEventPage />} />
                     <Route path="packages" element={<MerchantPackagesPage />} />
                     <Route path="packages/create" element={<CreatePackagePage />} />
-                    <Route path="packages/:id/edit" element={<CreatePackagePage />} />
+                    <Route path="packages/:id/edit" element={<PackageEditRedirect />} />
                     <Route path="bookings" element={<BookingsPage />} />
                     <Route path="analytics" element={<AnalyticsPage />} />
                     <Route path="promotions" element={<PromotionsPage />} />
@@ -146,9 +153,10 @@ function App() {
                   <Route path="/admin/logs" element={<SystemLogsPage />} />
                   <Route path="/admin/reports" element={<ReportsPage />} />
                   <Route path="/admin/profile" element={<AdminProfilePage />} />
-                </Routes>
-              </Router>
-            </MerchantProvider>
+                  </Routes>
+                </Router>
+              </MerchantProvider>
+            </CartProvider>
           </BookingProvider>
         </AuthProvider>
       </AntApp>

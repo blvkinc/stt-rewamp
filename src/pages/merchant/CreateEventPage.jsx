@@ -16,7 +16,9 @@ import {
   Space,
   Alert,
   Divider,
-  Tag
+  Tag,
+  Checkbox,
+  Radio
 } from 'antd'
 import {
   ArrowLeftOutlined,
@@ -31,6 +33,7 @@ import {
   QuestionCircleOutlined
 } from '@ant-design/icons'
 import { useMerchant } from '../../context/MerchantContext'
+import dayjs from 'dayjs'
 
 
 const { Title, Text } = Typography
@@ -39,7 +42,7 @@ const { Option } = Select
 const { Dragger } = Upload
 
 const CreateEventPage = () => {
-  const { merchant, addEvent, updateEvent, events, faqs, isMerchantAuthenticated, loading: authLoading } = useMerchant()
+  const { merchant, addEvent, updateEvent, events, faqs, packageTemplates, isMerchantAuthenticated, loading: authLoading } = useMerchant()
   const { id } = useParams()
   const isEditMode = !!id
   const [loading, setLoading] = useState(false)
@@ -57,9 +60,16 @@ const CreateEventPage = () => {
       price: '',
       guestCount: 1,
       description: '',
-      includes: ['']
+      includes: [''],
+      rules: {
+        inventoryConsumption: 'per_guest',
+        maxBookingsPerDate: null,
+        cutoffHours: null
+      }
     }
   ])
+  const [scheduleType, setScheduleType] = useState('one_time')
+  const [templateToAdd, setTemplateToAdd] = useState('')
 
   // Load event data if in edit mode
   React.useEffect(() => {
@@ -71,12 +81,24 @@ const CreateEventPage = () => {
           description: eventToEdit.description,
           eventType: eventToEdit.eventType,
           capacity: eventToEdit.capacity,
-          // Since date/time are complex objects in AntD usually, we just leave them blank or handle them if they exist
+          date: eventToEdit.date ? dayjs(eventToEdit.date) : null,
+          scheduleType: eventToEdit.scheduleType || 'one_time',
+          recurrenceEnd: eventToEdit.recurrence?.endDate ? dayjs(eventToEdit.recurrence.endDate) : null,
+          recurrenceDays: eventToEdit.recurrence?.days || [],
           specialRequirements: eventToEdit.specialRequirements,
           cancellationPolicy: eventToEdit.cancellationPolicy,
           selectedFaqs: eventToEdit.selectedFaqs
         })
-        setPackages(eventToEdit.packages || [])
+        setScheduleType(eventToEdit.scheduleType || 'one_time')
+        setPackages((eventToEdit.packages || []).map((pkg) => ({
+          rules: {
+            inventoryConsumption: 'per_guest',
+            maxBookingsPerDate: null,
+            cutoffHours: null,
+            ...(pkg.rules || {})
+          },
+          ...pkg
+        })))
         // Cannot easily pre-fill images due to File object requirements
       }
     }
@@ -116,9 +138,42 @@ const CreateEventPage = () => {
       price: '',
       guestCount: 1,
       description: '',
-      includes: ['']
+      includes: [''],
+      templateId: null,
+      templateName: null,
+      rules: {
+        inventoryConsumption: 'per_guest',
+        maxBookingsPerDate: null,
+        cutoffHours: null
+      }
     }
     setPackages([...packages, newPackage])
+  }
+
+  const addPackageFromTemplate = () => {
+    const selected = (packageTemplates || []).find(t => t.id === parseInt(templateToAdd, 10) || t.id === templateToAdd)
+    if (!selected) return
+    const templateIncludes = Array.isArray(selected.inclusions) && selected.inclusions.length > 0
+      ? selected.inclusions
+      : (Array.isArray(selected.features) ? selected.features : [])
+    const newPackage = {
+      id: Date.now(),
+      name: selected.name,
+      type: selected.pricingRules?.type || 'individual',
+      price: selected.pricingRules?.basePrice || selected.basePrice || '',
+      guestCount: selected.maxGuests || 1,
+      description: selected.description || '',
+      includes: templateIncludes.length > 0 ? templateIncludes : [''],
+      templateId: selected.id,
+      templateName: selected.name,
+      rules: {
+        inventoryConsumption: 'per_guest',
+        maxBookingsPerDate: null,
+        cutoffHours: null
+      }
+    }
+    setPackages([...packages, newPackage])
+    setTemplateToAdd('')
   }
 
   const updatePackage = (packageId, field, value) => {
@@ -160,6 +215,23 @@ const CreateEventPage = () => {
     ))
   }
 
+  const updatePackageRule = (packageId, field, value) => {
+    setPackages(packages.map(pkg =>
+      pkg.id === packageId
+        ? {
+          ...pkg,
+          rules: {
+            inventoryConsumption: 'per_guest',
+            maxBookingsPerDate: null,
+            cutoffHours: null,
+            ...(pkg.rules || {}),
+            [field]: value
+          }
+        }
+        : pkg
+    ))
+  }
+
   const handleSubmit = async (values, isDraft = true) => {
     setLoading(true)
     setError('')
@@ -170,7 +242,21 @@ const CreateEventPage = () => {
         date: values.date ? values.date.format('YYYY-MM-DD') : '',
         startTime: values.startTime ? values.startTime.format('HH:mm') : '',
         endTime: values.endTime ? values.endTime.format('HH:mm') : '',
-        packages: packages,
+        scheduleType: values.scheduleType || scheduleType,
+        recurrence: (values.scheduleType || scheduleType) === 'recurring' ? {
+          startDate: values.date ? values.date.format('YYYY-MM-DD') : '',
+          endDate: values.recurrenceEnd ? values.recurrenceEnd.format('YYYY-MM-DD') : '',
+          days: values.recurrenceDays || []
+        } : null,
+        packages: packages.map(pkg => ({
+          ...pkg,
+          rules: {
+            inventoryConsumption: 'per_guest',
+            maxBookingsPerDate: null,
+            cutoffHours: null,
+            ...(pkg.rules || {})
+          }
+        })),
         status: isDraft ? 'Draft' : 'Pending Approval'
       }
 
@@ -217,6 +303,11 @@ const CreateEventPage = () => {
         form={form}
         layout="vertical"
         onFinish={(values) => handleSubmit(values, false)}
+        onValuesChange={(changedValues) => {
+          if (Object.prototype.hasOwnProperty.call(changedValues, 'scheduleType')) {
+            setScheduleType(changedValues.scheduleType)
+          }
+        }}
         style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}
       >
         {/* Error/Success Messages */}
@@ -302,9 +393,32 @@ const CreateEventPage = () => {
               </Form.Item>
             </Col>
 
+            <Col xs={24} md={12}>
+              <Form.Item
+                label="Event Schedule"
+                name="scheduleType"
+                initialValue="one_time"
+                rules={[{ required: true, message: 'Please select schedule type' }]}
+              >
+                <Radio.Group
+                  optionType="button"
+                  buttonStyle="solid"
+                  size="large"
+                  style={{ width: '100%', display: 'flex' }}
+                >
+                  <Radio.Button value="one_time" style={{ flex: 1, textAlign: 'center' }}>
+                    One-time
+                  </Radio.Button>
+                  <Radio.Button value="recurring" style={{ flex: 1, textAlign: 'center' }}>
+                    Recurring
+                  </Radio.Button>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+
             <Col xs={24} md={8}>
               <Form.Item
-                label="Date"
+                label={scheduleType === 'recurring' ? 'Start Date' : 'Date'}
                 name="date"
                 rules={[{ required: true, message: 'Please select date' }]}
               >
@@ -345,6 +459,43 @@ const CreateEventPage = () => {
                 />
               </Form.Item>
             </Col>
+
+            {scheduleType === 'recurring' && (
+              <>
+                <Col xs={24} md={8}>
+                  <Form.Item
+                    label="Recurrence End"
+                    name="recurrenceEnd"
+                    rules={[{ required: true, message: 'Please select recurrence end date' }]}
+                  >
+                    <DatePicker
+                      size="large"
+                      style={{ width: '100%' }}
+                      suffixIcon={<CalendarOutlined />}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={16}>
+                  <Form.Item
+                    label="Repeat Days"
+                    name="recurrenceDays"
+                    rules={[{ required: true, message: 'Please select recurring days' }]}
+                  >
+                    <Checkbox.Group
+                      options={[
+                        { label: 'Mon', value: 'mon' },
+                        { label: 'Tue', value: 'tue' },
+                        { label: 'Wed', value: 'wed' },
+                        { label: 'Thu', value: 'thu' },
+                        { label: 'Fri', value: 'fri' },
+                        { label: 'Sat', value: 'sat' },
+                        { label: 'Sun', value: 'sun' }
+                      ]}
+                    />
+                  </Form.Item>
+                </Col>
+              </>
+            )}
           </Row>
         </Card>
 
@@ -413,15 +564,37 @@ const CreateEventPage = () => {
 
         {/* Packages */}
         <Card>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', gap: 16 }}>
             <Title level={4} style={{ margin: 0 }}>Packages</Title>
-            <Button
-              type="dashed"
-              icon={<PlusOutlined />}
-              onClick={addPackage}
-            >
-              Add Package
-            </Button>
+            <Space>
+              <Select
+                size="middle"
+                placeholder="Add from template"
+                value={templateToAdd || undefined}
+                onChange={setTemplateToAdd}
+                style={{ width: 220 }}
+                allowClear
+              >
+                {(packageTemplates || []).map((template) => (
+                  <Option key={template.id} value={template.id}>
+                    {template.name}
+                  </Option>
+                ))}
+              </Select>
+              <Button onClick={addPackageFromTemplate} disabled={!templateToAdd}>
+                Add Template
+              </Button>
+              <Link to="/merchant/packages/create" target="_blank">
+                <Button type="link">New Template</Button>
+              </Link>
+              <Button
+                type="dashed"
+                icon={<PlusOutlined />}
+                onClick={addPackage}
+              >
+                Add Package
+              </Button>
+            </Space>
           </div>
 
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -433,6 +606,9 @@ const CreateEventPage = () => {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <Title level={5} style={{ margin: 0 }}>Package {index + 1}</Title>
+                  {pkg.templateName && (
+                    <Tag color="blue">Template: {pkg.templateName}</Tag>
+                  )}
                   {packages.length > 1 && (
                     <Button
                       type="text"
@@ -532,6 +708,44 @@ const CreateEventPage = () => {
                     </Button>
                   </Space>
                 </Form.Item>
+
+                <Divider style={{ margin: '16px 0' }} />
+                <Title level={5} style={{ marginBottom: '12px' }}>Event Rules</Title>
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} md={8}>
+                    <Form.Item label="Inventory Consumption">
+                      <Select
+                        value={pkg.rules?.inventoryConsumption || 'per_guest'}
+                        onChange={(value) => updatePackageRule(pkg.id, 'inventoryConsumption', value)}
+                      >
+                        <Option value="per_guest">Per guest</Option>
+                        <Option value="per_package">Per package</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <Form.Item label="Max Bookings per Date">
+                      <InputNumber
+                        style={{ width: '100%' }}
+                        min={0}
+                        value={pkg.rules?.maxBookingsPerDate}
+                        onChange={(value) => updatePackageRule(pkg.id, 'maxBookingsPerDate', value)}
+                        placeholder="No limit"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <Form.Item label="Booking Cutoff (hours)">
+                      <InputNumber
+                        style={{ width: '100%' }}
+                        min={0}
+                        value={pkg.rules?.cutoffHours}
+                        onChange={(value) => updatePackageRule(pkg.id, 'cutoffHours', value)}
+                        placeholder="e.g. 6"
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
               </Card>
             ))}
           </Space>

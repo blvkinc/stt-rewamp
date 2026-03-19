@@ -9,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert'
 import { motion } from 'framer-motion'
 
 import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
 import SaianaImage1 from '../client-demo-pics/BEBEACH1.webp'
 import SaianaImage2 from '../client-demo-pics/BEBEACH2.webp'
 import SaianaImage3 from '../client-demo-pics/BEBEACH3.webp'
@@ -23,6 +24,8 @@ const EventDetailsPage = () => {
   const [guestCount, setGuestCount] = useState(2)
   const [activeTab, setActiveTab] = useState('overview')
   const [showDatePrompt, setShowDatePrompt] = useState(false)
+  const [cartAdded, setCartAdded] = useState(false)
+  const { addToCart } = useCart()
 
   // Review Form State
   const [userRating, setUserRating] = useState(0)
@@ -736,6 +739,37 @@ const EventDetailsPage = () => {
                               >
                                 Reserve
                               </Button>
+                            </div>
+
+                            <div className="pt-2">
+                              <Button
+                                variant="outline"
+                                className="w-full h-11 rounded-xl border-gray-200"
+                                onClick={() => {
+                                  const pkg = event.packages.find(p => p.id === parseInt(selectedPackage))
+                                  addToCart({
+                                    eventId: event.id,
+                                    eventTitle: event.title,
+                                    venue: event.venue,
+                                    date: selectedDate,
+                                    time: event.time,
+                                    packageId: pkg?.id,
+                                    packageName: pkg?.name,
+                                    guests: guestCount,
+                                    price: pkg?.price,
+                                    image: event.images[0]
+                                  })
+                                  setCartAdded(true)
+                                  setTimeout(() => setCartAdded(false), 2000)
+                                }}
+                              >
+                                Add to Cart
+                              </Button>
+                              {cartAdded && (
+                                <div className="mt-2 text-xs text-green-600 text-center">
+                                  Added to cart
+                                </div>
+                              )}
                             </div>
 
                             <p className="text-center text-xs text-gray-500">You won't be charged yet</p>

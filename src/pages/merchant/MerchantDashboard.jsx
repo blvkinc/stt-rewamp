@@ -12,18 +12,15 @@ import {
   Alert,
   Avatar,
   Table,
-  Progress,
   theme
 } from 'antd'
 import {
   BarChartOutlined,
   CalendarOutlined,
-  TeamOutlined,
   DollarOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
   StarFilled,
-  ClockCircleOutlined,
   PlusOutlined,
   UserOutlined,
   RightOutlined,
@@ -37,7 +34,7 @@ const { Title, Text } = Typography
 const MerchantDashboard = () => {
   const { merchant, events, isMerchantAuthenticated, loading } = useMerchant()
   const {
-    token: { colorBgContainer, borderRadiusLG, colorPrimary },
+    token: { colorPrimary },
   } = theme.useToken()
 
   if (loading) {
@@ -130,11 +127,11 @@ const MerchantDashboard = () => {
   const StatCard = ({ title, value, icon, change, color = colorPrimary, prefix = "" }) => (
     <Card
       hoverable
-      variant="borderless"
       style={{
         height: '100%',
         borderRadius: 16,
-        boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
+        border: '1px solid #f0f0f0',
+        boxShadow: '0 6px 18px rgba(15, 23, 42, 0.06)'
       }}
       styles={{ body: { padding: 24 } }}
     >
@@ -158,10 +155,10 @@ const MerchantDashboard = () => {
       </div>
 
       <Statistic
-        title={<Text type="secondary" style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{title}</Text>}
+        title={<Text type="secondary" style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.6px' }}>{title}</Text>}
         value={value}
         prefix={prefix}
-        styles={{ content: { fontSize: 32, fontWeight: 700, color: '#1f1f1f' } }}
+        styles={{ content: { fontSize: 30, fontWeight: 700, color: '#111827' } }}
       />
     </Card>
   )
@@ -212,36 +209,56 @@ const MerchantDashboard = () => {
   ];
 
   return (
-    <Space orientation="vertical" size="large" style={{ width: '100%' }}>
+    <Space direction="vertical" size="large" style={{ width: '100%' }}>
 
       {/* Header Section */}
-      <div style={{ padding: '0 8px' }}>
-        <Row justify="space-between" align="middle">
-          <Col>
-            <Text type="secondary" style={{ fontSize: 14 }}>Overview</Text>
-            <Title level={2} style={{ margin: '4px 0 0 0', fontWeight: 700 }}>
-              Welcome back, {merchant?.businessName} 👋
-            </Title>
+      <Card
+        style={{
+          borderRadius: 18,
+          border: '1px solid #f0f0f0',
+          background: 'linear-gradient(120deg, #f7fbff 0%, #ffffff 65%)',
+          boxShadow: '0 8px 24px rgba(15, 23, 42, 0.06)'
+        }}
+        styles={{ body: { padding: 24 } }}
+      >
+        <Row justify="space-between" align="middle" gutter={[16, 16]}>
+          <Col xs={24} md={16}>
+            <Space direction="vertical" size={6}>
+              <Text type="secondary" style={{ fontSize: 13, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                Overview
+              </Text>
+              <Title level={2} style={{ margin: 0, fontWeight: 700 }}>
+                Welcome back, {merchant?.businessName || 'Merchant'}
+              </Title>
+              <Text type="secondary">
+                Here is a clean snapshot of your events, revenue, and recent bookings.
+              </Text>
+            </Space>
           </Col>
-          <Col>
-            <Link to="/merchant/events/create">
-              <Button
-                type="primary"
-                size="large"
-                icon={<PlusOutlined />}
-                style={{
-                  background: 'linear-gradient(90deg, #1890ff, #40a9ff)',
-                  border: 'none',
-                  boxShadow: '0 4px 10px rgba(24, 144, 255, 0.3)',
-                  fontWeight: 600
-                }}
-              >
-                Create New Event
-              </Button>
-            </Link>
+          <Col xs={24} md={8} style={{ textAlign: 'right' }}>
+            <Space size={12}>
+              <Link to="/merchant/analytics">
+                <Button size="large">View Analytics</Button>
+              </Link>
+              <Link to="/merchant/events/create">
+                <Button
+                  type="primary"
+                  size="large"
+                  icon={<PlusOutlined />}
+                  style={{
+                    background: 'linear-gradient(90deg, #1890ff, #40a9ff)',
+                    border: 'none',
+                    boxShadow: '0 4px 10px rgba(24, 144, 255, 0.3)',
+                    fontWeight: 600
+                  }}
+                >
+                  Create Event
+                </Button>
+              </Link>
+            </Space>
           </Col>
         </Row>
-      </div>
+      </Card>
 
       {/* Status Alert */}
       {merchant?.status === 'Pending Approval' && (
@@ -294,6 +311,80 @@ const MerchantDashboard = () => {
         </Col>
       </Row>
 
+      <Row gutter={[24, 24]}>
+        <Col xs={24} xl={8}>
+          <Card
+            title={<Title level={4} style={{ margin: 0 }}>Quick Actions</Title>}
+            style={{
+              borderRadius: 16,
+              border: '1px solid #f0f0f0',
+              boxShadow: '0 6px 18px rgba(15, 23, 42, 0.06)'
+            }}
+          >
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <Link to="/merchant/events/create">
+                <Button type="primary" icon={<PlusOutlined />} block>
+                  Create Event
+                </Button>
+              </Link>
+              <Link to="/merchant/packages">
+                <Button icon={<BarChartOutlined />} block>
+                  Manage Packages
+                </Button>
+              </Link>
+              <Link to="/merchant/bookings">
+                <Button icon={<CalendarOutlined />} block>
+                  View Bookings
+                </Button>
+              </Link>
+            </Space>
+          </Card>
+        </Col>
+        <Col xs={24} xl={16}>
+          <Card
+            title={<Title level={4} style={{ margin: 0 }}>Performance Snapshot</Title>}
+            style={{
+              borderRadius: 16,
+              border: '1px solid #f0f0f0',
+              boxShadow: '0 6px 18px rgba(15, 23, 42, 0.06)',
+              height: '100%'
+            }}
+          >
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={8}>
+                <Statistic
+                  title="This Month Revenue"
+                  value={`AED ${analytics.totalRevenue.toLocaleString()}`}
+                />
+              </Col>
+              <Col xs={24} md={8}>
+                <Statistic
+                  title="This Month Bookings"
+                  value={analytics.totalBookings}
+                />
+              </Col>
+              <Col xs={24} md={8}>
+                <Statistic
+                  title="Active Events"
+                  value={analytics.totalEvents}
+                />
+              </Col>
+            </Row>
+            <div style={{ marginTop: 16, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <Tag color="success" style={{ borderRadius: 999 }}>
+                <ArrowUpOutlined /> {analytics.monthlyGrowth}%
+              </Tag>
+              <Tag color="gold" style={{ borderRadius: 999 }}>
+                <StarFilled /> {analytics.avgRating}
+              </Tag>
+              <Tag color="processing" style={{ borderRadius: 999 }}>
+                AED 8,240 next payout
+              </Tag>
+            </div>
+          </Card>
+        </Col>
+      </Row>
+
       {/* Tables Section */}
       <Row gutter={[24, 24]}>
         {/* Recent Bookings */}
@@ -301,8 +392,7 @@ const MerchantDashboard = () => {
           <Card
             title={<Title level={4} style={{ margin: 0 }}>Recent Bookings</Title>}
             extra={<Link to="/merchant/bookings"><Button type="link">View All <RightOutlined /></Button></Link>}
-            variant="borderless"
-            style={{ borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}
+            style={{ borderRadius: 16, border: '1px solid #f0f0f0', boxShadow: '0 6px 18px rgba(15, 23, 42, 0.06)' }}
             styles={{ body: { padding: 0 } }}
           >
             <Table
@@ -310,6 +400,7 @@ const MerchantDashboard = () => {
               dataSource={analytics.recentBookings}
               pagination={false}
               rowKey="id"
+              size="middle"
             />
           </Card>
         </Col>
@@ -318,8 +409,7 @@ const MerchantDashboard = () => {
         <Col xs={24} xl={8}>
           <Card
             title={<Title level={4} style={{ margin: 0 }}>Top Events</Title>}
-            variant="borderless"
-            style={{ borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.03)', height: '100%' }}
+            style={{ borderRadius: 16, border: '1px solid #f0f0f0', boxShadow: '0 6px 18px rgba(15, 23, 42, 0.06)', height: '100%' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {analytics.topEvents.map((event, index) => (
@@ -344,7 +434,7 @@ const MerchantDashboard = () => {
                       <Space style={{ marginTop: 4 }}>
                         <StarFilled style={{ color: '#faad14', fontSize: 12 }} />
                         <Text type="secondary" style={{ fontSize: 12 }}>{event.rating}</Text>
-                        <Text type="secondary" style={{ fontSize: 12 }}>• {event.bookings} bookings</Text>
+                        <Text type="secondary" style={{ fontSize: 12 }}>- {event.bookings} bookings</Text>
                       </Space>
                     </div>
                   </div>

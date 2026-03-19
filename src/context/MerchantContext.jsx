@@ -22,6 +22,18 @@ export const MerchantProvider = ({ children }) => {
   const [adsCampaigns, setAdsCampaigns] = useState([])
   const [adsInternal, setAdsInternal] = useState([])
   const [adsExternal, setAdsExternal] = useState([])
+  const [packageTemplates, setPackageTemplates] = useState([])
+
+  const isStorageArrayMissing = (key) => {
+    const raw = localStorage.getItem(key)
+    if (!raw) return true
+    try {
+      const parsed = JSON.parse(raw)
+      return !Array.isArray(parsed) || parsed.length === 0
+    } catch (error) {
+      return true
+    }
+  }
 
   // Check for existing merchant on app load
   useEffect(() => {
@@ -41,6 +53,8 @@ export const MerchantProvider = ({ children }) => {
 
       setMerchant(merchantData)
       loadMerchantData()
+      initializeMockData()
+      loadMerchantData()
     }
     setLoading(false)
   }, [])
@@ -55,7 +69,38 @@ export const MerchantProvider = ({ children }) => {
     // Load events
     const savedEvents = localStorage.getItem('stt_merchant_events')
     if (savedEvents) {
-      setEvents(JSON.parse(savedEvents))
+      let parsedEvents = []
+      try {
+        parsedEvents = JSON.parse(savedEvents)
+      } catch (error) {
+        parsedEvents = []
+      }
+      const sanitizeEvents = (list) => {
+        if (!Array.isArray(list)) return []
+        const isPlaceholderPackage = (pkg) => {
+          if (!pkg) return false
+          const name = String(pkg.name || '').toLowerCase()
+          const price = Number(pkg.price || 0)
+          return name === 'individual package' && price <= 0
+        }
+        const isPlaceholderEvent = (event) => {
+          const titleMissing = !event?.title || String(event.title).trim().length === 0
+          const hasImage = Boolean(event?.image) || (Array.isArray(event?.images) && event.images.length > 0)
+          const status = String(event?.status || '').toLowerCase()
+          return status === 'draft' && (titleMissing || !hasImage)
+        }
+        return list
+          .filter(event => !isPlaceholderEvent(event))
+          .map(event => ({
+            ...event,
+            packages: (event.packages || []).filter(pkg => !isPlaceholderPackage(pkg))
+          }))
+      }
+      const sanitized = sanitizeEvents(parsedEvents)
+      setEvents(sanitized)
+      if (sanitized.length !== parsedEvents.length || JSON.stringify(parsedEvents) !== JSON.stringify(sanitized)) {
+        localStorage.setItem('stt_merchant_events', JSON.stringify(sanitized))
+      }
     }
 
     // Load bookings
@@ -94,6 +139,11 @@ export const MerchantProvider = ({ children }) => {
     const savedAdsExternal = localStorage.getItem('stt_merchant_ads_external')
     if (savedAdsExternal) {
       setAdsExternal(JSON.parse(savedAdsExternal))
+    }
+
+    const savedTemplates = localStorage.getItem('stt_merchant_package_templates')
+    if (savedTemplates) {
+      setPackageTemplates(JSON.parse(savedTemplates))
     }
   }
 
@@ -194,7 +244,7 @@ export const MerchantProvider = ({ children }) => {
 
   const initializeMockData = () => {
     // Only initialize if data doesn't exist to avoid overwriting user edits
-    if (!localStorage.getItem('stt_merchant_promotions')) {
+    if (isStorageArrayMissing('stt_merchant_promotions')) {
       const mockPromotions = [
         {
           id: 1, name: 'Weekend Special', type: 'percentage', value: 20, code: 'WEEKEND20',
@@ -212,7 +262,7 @@ export const MerchantProvider = ({ children }) => {
       localStorage.setItem('stt_merchant_promotions', JSON.stringify(mockPromotions))
     }
 
-    if (!localStorage.getItem('stt_merchant_customers')) {
+    if (isStorageArrayMissing('stt_merchant_customers')) {
       const mockCustomers = [
         {
           id: 1, name: "Sarah Ahmed", email: "sarah.ahmed@email.com", phone: "+971 50 123 4567",
@@ -232,7 +282,7 @@ export const MerchantProvider = ({ children }) => {
       localStorage.setItem('stt_merchant_customers', JSON.stringify(mockCustomers))
     }
 
-    if (!localStorage.getItem('stt_merchant_bookings')) {
+    if (isStorageArrayMissing('stt_merchant_bookings')) {
       const mockBookings = [
         {
           id: 1, bookingRef: 'STT-001234', customerName: 'Sarah Ahmed', customerEmail: 'sarah.ahmed@email.com',
@@ -244,7 +294,7 @@ export const MerchantProvider = ({ children }) => {
       localStorage.setItem('stt_merchant_bookings', JSON.stringify(mockBookings))
     }
 
-    if (!localStorage.getItem('stt_merchant_ads_internal')) {
+    if (isStorageArrayMissing('stt_merchant_ads_internal')) {
       const mockAdsInternal = [
         { id: 1, name: 'Featured Event', description: 'Highlight your event at the top of search results', price: 299, duration: '7 days', features: ['Top position in search results'], metrics: { impressions: 12500, clicks: 890, bookings: 23 }, isActive: true },
         { id: 2, name: 'Homepage Banner', description: 'Display your venue on the homepage banner', price: 599, duration: '14 days', features: ['Homepage banner placement'], metrics: { impressions: 45000, clicks: 2100, bookings: 67 }, isActive: false }
@@ -252,7 +302,7 @@ export const MerchantProvider = ({ children }) => {
       localStorage.setItem('stt_merchant_ads_internal', JSON.stringify(mockAdsInternal))
     }
 
-    if (!localStorage.getItem('stt_merchant_ads_external')) {
+    if (isStorageArrayMissing('stt_merchant_ads_external')) {
       const mockAdsExternal = [
         { id: 1, name: 'Social Media Management', description: 'Complete social media marketing across all platforms', price: 1299, duration: 'Monthly', features: ['Instagram, Facebook, Twitter management'], platforms: ['instagram', 'facebook', 'twitter'], isActive: true },
         { id: 2, name: 'Influencer Partnerships', description: 'Connect with food bloggers and influencers', price: 2499, duration: 'Campaign', features: ['Influencer matching and outreach'], platforms: ['instagram', 'tiktok'], isActive: false }
@@ -260,13 +310,166 @@ export const MerchantProvider = ({ children }) => {
       localStorage.setItem('stt_merchant_ads_external', JSON.stringify(mockAdsExternal))
     }
 
-    if (!localStorage.getItem('stt_merchant_ads_campaigns')) {
+    if (isStorageArrayMissing('stt_merchant_ads_campaigns')) {
       const mockAdsCampaigns = [
         { id: 1, name: 'Weekend Brunch Promotion', type: 'Featured Event', startDate: '2024-12-01', endDate: '2024-12-07', budget: 299, spent: 156, impressions: 8900, clicks: 234, bookings: 12, status: 'Active' },
         { id: 2, name: 'Holiday Special Campaign', type: 'Social Media Management', startDate: '2024-12-01', endDate: '2024-12-31', budget: 1299, spent: 432, impressions: 25600, clicks: 1200, bookings: 45, status: 'Active' }
       ]
       localStorage.setItem('stt_merchant_ads_campaigns', JSON.stringify(mockAdsCampaigns))
     }
+
+    const mockTemplates = [
+        {
+          id: 1,
+          name: 'Soft Drinks Package',
+          description: 'Includes unlimited soft drinks with dining.',
+          pricingRules: {
+            type: 'individual',
+            basePrice: 120,
+            genderPricing: { enabled: false, ladies: '', gents: '', kids: '' },
+            timePricing: { enabled: false, type: 'early_bird', discountLimit: '', rules: [] },
+            fixedPricing: { enabled: false, amount: '' }
+          },
+          maxGuests: 4,
+          minGuests: 1,
+          features: ['Unlimited soft drinks', 'Dining access'],
+          inclusions: ['Soft drinks', 'Dining'],
+          exclusions: [],
+          status: 'Draft'
+        },
+        {
+          id: 2,
+          name: 'House Beverages Package',
+          description: 'Selection of house beverages for brunch experiences.',
+          pricingRules: {
+            type: 'individual',
+            basePrice: 180,
+            genderPricing: { enabled: false, ladies: '', gents: '', kids: '' },
+            timePricing: { enabled: false, type: 'early_bird', discountLimit: '', rules: [] },
+            fixedPricing: { enabled: false, amount: '' }
+          },
+          maxGuests: 6,
+          minGuests: 1,
+          features: ['House spirits', 'Beer & wine'],
+          inclusions: ['House spirits', 'Beer', 'Wine'],
+          exclusions: [],
+          status: 'Draft'
+        }
+      ]
+    const existingTemplatesRaw = localStorage.getItem('stt_merchant_package_templates')
+    let existingTemplates = []
+    try {
+      existingTemplates = existingTemplatesRaw ? JSON.parse(existingTemplatesRaw) : []
+    } catch (error) {
+      existingTemplates = []
+    }
+    if (!Array.isArray(existingTemplates)) existingTemplates = []
+    const mergedTemplates = [...existingTemplates]
+    mockTemplates.forEach((template) => {
+      const exists = mergedTemplates.some(t => t.id === template.id || t.name === template.name)
+      if (!exists) mergedTemplates.push(template)
+    })
+    if (mergedTemplates.length !== existingTemplates.length) {
+      localStorage.setItem('stt_merchant_package_templates', JSON.stringify(mergedTemplates))
+    }
+
+    const mockEvents = [
+        {
+          id: 101,
+          title: 'Saiana Brunch Sunday',
+          description: 'Sunday brunch experience with live DJ and beach access.',
+          eventType: 'Brunch',
+          date: '2026-03-23',
+          startTime: '14:00',
+          endTime: '18:00',
+          capacity: 200,
+          status: 'Published',
+          createdAt: new Date().toISOString(),
+          views: 120,
+          bookings: 34,
+          scheduleType: 'one_time',
+          packages: [
+            {
+              id: 5001,
+              name: 'Soft Drinks Package',
+              description: 'Unlimited soft drinks with dining.',
+              price: 120,
+              guestCount: 1,
+              type: 'individual',
+              includes: ['Soft drinks', 'Dining'],
+              templateId: 1,
+              templateName: 'Soft Drinks Package',
+              rules: {
+                inventoryConsumption: 'per_guest',
+                maxBookingsPerDate: 60,
+                cutoffHours: 6
+              },
+              status: 'Active'
+            }
+          ]
+        },
+        {
+          id: 102,
+          title: 'Twilight Brunch Series',
+          description: 'Recurring brunch series with sunset views and soft drinks.',
+          eventType: 'Brunch',
+          date: '2026-03-22',
+          startTime: '16:00',
+          endTime: '20:00',
+          capacity: 150,
+          status: 'Published',
+          createdAt: new Date().toISOString(),
+          views: 88,
+          bookings: 20,
+          scheduleType: 'recurring',
+          recurrence: {
+            startDate: '2026-03-22',
+            endDate: '2026-04-12',
+            days: ['sun']
+          },
+          packages: [
+            {
+              id: 5002,
+              name: 'Soft Drinks Package',
+              description: 'Unlimited soft drinks with dining.',
+              price: 120,
+              guestCount: 1,
+              type: 'individual',
+              includes: ['Soft drinks', 'Dining'],
+              templateId: 1,
+              templateName: 'Soft Drinks Package',
+              rules: {
+                inventoryConsumption: 'per_package',
+                maxBookingsPerDate: 40,
+                cutoffHours: 24
+              },
+              status: 'Active'
+            }
+          ]
+        }
+      ]
+
+    const existingEventsRaw = localStorage.getItem('stt_merchant_events')
+    let existingEvents = []
+    try {
+      existingEvents = existingEventsRaw ? JSON.parse(existingEventsRaw) : []
+    } catch (error) {
+      existingEvents = []
+    }
+    if (!Array.isArray(existingEvents)) existingEvents = []
+    const mergedEvents = [...existingEvents]
+    mockEvents.forEach((event) => {
+      const exists = mergedEvents.some(e => e.id === event.id || e.title === event.title)
+      if (!exists) mergedEvents.push(event)
+    })
+    if (mergedEvents.length !== existingEvents.length) {
+      localStorage.setItem('stt_merchant_events', JSON.stringify(mergedEvents))
+    }
+  }
+
+  const seedDemoData = () => {
+    initializeMockData()
+    loadMerchantData()
   }
 
   const updateMerchant = (updates) => {
@@ -399,6 +602,32 @@ export const MerchantProvider = ({ children }) => {
       updatedPackages[foundPackageIndex] = { ...updatedPackages[foundPackageIndex], ...updates, status: updates.status || updatedPackages[foundPackageIndex].status || 'draft' }
       updateEvent(foundEvent.id, { packages: updatedPackages })
     }
+  }
+
+  const addPackageTemplate = (templateData) => {
+    const newTemplate = {
+      id: Date.now(),
+      ...templateData,
+      createdAt: new Date().toISOString()
+    }
+    const updatedTemplates = [...packageTemplates, newTemplate]
+    setPackageTemplates(updatedTemplates)
+    localStorage.setItem('stt_merchant_package_templates', JSON.stringify(updatedTemplates))
+    return newTemplate
+  }
+
+  const updatePackageTemplate = (templateId, updates) => {
+    const updatedTemplates = packageTemplates.map(t =>
+      t.id === templateId ? { ...t, ...updates } : t
+    )
+    setPackageTemplates(updatedTemplates)
+    localStorage.setItem('stt_merchant_package_templates', JSON.stringify(updatedTemplates))
+  }
+
+  const deletePackageTemplate = (templateId) => {
+    const updatedTemplates = packageTemplates.filter(t => t.id !== templateId)
+    setPackageTemplates(updatedTemplates)
+    localStorage.setItem('stt_merchant_package_templates', JSON.stringify(updatedTemplates))
   }
 
   const clonePackage = (packageId) => {
@@ -564,6 +793,7 @@ export const MerchantProvider = ({ children }) => {
     adsExternal,
     toggleCampaignStatus,
     purchaseAdPackage,
+    seedDemoData,
     loading,
     registerMerchant,
     loginMerchant,
@@ -577,6 +807,10 @@ export const MerchantProvider = ({ children }) => {
     addPackage,
     updatePackage,
     clonePackage,
+    packageTemplates,
+    addPackageTemplate,
+    updatePackageTemplate,
+    deletePackageTemplate,
     faqs,
     addFaq,
     updateFaq,
