@@ -1,0 +1,282 @@
+﻿<!DOCTYPE html>
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="utf-8"><style>
+body{font-family:Calibri, Arial, sans-serif; font-size:11pt; color:#111;}
+h1{font-size:20pt;} h2{font-size:16pt;} h3{font-size:14pt;} h4{font-size:12pt;}
+table{border-collapse:collapse; width:100%; margin:12px 0;}
+th,td{border:1px solid #999; padding:6px 8px; vertical-align:top;}
+th{background:#f2f2f2;}
+code{font-family:Consolas, monospace; background:#f6f6f6; padding:1px 3px; border-radius:3px;}
+</style></head><body>
+<h1>MVP vs Prototype Alignment Notes (v0.5) - Comprehensive</h1>
+<p>Source document: Set The Table - MVP Technical Requirements Document - Working Draft v0.5 (Prepared 2026-03-22)</p>
+<p>Prototype analyzed: STT React prototype in C:\Users\Blvk Inc\Desktop\Stt</p>
+<p>Analysis date: 2026-03-23</p>
+<p>Note: The prototype is front-end only. Data is stored in localStorage and no backend workflows, emails, or Stripe integration are present.</p>
+<p>Status legend:</p>
+<ul>
+<li>Implemented: UI plus working client-side logic that demonstrates the requirement in the prototype.</li>
+<li>UI-only: Screens or inputs exist, but no real data model enforcement or backend support.</li>
+<li>Partial: Some fields or flows exist, but key parts of the requirement are missing.</li>
+<li>Not implemented: The requirement is not present in the prototype.</li>
+<li>Conflict with MVP: The prototype includes opposite scope or a future-phase feature.</li>
+<li>Out of scope but present: MVP explicitly excludes it, yet the prototype includes it.</li>
+</ul>
+<h2>Prototype snapshot (routes, data, and key behaviors)</h2>
+<ul>
+<li>Customer routes: /, /explore, /events, /events/:id, /venues, /venues/:id, /packages/:eventId, /packages/detail/:packageId, /booking/:id, /profile, /auth, /premium, /review/:bookingId, /cart, /cart/checkout.</li>
+<li>Merchant routes: /merchant/auth, /merchant/onboarding, /merchant/dashboard, /merchant/events, /merchant/events/create, /merchant/events/:id/edit, /merchant/events/:id, /merchant/packages, /merchant/packages/create, /merchant/packages/:id/edit, /merchant/bookings, /merchant/customers, /merchant/analytics, /merchant/promotions, /merchant/advertising, /merchant/faqs, /merchant/settings, /merchant/profile, /merchant/plans.</li>
+<li>Admin routes: /admin/dashboard, /admin/merchants, /admin/merchants/new, /admin/merchants/:id/edit, /admin/users, /admin/events, /admin/approvals, /admin/payments, /admin/analytics, /admin/system, /admin/logs, /admin/reports, /admin/profile, /admin/venues/:venueId.</li>
+<li>Storage model: localStorage keys for stt_user, stt_cart, stt_merchant and multiple stt_merchant_* collections.</li>
+<li>Demo data: Soft Drinks Package template is reused across two events with different per-event rules in MerchantContext:</li>
+<li>Event 101 (one-time) uses inventoryConsumption=per_guest, maxBookingsPerDate=60, cutoffHours=6.</li>
+<li>Event 102 (recurring) uses inventoryConsumption=per_package, maxBookingsPerDate=40, cutoffHours=24.</li>
+<li>Cart behavior: CartPage supports per-item checkout and an aggregated "Checkout All" flow (multi-checkout UX).</li>
+<li>Date gating: EventDetailsPage requires a date selection before package selection.</li>
+</ul>
+<h2>MVP design principles vs prototype</h2>
+<ul>
+<li>Admin-first launch: Conflict. Prototype includes merchant self-service portal and onboarding.</li>
+<li>Venue-first MVP model: Partial. Prototype centers merchants; venue records exist but are not admin-first.</li>
+<li>Future merchant compatibility: Partial. Prototype uses merchantId in event objects but does not model venue-claim.</li>
+<li>Normalized package architecture: Partial. Package templates exist and are reused across events.</li>
+<li>Occurrence-level inventory: Not implemented.</li>
+<li>Default + exception occurrence control: Not implemented.</li>
+<li>Operational availability controls: Not implemented.</li>
+<li>Per-event-package payment control: Not implemented.</li>
+<li>Mixed-cart privacy by venue: Not implemented.</li>
+<li>Structured customer data ownership: Not implemented.</li>
+<li>Venue-level financial ownership: Partial. Merchant settings capture banking, but not in admin portal.</li>
+<li>Event-level availability control: Not implemented.</li>
+</ul>
+<h2>Actor model alignment</h2>
+<ul>
+<li>Customer: Implemented as UI-only (customer website, auth, cart, booking, profile).</li>
+<li>STT Super Admin: Implemented as UI-only (admin portal routes).</li>
+<li>STT Admin: Not implemented as a distinct role.</li>
+<li>STT Editor: Not implemented.</li>
+<li>STT Bookings &amp; Customer Manager: Not implemented.</li>
+<li>Merchant organization (future phase): Conflict. Prototype includes full merchant onboarding and portal.</li>
+</ul>
+<h2>6.1 Customer requirements (CUS-01 to CUS-17)</h2>
+<table>
+<thead><tr><th>ID</th><th>MVP requirement</th><th>Prototype status</th><th>Evidence (routes/files)</th><th>Gap / Notes</th></tr></thead>
+<tbody>
+<tr><td>CUS-01</td><td>Email signup/login</td><td>UI-only</td><td>/auth, src/pages/AuthPage.jsx, src/context/AuthContext.jsx</td><td>localStorage-only; no backend auth or validation beyond client checks</td></tr>
+<tr><td>CUS-02</td><td>Google and Facebook login</td><td>UI-only</td><td>/auth, src/pages/AuthPage.jsx</td><td>Buttons only, no OAuth flow</td></tr>
+<tr><td>CUS-03</td><td>Email verification, forgot password, reset password</td><td>Not implemented</td><td>/auth</td><td>No verification/reset flows or screens</td></tr>
+<tr><td>CUS-04</td><td>Customer dashboard with bookings, receipts, favorites, cancellation requests</td><td>Partial</td><td>/profile, src/pages/ProfilePage.jsx, src/context/BookingContext.jsx</td><td>Bookings and favorites exist; receipts and cancellation requests are missing</td></tr>
+<tr><td>CUS-05</td><td>Searchable listings with filters: Day, Day/Night, Cuisine, Budget, Area, Brand/Hotel, Rating, Type, Offers, Birthday Offers, Family/Animal Friendly, Indoor/Outdoor</td><td>Partial</td><td>/explore, src/pages/ExplorePage.jsx</td><td>Only category, location, price range, date; rating/availability only in mock data</td></tr>
+<tr><td>CUS-06</td><td>Event details: venue organizer, categories/tags, map, date/time, accessibility, description, ordered media, FAQs, SEO fields</td><td>Partial</td><td>/events/:id, src/pages/EventDetailsPage.jsx</td><td>Venue name, time, description, media exist; no map embed, accessibility, FAQs, or SEO fields</td></tr>
+<tr><td>CUS-07</td><td>Multi-event and multi-venue cart</td><td>Implemented (UI)</td><td>/cart, /cart/checkout, src/context/CartContext.jsx</td><td>Client-side only; no inventory or payment enforcement</td></tr>
+<tr><td>CUS-08</td><td>Bookable calendar with occurrence-level availability</td><td>Partial</td><td>/events/:id</td><td>Date input exists; no occurrence model or time-slot availability logic</td></tr>
+<tr><td>CUS-09</td><td>Promo codes and pricing rules applied at checkout</td><td>Not implemented</td><td>/cart/checkout, /booking/:id</td><td>No promo code field or discount engine in checkout</td></tr>
+<tr><td>CUS-10</td><td>Mixed payment modes per booking line (full/deposit/no-upfront)</td><td>Not implemented</td><td>/cart/checkout, /booking/:id</td><td>Only full payment UI; no Stripe integration</td></tr>
+<tr><td>CUS-11</td><td>Booking confirmation and e-ticket accessible in history</td><td>Partial</td><td>/booking/:id, /profile</td><td>Confirmation UI exists; no receipt/e-ticket storage or view</td></tr>
+<tr><td>CUS-12</td><td>Required system emails (verification, welcome, confirmation, receipt/e-ticket, payment failed, reminders, cancellation/refund)</td><td>Not implemented</td><td>N/A</td><td>No email system</td></tr>
+<tr><td>CUS-13</td><td>Venue-level privacy for multi-venue orders</td><td>Not implemented</td><td>N/A</td><td>No venue-scoped data isolation or exports</td></tr>
+<tr><td>CUS-14</td><td>Customer identity/contact/residence data fields (DOB, gender, nationality, stay type, residence, WhatsApp, phone)</td><td>Not implemented</td><td>/profile, /booking/:id</td><td>Only name, email, phone captured</td></tr>
+<tr><td>CUS-15</td><td>Customer classification for Teacher and Cabin Crew</td><td>Not implemented</td><td>N/A</td><td>No structured classification fields</td></tr>
+<tr><td>CUS-16</td><td>Booking-specific inputs (hair/makeup, notes) stored separately from profile</td><td>Not implemented</td><td>/booking/:id</td><td>Only free-text special requests in booking</td></tr>
+<tr><td>CUS-17</td><td>Guest-detail capture per booking line not required</td><td>Implemented (implicit)</td><td>/booking/:id, /cart</td><td>No per-guest detail UI present</td></tr>
+</tbody>
+</table>
+<h2>6.2 Admin requirements (ADM-01 to ADM-16)</h2>
+<table>
+<thead><tr><th>ID</th><th>MVP requirement</th><th>Prototype status</th><th>Evidence (routes/files)</th><th>Gap / Notes</th></tr></thead>
+<tbody>
+<tr><td>ADM-01</td><td>STT admin portal and dashboard</td><td>UI-only</td><td>/admin/dashboard</td><td>Mock data only</td></tr>
+<tr><td>ADM-02</td><td>Roles: Super Admin, Admin, Editor, Bookings &amp; Customer Manager</td><td>Partial</td><td>src/components/admin/AddUserModal.jsx</td><td>Only Super Admin and Venue Admin listed</td></tr>
+<tr><td>ADM-03</td><td>No merchant accounts/login/KYB/venue claim in MVP</td><td>Conflict with MVP</td><td>/merchant/*, /admin/merchants</td><td>Merchant portal and onboarding are present</td></tr>
+<tr><td>ADM-04</td><td>Venue creation/management</td><td>Partial</td><td>src/components/admin/AddVenueModal.jsx, /admin/venues/:venueId</td><td>No admin venue list route in App.jsx; management is incomplete</td></tr>
+<tr><td>ADM-05</td><td>Venue-level bank/payout details</td><td>Not implemented (admin)</td><td>/admin/system, /admin/payments</td><td>Banking exists in merchant settings instead</td></tr>
+<tr><td>ADM-06</td><td>One active global commission model (flat or percentage)</td><td>Partial</td><td>src/pages/admin/SystemSettings.jsx</td><td>Commission rate exists but no flat vs percentage mode</td></tr>
+<tr><td>ADM-07</td><td>Commission per booking line; manual payouts</td><td>Partial</td><td>/admin/payments</td><td>UI shows commission values; no per-line logic or payout workflow</td></tr>
+<tr><td>ADM-08</td><td>Event creation/editing with recurrence and lifecycle</td><td>Partial</td><td>/admin/events, src/components/admin/EditEventModal.jsx</td><td>Basic event editing only; no recurrence or occurrence handling</td></tr>
+<tr><td>ADM-09</td><td>Workflow states: Draft, Pending, Approved</td><td>Partial</td><td>/admin/approvals</td><td>Admin approvals exist as UI; not integrated with events/packages</td></tr>
+<tr><td>ADM-10</td><td>Venue-level package creation and package combinations</td><td>Not implemented (admin)</td><td>N/A</td><td>Only merchant package tools exist</td></tr>
+<tr><td>ADM-11</td><td>Event-level package rules, pricing, availability, payment mode, inventory</td><td>Not implemented (admin)</td><td>N/A</td><td>Merchant portal has UI for this, but admin does not</td></tr>
+<tr><td>ADM-12</td><td>Access booking, event, customer data</td><td>Partial</td><td>/admin/reports, /admin/analytics</td><td>Mock analytics; no operational data model</td></tr>
+<tr><td>ADM-13</td><td>Venue-scoped booking notifications/exports for mixed orders</td><td>Not implemented</td><td>N/A</td><td>No venue-scoped export tooling</td></tr>
+<tr><td>ADM-14</td><td>Customer analysis by booking/event/venue</td><td>Not implemented</td><td>/admin/analytics</td><td>Analytics is placeholder</td></tr>
+<tr><td>ADM-15</td><td>Venue-level FAQ management for reuse</td><td>Not implemented (admin)</td><td>/merchant/faqs</td><td>FAQ management exists in merchant portal only</td></tr>
+<tr><td>ADM-16</td><td>Required email integrations incl. admin notifications</td><td>Not implemented</td><td>N/A</td><td>No email system</td></tr>
+</tbody>
+</table>
+<h2>6.3 Category requirements (CAT-01 to CAT-02)</h2>
+<table>
+<thead><tr><th>ID</th><th>MVP requirement</th><th>Prototype status</th><th>Evidence</th><th>Gap / Notes</th></tr></thead>
+<tbody>
+<tr><td>CAT-01</td><td>Global categories managed by STT admins</td><td>Not implemented</td><td>N/A</td><td>No category management UI</td></tr>
+<tr><td>CAT-02</td><td>One primary category per event, multiple subcategories allowed</td><td>Not implemented</td><td>N/A</td><td>Event type exists but not a category model</td></tr>
+</tbody>
+</table>
+<h2>6.3 Event requirements (EVT-01 to EVT-12)</h2>
+<table>
+<thead><tr><th>ID</th><th>MVP requirement</th><th>Prototype status</th><th>Evidence</th><th>Gap / Notes</th></tr></thead>
+<tbody>
+<tr><td>EVT-01</td><td>One-off, daily, weekly, monthly, yearly recurrence</td><td>Partial</td><td>src/pages/merchant/CreateEventPage.jsx</td><td>Only one-time or recurring with days; no monthly/yearly patterns</td></tr>
+<tr><td>EVT-02</td><td>Configure date/day/time after choosing pattern</td><td>Partial</td><td>src/pages/merchant/CreateEventPage.jsx</td><td>Start/end dates and days for recurring; no detailed schedule types</td></tr>
+<tr><td>EVT-03</td><td>Single-occurrence edit/cancel/override with guardrails</td><td>Not implemented</td><td>N/A</td><td>No occurrence model</td></tr>
+<tr><td>EVT-04</td><td>Blackout dates for recurring events</td><td>Not implemented</td><td>N/A</td><td>No blackout UI</td></tr>
+<tr><td>EVT-05</td><td>Venue linked as organizer</td><td>Partial</td><td>/events/:id, /merchant/events/:id</td><td>Venue name shown; relationship is not admin-managed</td></tr>
+<tr><td>EVT-06</td><td>Ordered images and videos</td><td>Partial</td><td>/events/:id</td><td>Images present; no ordering or video management</td></tr>
+<tr><td>EVT-07</td><td>Event FAQs attach from venue FAQ set</td><td>Partial</td><td>/merchant/events/create</td><td>Merchant FAQ selection exists; not shown on customer event page</td></tr>
+<tr><td>EVT-08</td><td>SEO fields (meta title/description/slug/OG image)</td><td>Not implemented</td><td>N/A</td><td>No SEO fields in admin or merchant</td></tr>
+<tr><td>EVT-09</td><td>Open-ended recurring series without end date</td><td>Not implemented</td><td>/merchant/events/create</td><td>Recurrence end date is required</td></tr>
+<tr><td>EVT-10</td><td>Mark whole-event occurrence sold out</td><td>Not implemented</td><td>N/A</td><td>No occurrence-level availability</td></tr>
+<tr><td>EVT-11</td><td>Close whole-event occurrence without disabling packages</td><td>Not implemented</td><td>N/A</td><td>No event-level availability control</td></tr>
+<tr><td>EVT-12</td><td>Event-level availability overrides package availability</td><td>Not implemented</td><td>N/A</td><td>No availability logic</td></tr>
+</tbody>
+</table>
+<h2>6.3 Package requirements (PKG-01 to PKG-08)</h2>
+<table>
+<thead><tr><th>ID</th><th>MVP requirement</th><th>Prototype status</th><th>Evidence</th><th>Gap / Notes</th></tr></thead>
+<tbody>
+<tr><td>PKG-01</td><td>Base package fields: name, slug, package type, default guest count, base price</td><td>Partial</td><td>/merchant/packages/create, src/components/merchant/PackageTemplates.jsx</td><td>No slug; guest count and base price exist</td></tr>
+<tr><td>PKG-02</td><td>Package types Individual, Couple, Group with default guest counts</td><td>Partial</td><td>/merchant/packages/create, /merchant/events/create</td><td>Type exists but defaults not enforced</td></tr>
+<tr><td>PKG-03</td><td>Packages are venue-specific</td><td>Partial</td><td>MerchantContext event packages</td><td>No explicit multi-venue scoping logic</td></tr>
+<tr><td>PKG-04</td><td>Base package table separate from event-package config</td><td>Partial</td><td>MerchantContext packageTemplates + event packages</td><td>UI structure exists; no backend enforcement</td></tr>
+<tr><td>PKG-05</td><td>Same base package can vary by event/occurrence</td><td>Partial</td><td>MerchantContext mock events 101/102</td><td>Per-event rules exist; no per-occurrence overrides</td></tr>
+<tr><td>PKG-06</td><td>Package combinations/bundles</td><td>UI-only</td><td>/merchant/packages/create</td><td>No customer checkout usage</td></tr>
+<tr><td>PKG-07</td><td>Payment mode per event package</td><td>Not implemented</td><td>N/A</td><td>No full/deposit/no-upfront choice</td></tr>
+<tr><td>PKG-08</td><td>Deposit mode stores deposit and full amount</td><td>Not implemented</td><td>N/A</td><td>No deposit model</td></tr>
+</tbody>
+</table>
+<h2>6.3 Rule requirements (RULE-01 to RULE-02)</h2>
+<table>
+<thead><tr><th>ID</th><th>MVP requirement</th><th>Prototype status</th><th>Evidence</th><th>Gap / Notes</th></tr></thead>
+<tbody>
+<tr><td>RULE-01</td><td>Rules: Ladies, Gents, Kids, age-based, early-bird, time/day availability, availability/inventory constraints</td><td>Partial</td><td>src/components/merchant/RuleEngine.jsx</td><td>Gender + early bird + time slots exist; no age-based or day-based rules</td></tr>
+<tr><td>RULE-02</td><td>Multiple non-conflicting rules allowed and enforced</td><td>Not implemented</td><td>N/A</td><td>No rule conflict engine</td></tr>
+</tbody>
+</table>
+<h2>6.3 Inventory requirements (INV-01 to INV-08)</h2>
+<table>
+<thead><tr><th>ID</th><th>MVP requirement</th><th>Prototype status</th><th>Evidence</th><th>Gap / Notes</th></tr></thead>
+<tbody>
+<tr><td>INV-01</td><td>Inventory tracked per package per event occurrence</td><td>Not implemented</td><td>N/A</td><td>No occurrence model</td></tr>
+<tr><td>INV-02</td><td>Default event-package inventory inherited by occurrences</td><td>Not implemented</td><td>N/A</td><td>No default + override model</td></tr>
+<tr><td>INV-03</td><td>Override inventory per occurrence</td><td>Not implemented</td><td>N/A</td><td>No occurrence overrides</td></tr>
+<tr><td>INV-04</td><td>Mark package sold out/unavailable per occurrence</td><td>Not implemented</td><td>N/A</td><td>No sold-out state</td></tr>
+<tr><td>INV-05</td><td>Close package for date or stop selling after time</td><td>Not implemented</td><td>N/A</td><td>No cutoff or closure enforcement</td></tr>
+<tr><td>INV-06</td><td>Sold-out status is per occurrence only</td><td>Not implemented</td><td>N/A</td><td>No occurrence handling</td></tr>
+<tr><td>INV-07</td><td>Cart reserves stock for 1 hour (configurable)</td><td>Not implemented</td><td>N/A</td><td>No reservation holds</td></tr>
+<tr><td>INV-08</td><td>No automated shared-capacity engine required</td><td>Not implemented</td><td>N/A</td><td>Prototype has no inventory engine at all</td></tr>
+</tbody>
+</table>
+<h2>6.3 Booking requirements (BOOK-01 to BOOK-02)</h2>
+<table>
+<thead><tr><th>ID</th><th>MVP requirement</th><th>Prototype status</th><th>Evidence</th><th>Gap / Notes</th></tr></thead>
+<tbody>
+<tr><td>BOOK-01</td><td>Multi-quantity, multi-package, multi-event/venue within one order</td><td>Partial</td><td>/cart, /cart/checkout, src/context/CartContext.jsx</td><td>Cart supports multiple items; quantity tied to guest count</td></tr>
+<tr><td>BOOK-02</td><td>Guest-detail capture per booking line not required</td><td>Implemented (implicit)</td><td>/booking/:id</td><td>No per-guest fields</td></tr>
+</tbody>
+</table>
+<h2>6.4 Reporting and analytics (AN-01 to AN-05)</h2>
+<table>
+<thead><tr><th>ID</th><th>MVP requirement</th><th>Prototype status</th><th>Evidence</th><th>Gap / Notes</th></tr></thead>
+<tbody>
+<tr><td>AN-01</td><td>Revenue reports by day/month/year</td><td>UI-only</td><td>/admin/analytics, /admin/reports</td><td>Mock data only</td></tr>
+<tr><td>AN-02</td><td>Booked events reports by day/month/year</td><td>UI-only</td><td>/admin/analytics, /admin/reports</td><td>Mock data only</td></tr>
+<tr><td>AN-03</td><td>Customer analytics views</td><td>UI-only</td><td>/admin/analytics</td><td>Mock data only</td></tr>
+<tr><td>AN-04</td><td>Venue analytics views</td><td>UI-only</td><td>/admin/analytics</td><td>Mock data only</td></tr>
+<tr><td>AN-05</td><td>Inspect customer info by booking/event/venue</td><td>Not implemented</td><td>N/A</td><td>No joined analytics model</td></tr>
+</tbody>
+</table>
+<h2>Domain model alignment (from Section 7)</h2>
+<table>
+<thead><tr><th>Domain object</th><th>MVP intent</th><th>Prototype status</th><th>Evidence / Notes</th></tr></thead>
+<tbody>
+<tr><td>User / Account</td><td>Customer + admin accounts</td><td>Partial</td><td>AuthContext supports customer only; admin users are UI-only</td></tr>
+<tr><td>Admin Role</td><td>RBAC roles</td><td>Partial</td><td>Only Super Admin and Venue Admin in UI</td></tr>
+<tr><td>Venue</td><td>Operational unit</td><td>Partial</td><td>Merchant onboarding uses venue info; admin venue list missing</td></tr>
+<tr><td>Venue Payout Profile</td><td>Venue-owned payout info</td><td>Partial</td><td>Merchant settings capture banking; admin does not</td></tr>
+<tr><td>Platform Commission Configuration</td><td>Single active commission rule</td><td>Partial</td><td>SystemSettings commissionRate only</td></tr>
+<tr><td>Global Category</td><td>Admin-managed taxonomy</td><td>Not implemented</td><td>No category management UI</td></tr>
+<tr><td>Event</td><td>Marketable listing</td><td>Implemented (UI)</td><td>MerchantContext + customer event pages</td></tr>
+<tr><td>Event Occurrence</td><td>Date/time instances</td><td>Not implemented</td><td>No occurrence model</td></tr>
+<tr><td>Venue FAQ / FAQ Item</td><td>Reusable FAQ set</td><td>Partial</td><td>Merchant FAQ UI exists; not used in customer event</td></tr>
+<tr><td>Package</td><td>Base package catalog</td><td>Partial</td><td>Package templates exist; no admin catalog</td></tr>
+<tr><td>Package Combination</td><td>Bundles</td><td>UI-only</td><td>Merchant create package UI</td></tr>
+<tr><td>Event Package</td><td>Event-specific package config</td><td>Partial</td><td>Event packages in MerchantContext</td></tr>
+<tr><td>Event Package Occurrence Override</td><td>Occurrence exceptions</td><td>Not implemented</td><td>No occurrence model</td></tr>
+<tr><td>Pricing Rule / Discount</td><td>Rule engine and discounts</td><td>Partial</td><td>RuleEngine UI + promotions UI; no checkout enforcement</td></tr>
+<tr><td>Inventory Record</td><td>Occurrence-level inventory</td><td>Not implemented</td><td>No inventory model</td></tr>
+<tr><td>Cart</td><td>Multi-event cart</td><td>Implemented (UI)</td><td>CartContext + CartPage</td></tr>
+<tr><td>Booking / Order</td><td>Customer order outcome</td><td>Partial</td><td>BookingContext stores bookings; no multi-line order object</td></tr>
+<tr><td>Booking Line</td><td>Per-package line items</td><td>Not implemented</td><td>Bookings are single-line records</td></tr>
+<tr><td>Payment</td><td>Stripe payment record</td><td>Not implemented</td><td>UI-only payment form</td></tr>
+<tr><td>Customer Profile</td><td>Reusable identity data</td><td>Partial</td><td>Basic name/email/phone only</td></tr>
+<tr><td>Customer Address</td><td>Residence data</td><td>Not implemented</td><td>No address model</td></tr>
+<tr><td>Booking Customer Detail</td><td>Booking-time inputs</td><td>Partial</td><td>specialRequests only</td></tr>
+<tr><td>Receipt / E-ticket</td><td>Post-purchase artifact</td><td>Not implemented</td><td>No receipt/e-ticket storage</td></tr>
+<tr><td>Notification / Email Log</td><td>System email log</td><td>Not implemented</td><td>No notification system</td></tr>
+</tbody>
+</table>
+<h2>API and service boundary alignment (Section 8)</h2>
+<p>All API layers described in the MVP are not implemented in the prototype because there is no backend. The prototype provides only UI surfaces for some of the domains.</p>
+<ul>
+<li>Identity &amp; Access: UI-only (AuthPage, AuthContext).</li>
+<li>Customer Profile &amp; Address: UI-only (ProfilePage).</li>
+<li>Catalog: UI-only (EventsPage, VenuesPage, EventDetailsPage).</li>
+<li>Package &amp; Pricing: UI-only (Merchant package templates and rule UI).</li>
+<li>Occurrence &amp; Inventory: Not implemented.</li>
+<li>Cart &amp; Booking: UI-only (CartContext, BookingContext).</li>
+<li>Payments &amp; Payouts: UI-only (BookingPage, CartCheckoutPage, admin payments pages).</li>
+<li>Notifications: Not implemented.</li>
+<li>Reporting: UI-only (admin analytics/reports pages).</li>
+</ul>
+<h2>Non-functional requirements (Section 9)</h2>
+<ul>
+<li>Extensible for future merchant portal: Partial. Prototype already includes merchant portal, but no venue-claim model.</li>
+<li>Referential integrity across venue/event/occurrence/package/booking/payment: Not implemented.</li>
+<li>Transaction-safe inventory updates: Not implemented.</li>
+<li>Stripe webhook as payment source of truth: Not implemented.</li>
+<li>Auditable admin actions: Not implemented.</li>
+<li>Structured recurrence/occurrence with default + overrides: Not implemented.</li>
+<li>Manual sold-out/unavailable controls at package and event level: Not implemented.</li>
+<li>Reporting uses normalized data: Not implemented.</li>
+<li>Event-driven email integrations with failure logging: Not implemented.</li>
+<li>Venue data isolation in mixed-venue orders: Not implemented.</li>
+<li>Mixed-payment orders with per-line tracking: Not implemented.</li>
+<li>Commission per booking line with manual payouts: Not implemented.</li>
+</ul>
+<h2>MVP exclusions (Section 10) vs prototype</h2>
+<ul>
+<li>Merchant self-service portal and login: Out of scope but present (/merchant/*).</li>
+<li>Merchant onboarding, KYB, business-license collection: Out of scope but present (merchant onboarding, settings, trade license upload UI).</li>
+<li>Venue claim flow: Out of scope and not present.</li>
+<li>Premium customer plans: Out of scope but present (/premium).</li>
+<li>Rewards / referrals: Out of scope but present (Profile rewards UI).</li>
+<li>Customer reviews: Out of scope but present (/review/:bookingId, reviews in event details).</li>
+<li>Advertising / ads manager: Out of scope but present (/merchant/advertising, /merchant/promotions).</li>
+<li>Community / forum / messaging: Out of scope and not present.</li>
+<li>Native app / in-app notifications: Out of scope and not present.</li>
+<li>Refund-status view: Out of scope and not present.</li>
+<li>Merchant analytics: Out of scope but present (/merchant/analytics).</li>
+<li>Automated shared-capacity optimizer: Out of scope and not present.</li>
+</ul>
+<h2>Remaining implementation decisions (Section 11)</h2>
+<p>The prototype does not address any of the open decision areas in the MVP document.</p>
+<ul>
+<li>Rule conflict precedence: Not defined.</li>
+<li>Recurring occurrence materialization horizon: Not defined.</li>
+<li>Cancellation request policy (cutoffs/refund behavior): Not defined.</li>
+<li>Customer churn definition: Not defined.</li>
+<li>Media handling method (upload vs embed): Not defined.</li>
+<li>Accessibility data structure (free text vs structured): Not defined.</li>
+<li>Advanced shared-capacity policy (future): Not defined.</li>
+</ul>
+<h2>Key mismatches and gaps to highlight</h2>
+<ul>
+<li>The MVP is admin-first and venue-first with no merchant portal. The prototype is merchant-centric and includes onboarding, settings, and plans.</li>
+<li>Recurrence, occurrence-level inventory, and availability are central MVP requirements but are not implemented in the prototype.</li>
+<li>Mixed payment modes, deposit handling, and Stripe payment workflows are not implemented.</li>
+<li>Customer data capture requirements (DOB, nationality, residency, WhatsApp, Teacher/Cabin Crew) are missing.</li>
+<li>Global categories, SEO fields, and reusable FAQs are missing or only present in merchant UI.</li>
+<li>Venue-scoped privacy for multi-venue orders is not implemented.</li>
+</ul>
+<h2>Summary</h2>
+<p>The prototype demonstrates a strong UI foundation for discovery, booking, cart, and a full merchant portal. However, the MVP document is explicitly admin-first with deeper recurrence, inventory, and rule engine requirements that are largely absent from the prototype. The largest alignment risk is the mismatch between the MVP operating model (admin-only venue setup) and the prototype's merchant self-service model. The next alignment step is to either scope the prototype as "post-MVP" or add admin-first workflows with occurrence-level inventory, payment-mode handling, and complete customer data capture.</p>
+</body></html>
+
